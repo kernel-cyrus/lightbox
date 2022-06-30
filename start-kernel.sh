@@ -1,4 +1,4 @@
-KERNEL="../codebase/android-12/kernel-5.10/"
+KERNEL="../codebase/android-13/kernel-5.15/"
 INITRD="./prebuilts/rootfs/initrd_aarch64.cpio.gz"
 
 for i in "$@"; do
@@ -18,7 +18,7 @@ for i in "$@"; do
     esac
 done
 
-KERNEL_VERSION=android12-5.10
+KERNEL_VERSION=android13-5.15
 
 KERNEL_PATH=$(cd ${KERNEL}; pwd)
 
