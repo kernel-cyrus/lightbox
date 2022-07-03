@@ -75,7 +75,7 @@ ${QEMU_EXEC}                    \
  -serial stdio                  \
  -display none                  \
  -gdb tcp::${DEBUG_PORT}        \
- -S -append nokaslr
+ -S -append "earlycon=pl011,0x9000000 nokaslr"
 
 if [ $DEBUGGER == "gdb" ]; then
 
