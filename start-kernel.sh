@@ -97,6 +97,7 @@ elif [ $DEBUGGER == "ddd" ]; then
 
     rm -f ${DDD_SCRIPT}
     touch ${DDD_SCRIPT}
+
     echo "add-auto-load-safe-path ${KERNEL_SCRIPTS}" >> ${DDD_SCRIPT}
     echo "set confirm off" >> ${DDD_SCRIPT}
     echo "file ${KERNEL_VMLINUX}" >> ${DDD_SCRIPT}
@@ -106,6 +107,8 @@ elif [ $DEBUGGER == "ddd" ]; then
     echo "continue" >> ${DDD_SCRIPT}
 
     (cd ${KERNEL_SOURCE}; ddd --debugger ${GDB_EXEC} --command ${DDD_SCRIPT})
+
+    rm -f ${DDD_SCRIPT}
 fi
 
 killall qemu-system-aarch64
