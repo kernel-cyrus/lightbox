@@ -69,6 +69,12 @@ sudo apt install ddd
 ./start-kernel --kernel=<kernel source path> --with=ddd
 ```
 
+**Run with your own initramfs image**
+
+```
+./start-kernel --kernel=<kernel source path> --initrd=<initramfs image path>
+```
+
 Start Android Common Kernel
 -----------------------------
 
@@ -103,4 +109,10 @@ BUILD_CONFIG=common/build.config.lightbox build/build.sh
 ```
 sudo apt install ddd
 ./start-kernel --kernel=<kernel repo path> --with=ddd
+```
+
+**Run with your own initramfs image**
+
+```
+./start-kernel --kernel=<kernel repo path> --initrd=<initramfs image path>
 ```
