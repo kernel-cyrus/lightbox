@@ -8,7 +8,7 @@ All the stuff are intergrated and configured ready to run.
 The envionment include:
 - prebuilt aarch64 qemu excutables
 - prebuilt aarch64 gdb with tui enabled
-- prebuilt aarch64 busybox rootfs
+- prebuilt aarch64 initramfs image
 - support running with linux kernel
 - support running with android common kernel
 - support debug with gdb for aarch64
