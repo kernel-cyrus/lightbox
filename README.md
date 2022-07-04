@@ -3,6 +3,8 @@ Lightbox
 
 An aarch64 qemu running and debug environment for both linux and android common kernel.
 
+All the stuff are intergrated and configured ready to run.
+
 The envionment include:
 - prebuilt aarch64 qemu excutables
 - prebuilt aarch64 gdb with tui enabled
@@ -12,11 +14,9 @@ The envionment include:
 - support debug with gdb for aarch64
 - support debug with ddd for aarch64
 
-Anything needed are intergrated into the environment.
+You can start running and debugging the kernel with gdb or ddd just by the `start-kernel.sh` script.
 
-You can start running and debugging the kernel with gdb or ddd just by `start-kernel.sh`
-
-Download lightbox
+Download Lightbox
 -----------------------------
 
 ```
