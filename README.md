@@ -16,7 +16,7 @@ The envionment include:
 
 You can start running and debugging the kernel with gdb or ddd just by the `start-kernel.sh` script.
 
-My Running Host: x86 PC + Ubuntu 20.04
+Host Environment: x86 PC + Ubuntu 20.04
 
 Download Lightbox
 -----------------------------
