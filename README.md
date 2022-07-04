@@ -1,7 +1,7 @@
 Lightbox
 =============================
 
-An aarch64 qemu running and debug environment for both android common kernel and linux kernel.
+An aarch64 qemu running and debug environment for both linux and android common kernel.
 
 The envionment include:
 - prebuilt aarch64 qemu excutables
