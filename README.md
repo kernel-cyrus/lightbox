@@ -18,13 +18,17 @@ You can start running and debugging the kernel with gdb or ddd just by the `star
 
 Host Environment: x86 PC + Ubuntu 20.04
 
-## Download Lightbox
+
+Download Lightbox
+-----------------------------
 
 ```
 git clone https://github.com/kernel-cyrus/lightbox.git
 ```
 
-## Command Format
+
+Command Format
+-----------------------------
 
 ```
 ./start-kernel.sh
@@ -33,8 +37,9 @@ git clone https://github.com/kernel-cyrus/lightbox.git
     --with=<gdb or ddd>
 ```
 
-## Start Linux Kernel
 
+Start Linux Kernel
+-----------------------------
 
 **Download linux kernel**
 ```
@@ -64,7 +69,9 @@ sudo apt install ddd
 ./start-kernel --kernel=<kernel source path> --initrd=<initramfs image path>
 ```
 
-## Start Android Common Kernel
+
+Start Android Common Kernel
+-----------------------------
 
 **Download android common kernel**
 ```
