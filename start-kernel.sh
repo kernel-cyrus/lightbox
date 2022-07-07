@@ -1,6 +1,7 @@
 KERNEL=""
 INITRD=$(realpath ./prebuilts/rootfs/initrd_aarch64.cpio.gz)
 DEBUGGER="gdb"
+BOOTARGS=""
 
 for i in "$@"; do
     case $i in
@@ -14,6 +15,10 @@ for i in "$@"; do
             ;;
         -with=*|--with=*)
             DEBUGGER="${i#*=}"
+            shift # past argument=value
+            ;;
+        -append=*|--append=*)
+            BOOTARGS="${i#*=}"
             shift # past argument=value
             ;;
         *)
@@ -75,7 +80,7 @@ ${QEMU_EXEC}                    \
  -serial stdio                  \
  -display none                  \
  -gdb tcp::${DEBUG_PORT}        \
- -S -append "earlycon=pl011,0x9000000 nokaslr"
+ -S -append "${BOOTARGS} earlycon=pl011,0x9000000 nokaslr"
 
 if [ $DEBUGGER == "gdb" ]; then
 
