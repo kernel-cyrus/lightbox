@@ -20,17 +20,21 @@ Host Environment: x86 PC + Ubuntu 20.04
 
 Download Lightbox
 -----------------------------
+
 ```
 git clone https://github.com/kernel-cyrus/lightbox.git
 ```
+
 Command Format
 -----------------------------
+
 ```
 ./start-kernel.sh
     --kernel=<kernel source root path>
     --initrd=<initrd file path>
     --with=<gdb or ddd>
 ```
+
 Start Linux Kernel
 -----------------------------
 
@@ -61,6 +65,7 @@ sudo apt install ddd
 ```
 ./start-kernel --kernel=<kernel source path> --initrd=<initramfs image path>
 ```
+
 Start Android Common Kernel
 -----------------------------
 
