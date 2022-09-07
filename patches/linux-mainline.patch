@@ -1316,3 +1316,38 @@ index 000000000000..bfefbe75a0da
 +# CONFIG_DEBUG_PREEMPT is not set
 +# CONFIG_FTRACE is not set
 +CONFIG_MEMTEST=y
+diff --git a/build.sh b/build.sh
+new file mode 100644
+index 000000000000..ee60fcfe72f9
+--- /dev/null
++++ b/build.sh
+@@ -0,0 +1,4 @@
++export ARCH=arm64
++export CROSS_COMPILE=aarch64-linux-gnu-
++make lightbox_defconfig
++make -j48 Image
+diff --git a/config.sh b/config.sh
+new file mode 100644
+index 000000000000..e14291256233
+--- /dev/null
++++ b/config.sh
+@@ -0,0 +1,6 @@
++export ARCH=arm64
++export CROSS_COMPILE=aarch64-linux-gnu-
++make lightbox_defconfig
++make menuconfig
++make savedefconfig
++mv defconfig arch/arm64/configs/lightbox_defconfig
+diff --git a/drivers/Makefile b/drivers/Makefile
+index 9a30842b22c5..1a6d7a80a153 100644
+--- a/drivers/Makefile
++++ b/drivers/Makefile
+@@ -6,6 +6,8 @@
+ # Rewritten to use lists instead of if-statements.
+ #
+ 
++obj-y				+= test-modules/
++
+ obj-y				+= irqchip/
+ obj-y				+= bus/
+ 
