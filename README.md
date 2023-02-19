@@ -9,9 +9,7 @@ You can start to run and debug the linux kernel from the very first assembly cod
 
 ![Snapshot](https://raw.githubusercontent.com/kernel-cyrus/lightbox/master/snapshots/snapshot.png)
 
-Both linux kernel and android common kernel are supported.
-
-You can choose to use gdb-tui or ddd as the debugger's front-end.
+Both linux kernel and android common kernel are supported, and you can choose to use gdb-tui or ddd as the debugger's front-end.
 
 The envionment include:
 - prebuilt aarch64 qemu excutables
