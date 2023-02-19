@@ -36,12 +36,12 @@ Build Linux Kernel
 ```
 git clone https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 ```
-**Apply a patch to enable debug info**
+**Apply a patch**
 ```
 cd linux
 git apply .../lightbox/patches/linux-mainline.patch
 ```
-**Build linux kernel**
+**Build the kernel**
 ```
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make lightbox_defconfig
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make Image scripts_gdb
@@ -55,12 +55,12 @@ Build Android Common Kernel
 repo init -u https://android.googlesource.com/kernel/manifest -b common-android-mainline
 repo sync
 ```
-**Apply a patch to enable debug info**
+**Apply a patch**
 ```
 cd common
 git apply .../lightbox/patches/android-mainline.patch
 ```
-**Build kernel**
+**Build the kernel**
 ```
 BUILD_CONFIG=common/build.config.lightbox build/build.sh
 ```
