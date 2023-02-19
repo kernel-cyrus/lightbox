@@ -1,9 +1,17 @@
 Lightbox
 =============================
 
-An aarch64 qemu based kernel running and debug environment for both linux and android common kernel.
+Lightbox is an aarch64 qemu based kernel running and debug environment for the linux kernel.
 
-All the stuff are intergrated and configured ready to run.
+Everything is intergrated and configured ready to run.
+
+You can start to run and debug the linux kernel from the very first assembly code just with the `start-kernel.sh` script.
+
+![Snapshot](https://raw.githubusercontent.com/kernel-cyrus/lightbox/master/snapshots/snapshot.png)
+
+Both linux kernel and android common kernel are supported.
+
+You can choose to use gdb-tui or ddd as the debugger's front-end.
 
 The envionment include:
 - prebuilt aarch64 qemu excutables
@@ -14,9 +22,7 @@ The envionment include:
 - support debug with gdb for aarch64
 - support debug with ddd for aarch64
 
-You can start running and debugging the kernel with gdb or ddd just by the `start-kernel.sh` script.
-
-Host Environment: x86 PC + Ubuntu 20.04
+Host environment tested: x86 PC + Ubuntu 20.04
 
 Download Lightbox
 -----------------------------
