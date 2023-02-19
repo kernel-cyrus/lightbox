@@ -29,7 +29,7 @@ Download Lightbox
 git clone https://github.com/kernel-cyrus/lightbox.git
 ```
 
-Prepare Linux Kernel
+Build Linux Kernel
 -----------------------------
 
 **Download linux kernel**
@@ -47,7 +47,7 @@ ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make lightbox_defconfig
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make Image scripts_gdb
 ```
 
-Prepare Android Common Kernel
+Build Android Common Kernel
 -----------------------------
 
 **Download android common kernel**
