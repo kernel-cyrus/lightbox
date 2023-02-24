@@ -13,10 +13,10 @@ index 8973b285ce6c..a1c4cbc6f0ea 100644
  		   -Werror=implicit-function-declaration -Werror=implicit-int \
 diff --git a/arch/arm64/configs/lightbox_defconfig b/arch/arm64/configs/lightbox_defconfig
 new file mode 100644
-index 000000000000..bfefbe75a0da
+index 000000000000..0dda0f68acab
 --- /dev/null
 +++ b/arch/arm64/configs/lightbox_defconfig
-@@ -0,0 +1,1299 @@
+@@ -0,0 +1,1307 @@
 +CONFIG_SYSVIPC=y
 +CONFIG_POSIX_MQUEUE=y
 +CONFIG_AUDIT=y
@@ -45,7 +45,6 @@ index 000000000000..bfefbe75a0da
 +CONFIG_CGROUP_BPF=y
 +CONFIG_USER_NS=y
 +CONFIG_SCHED_AUTOGROUP=y
-+CONFIG_BLK_DEV_INITRD=y
 +CONFIG_KALLSYMS_ALL=y
 +CONFIG_PROFILING=y
 +CONFIG_ARCH_ACTIONS=y
@@ -138,6 +137,7 @@ index 000000000000..bfefbe75a0da
 +CONFIG_CRYPTO_AES_ARM64_CE_BLK=y
 +CONFIG_CRYPTO_CHACHA20_NEON=m
 +CONFIG_CRYPTO_AES_ARM64_BS=m
++CONFIG_KPROBES=y
 +CONFIG_JUMP_LABEL=y
 +CONFIG_MODULES=y
 +CONFIG_MODULE_UNLOAD=y
@@ -1312,20 +1312,28 @@ index 000000000000..bfefbe75a0da
 +CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
 +CONFIG_MAGIC_SYSRQ=y
 +CONFIG_DEBUG_FS=y
-+# CONFIG_SCHED_DEBUG is not set
++CONFIG_SCHEDSTATS=y
 +# CONFIG_DEBUG_PREEMPT is not set
-+# CONFIG_FTRACE is not set
++CONFIG_BOOTTIME_TRACING=y
++CONFIG_FUNCTION_PROFILER=y
++CONFIG_STACK_TRACER=y
++CONFIG_IRQSOFF_TRACER=y
++CONFIG_PREEMPT_TRACER=y
++CONFIG_SCHED_TRACER=y
++CONFIG_FTRACE_SYSCALLS=y
++CONFIG_HIST_TRIGGERS=y
++CONFIG_TRACE_EVENT_INJECT=y
 +CONFIG_MEMTEST=y
 diff --git a/build.sh b/build.sh
 new file mode 100644
-index 000000000000..ee60fcfe72f9
+index 000000000000..7d90c3562478
 --- /dev/null
 +++ b/build.sh
 @@ -0,0 +1,4 @@
 +export ARCH=arm64
 +export CROSS_COMPILE=aarch64-linux-gnu-
 +make lightbox_defconfig
-+make -j48 Image
++make -j24 Image
 diff --git a/config.sh b/config.sh
 new file mode 100644
 index 000000000000..e14291256233
@@ -1338,16 +1346,3 @@ index 000000000000..e14291256233
 +make menuconfig
 +make savedefconfig
 +mv defconfig arch/arm64/configs/lightbox_defconfig
-diff --git a/drivers/Makefile b/drivers/Makefile
-index 9a30842b22c5..1a6d7a80a153 100644
---- a/drivers/Makefile
-+++ b/drivers/Makefile
-@@ -6,6 +6,8 @@
- # Rewritten to use lists instead of if-statements.
- #
- 
-+obj-y				+= test-modules/
-+
- obj-y				+= irqchip/
- obj-y				+= bus/
- 
