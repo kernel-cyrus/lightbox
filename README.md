@@ -1,9 +1,15 @@
 Lightbox
 =============================
 
-An aarch64 qemu based kernel running and debug environment for both linux and android common kernel.
+Lightbox is an aarch64 qemu based kernel running and debug environment for the linux kernel.
 
-All the stuff are intergrated and configured ready to run.
+Everything is intergrated and configured ready to run.
+
+You can start to run and debug the linux kernel from the very first assembly code just with the `start-kernel.sh` script.
+
+![Snapshot](https://raw.githubusercontent.com/kernel-cyrus/lightbox/master/snapshots/snapshot.png)
+
+Both linux kernel and android common kernel are supported, and you can choose to use gdb-tui or ddd as the debugger's front-end.
 
 The envionment include:
 - prebuilt aarch64 qemu excutables
@@ -14,9 +20,7 @@ The envionment include:
 - support debug with gdb for aarch64
 - support debug with ddd for aarch64
 
-You can start running and debugging the kernel with gdb or ddd just by the `start-kernel.sh` script.
-
-Host Environment: x86 PC + Ubuntu 20.04
+Host environment tested: x86 PC + Ubuntu 20.04
 
 Download Lightbox
 -----------------------------
@@ -25,48 +29,25 @@ Download Lightbox
 git clone https://github.com/kernel-cyrus/lightbox.git
 ```
 
-Command Format
------------------------------
-
-```
-./start-kernel.sh
-    --kernel=<kernel source root path>
-    --initrd=<initrd file path>
-    --with=<gdb or ddd>
-```
-
-Start Linux Kernel
+Build Linux Kernel
 -----------------------------
 
 **Download linux kernel**
 ```
 git clone https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 ```
-**Apply a patch to enable debug info**
+**Apply a patch**
 ```
 cd linux
 git apply .../lightbox/patches/linux-mainline.patch
 ```
-**Build linux kernel**
+**Build the kernel**
 ```
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make lightbox_defconfig
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make Image scripts_gdb
 ```
-**Run kernel with gdb**
-```
-./start-kernel --kernel=<kernel source path> --with=gdb
-```
-**Run kernel with ddd**
-```
-sudo apt install ddd
-./start-kernel --kernel=<kernel source path> --with=ddd
-```
-**Run with your own initramfs image**
-```
-./start-kernel --kernel=<kernel source path> --initrd=<initramfs image path>
-```
 
-Start Android Common Kernel
+Build Android Common Kernel
 -----------------------------
 
 **Download android common kernel**
@@ -74,25 +55,48 @@ Start Android Common Kernel
 repo init -u https://android.googlesource.com/kernel/manifest -b common-android-mainline
 repo sync
 ```
-**Apply a patch to enable debug info**
+**Apply a patch**
 ```
 cd common
 git apply .../lightbox/patches/android-mainline.patch
 ```
-**Build kernel**
+**Build the kernel**
 ```
 BUILD_CONFIG=common/build.config.lightbox build/build.sh
 ```
+
+Start Kernel
+-----------------------------
+
+**Command Format**
+```
+./start-kernel.sh
+    --kernel=<kernel dir>           # kernel repo dir
+    --initrd=<initrd file path>     # initrd file path
+    --with=<"gdb" or "ddd">         # use gdb or ddd as debugger
+    --append=<kernel cmdline>       # append extra cmdline
+```
 **Run kernel with gdb**
 ```
-./start-kernel --kernel=<kernel repo path> --with=gdb
+./start-kernel --kernel=<kernel_dir> --with=gdb
 ```
 **Run kernel with ddd**
 ```
 sudo apt install ddd
-./start-kernel --kernel=<kernel repo path> --with=ddd
+./start-kernel --kernel=<kernel_dir> --with=ddd
 ```
 **Run with your own initramfs image**
 ```
-./start-kernel --kernel=<kernel repo path> --initrd=<initramfs image path>
+./start-kernel --kernel=<kernel_dir> --initrd=<initramfs_file_path>
 ```
+**Customize kernel cmdline**
+```
+./start-kernel --kernel=<kernel_dir> --append="earlycon"
+```
+
+Contact
+-----------------------------
+
+Author: Cyrus Huang
+
+Github: <https://github.com/kernel-cyrus/lightbox>
