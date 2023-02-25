@@ -2,6 +2,7 @@ KERNEL=""
 INITRD=$(realpath ./prebuilts/rootfs/initrd_aarch64.cpio.gz)
 DEBUGGER="gdb"
 BOOTARGS=""
+SHARE_FOLDER=$(realpath ./host-share)
 
 for i in "$@"; do
     case $i in
@@ -19,6 +20,10 @@ for i in "$@"; do
             ;;
         -append=*|--append=*)
             BOOTARGS="${i#*=}"
+            shift # past argument=value
+            ;;
+        -share=*|--share=*)
+            SHARE_FOLDER="${i#*=}"
             shift # past argument=value
             ;;
         *)
@@ -65,9 +70,10 @@ fi
 GDB_DIR=$(cd ./prebuilts/gdb; pwd)
 GDB_EXEC=${GDB_DIR}/usr/local/bin/aarch64-linux-gnu-gdb
 GDB_DATA=${GDB_DIR}/usr/local/share/gdb
-QEMU_EXEC=$(realpath ./prebuilts/qemu/usr/local/bin/qemu-system-aarch64)
+QEMU_EXEC=$(realpath ./prebuilts/qemu/bin/qemu-system-aarch64)
 INITRD_PATH=$(realpath ${INITRD})
 DEBUG_PORT=$((10000 + $RANDOM % 10000))
+SHARE_PARAM="-fsdev local,security_model=passthrough,id=fsdev0,path=$(realpath ${SHARE_FOLDER}) -device virtio-9p-device,id=fs0,fsdev=fsdev0,mount_tag=hostshare"
 
 gnome-terminal --               \
 ${QEMU_EXEC}                    \
@@ -77,6 +83,7 @@ ${QEMU_EXEC}                    \
  -smp 4                         \
  -initrd ${INITRD_PATH}         \
  -kernel ${KERNEL_IMAGE}        \
+ ${SHARE_PARAM}                 \
  -serial stdio                  \
  -display none                  \
  -gdb tcp::${DEBUG_PORT}        \

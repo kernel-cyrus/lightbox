@@ -1,0 +1,31 @@
+{
+    "description": "UEFI firmware for aarch64",
+    "interface-types": [
+        "uefi"
+    ],
+    "mapping": {
+        "device": "flash",
+        "executable": {
+            "filename": "/mnt/workspace/third-party/qemu/output/share/qemu/edk2-aarch64-code.fd",
+            "format": "raw"
+        },
+        "nvram-template": {
+            "filename": "/mnt/workspace/third-party/qemu/output/share/qemu/edk2-arm-vars.fd",
+            "format": "raw"
+        }
+    },
+    "targets": [
+        {
+            "architecture": "aarch64",
+            "machines": [
+                "virt-*"
+            ]
+        }
+    ],
+    "features": [
+        "verbose-static"
+    ],
+    "tags": [
+
+    ]
+}
