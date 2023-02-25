@@ -72,11 +72,11 @@ Start Kernel
 **Command Format**
 ```
 ./start-kernel.sh
-    --kernel=<kernel dir>           # kernel repo dir
-    --initrd=<initrd file path>     # initrd file path "./prebuilts/rootfs/initrd_aarch64.cpio.gz"
-    --with=<"gdb" or "ddd">         # use gdb or ddd as debugger
-    --append=<kernel cmdline>       # append extra cmdline
-    --share=<share folder path>     # host share folder,     default:"./host-share"
+    --kernel=<kernel dir>           # kernel repo dir            (REQUIRED)
+    --initrd=<initrd file path>     # initrd file                (OPTIONAL)
+    --with=<"gdb" or "ddd">         # use gdb or ddd as debugger (OPTIONAL)
+    --append=<kernel cmdline>       # append extra cmdline       (OPTIONAL)
+    --share=<share folder path>     # host share folder          (OPTIONAL)
 ```
 **Run kernel with gdb**
 ```
@@ -96,7 +96,11 @@ sudo apt install ddd
 ./start-kernel --kernel=<kernel_dir> --append="earlycon"
 ```
 **Share host files**
-The default
+
+The default share folder is "./host-share", and it will be automatically mounted when guest os bootup.
+
+You can also use a custom share folder:
+
 ```
 ./start-kernel --kernel=<kernel_dir> --share="./host-share"
 ```
