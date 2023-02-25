@@ -19,6 +19,7 @@ The envionment include:
 - support running with android common kernel
 - support debug with gdb for aarch64
 - support debug with ddd for aarch64
+- support 9pfs share folder
 
 Host environment tested: x86 PC + Ubuntu 20.04
 
@@ -72,9 +73,10 @@ Start Kernel
 ```
 ./start-kernel.sh
     --kernel=<kernel dir>           # kernel repo dir
-    --initrd=<initrd file path>     # initrd file path
+    --initrd=<initrd file path>     # initrd file path "./prebuilts/rootfs/initrd_aarch64.cpio.gz"
     --with=<"gdb" or "ddd">         # use gdb or ddd as debugger
     --append=<kernel cmdline>       # append extra cmdline
+    --share=<share folder path>     # host share folder,     default:"./host-share"
 ```
 **Run kernel with gdb**
 ```
@@ -92,6 +94,11 @@ sudo apt install ddd
 **Customize kernel cmdline**
 ```
 ./start-kernel --kernel=<kernel_dir> --append="earlycon"
+```
+**Share host files**
+The default
+```
+./start-kernel --kernel=<kernel_dir> --share="./host-share"
 ```
 
 Contact
