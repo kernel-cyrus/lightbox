@@ -1,7 +1,8 @@
 KERNEL=""
 INITRD=$(realpath ./prebuilts/rootfs/initrd_aarch64.cpio.gz)
+DTB=$(realpath ./prebuilts/dts/lightbox.dtb)
+CMDLINE=""
 DEBUGGER="gdb"
-BOOTARGS=""
 SHARE_FOLDER=$(realpath ./host-share)
 
 for i in "$@"; do
@@ -19,7 +20,7 @@ for i in "$@"; do
             shift # past argument=value
             ;;
         -append=*|--append=*)
-            BOOTARGS="${i#*=}"
+            CMDLINE="${i#*=}"
             shift # past argument=value
             ;;
         -share=*|--share=*)
@@ -72,6 +73,7 @@ GDB_EXEC=${GDB_DIR}/usr/local/bin/aarch64-linux-gnu-gdb
 GDB_DATA=${GDB_DIR}/usr/local/share/gdb
 QEMU_EXEC=$(realpath ./prebuilts/qemu/bin/qemu-system-aarch64)
 INITRD_PATH=$(realpath ${INITRD})
+DTB_PATH=$(realpath ${DTB})
 DEBUG_PORT=$((10000 + $RANDOM % 10000))
 SHARE_PARAM="-fsdev local,security_model=passthrough,id=fsdev0,path=$(realpath ${SHARE_FOLDER}) -device virtio-9p-device,id=fs0,fsdev=fsdev0,mount_tag=hostshare"
 
@@ -80,14 +82,15 @@ ${QEMU_EXEC}                    \
  -machine virt                  \
  -cpu cortex-a72                \
  -m 1024                        \
- -smp 4                         \
+ -smp 8                         \
+ -dtb ${DTB_PATH}               \
  -initrd ${INITRD_PATH}         \
  -kernel ${KERNEL_IMAGE}        \
  ${SHARE_PARAM}                 \
  -serial stdio                  \
  -display none                  \
  -gdb tcp::${DEBUG_PORT}        \
- -S -append "${BOOTARGS} earlycon=pl011,0x9000000 nokaslr"
+ -S -append "${CMDLINE} earlycon=pl011,0x9000000 nokaslr"
 
 if [ $DEBUGGER == "gdb" ]; then
 
