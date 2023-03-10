@@ -75,7 +75,7 @@ QEMU_EXEC=$(realpath ./prebuilts/qemu/bin/qemu-system-aarch64)
 INITRD_PATH=$(realpath ${INITRD})
 DTB_PATH=$(realpath ${DTB})
 DEBUG_PORT=$((10000 + $RANDOM % 10000))
-SHARE_PARAM="-fsdev local,security_model=passthrough,id=fsdev0,path=$(realpath ${SHARE_FOLDER}) -device virtio-9p-device,id=fs0,fsdev=fsdev0,mount_tag=hostshare"
+SHARE_PARAM="-fsdev local,security_model=mapped,id=fsdev0,path=$(realpath ${SHARE_FOLDER}) -device virtio-9p-device,id=fs0,fsdev=fsdev0,mount_tag=hostshare"
 
 gnome-terminal --               \
 ${QEMU_EXEC}                    \
@@ -87,7 +87,7 @@ ${QEMU_EXEC}                    \
  -initrd ${INITRD_PATH}         \
  -kernel ${KERNEL_IMAGE}        \
  ${SHARE_PARAM}                 \
- -serial stdio                  \
+ -serial mon:stdio              \
  -display none                  \
  -gdb tcp::${DEBUG_PORT}        \
  -S -append "${CMDLINE} earlycon=pl011,0x9000000 nokaslr"
