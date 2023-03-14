@@ -58,7 +58,7 @@ fi
 KERNEL_DIR=$(cd ${KERNEL}; pwd)
 
 if [ $KERNEL_TYPE == "android" ]; then
-    KERNEL_OUT=${KERNEL_DIR}/out/$(ls ${KERNEL_DIR}/out/)
+    KERNEL_OUT=${KERNEL_DIR}/out/$(ls ${KERNEL_DIR}/out/ | grep android)
     KERNEL_SOURCE=${KERNEL_DIR}/common
     KERNEL_IMAGE=${KERNEL_OUT}/dist/Image
     KERNEL_VMLINUX=${KERNEL_OUT}/common/vmlinux
