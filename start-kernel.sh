@@ -4,6 +4,7 @@ DTB=$(realpath ./prebuilts/dts/lightbox.dtb)
 CMDLINE=""
 DEBUGGER="gdb"
 SHARE_FOLDER=$(realpath ./host-share)
+TERMINAL="gnome"
 
 for i in "$@"; do
     case $i in
@@ -25,6 +26,10 @@ for i in "$@"; do
             ;;
         -share=*|--share=*)
             SHARE_FOLDER="${i#*=}"
+            shift # past argument=value
+            ;;
+        -terminal=*|--terminal=*)
+            TERMINAL="${i#*=}"
             shift # past argument=value
             ;;
         *)
@@ -77,8 +82,9 @@ DTB_PATH=$(realpath ${DTB})
 DEBUG_PORT=$((10000 + $RANDOM % 10000))
 SHARE_PARAM="-fsdev local,security_model=mapped,id=fsdev0,path=$(realpath ${SHARE_FOLDER}) -device virtio-9p-device,id=fs0,fsdev=fsdev0,mount_tag=hostshare"
 
-gnome-terminal --               \
-${QEMU_EXEC}                    \
+QEMU_TITTLE="QEMU@localhost:$DEBUG_PORT"
+
+QEMU_CMD="${QEMU_EXEC}          \
  -machine virt                  \
  -cpu cortex-a72                \
  -m 1024                        \
@@ -90,7 +96,16 @@ ${QEMU_EXEC}                    \
  -serial mon:stdio              \
  -display none                  \
  -gdb tcp::${DEBUG_PORT}        \
- -S -append "${CMDLINE} earlycon=pl011,0x9000000 nokaslr"
+ -S -append '${CMDLINE} earlycon=pl011,0x9000000 nokaslr'"
+
+if [ $TERMINAL == "gnome" ]; then
+    gnome-terminal -t "$QEMU_TITLE" -- bash -c "$QEMU_CMD" &
+elif [ $TERMINAL == "xfce4" ]; then
+    xfce4-terminal -T "$QEMU_TITLE" --command "bash -c \"$QEMU_CMD\"" &
+else
+    echo "Invalid param: --terminal=\"$TERMINAL\", please use \"gnome\" or \"xfce4\""
+    return
+fi
 
 if [ $DEBUGGER == "gdb" ]; then
 
