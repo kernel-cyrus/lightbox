@@ -1,8 +1,8 @@
 diff --git a/Makefile b/Makefile
-index 886d99657..9705ee91b 100644
+index 0b05d0002..dcfd1cc25 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -507,7 +507,7 @@ LINUXINCLUDE    := \
+@@ -527,7 +527,7 @@ LINUXINCLUDE    := \
  		-I$(objtree)/include \
  		$(USERINCLUDE)
  
@@ -27,7 +27,7 @@ index 000000000..a0ddc4553
 +CONFIG_VIRTIO_PCI=y
 diff --git a/build.config.lightbox b/build.config.lightbox
 new file mode 100644
-index 000000000..52a374841
+index 000000000..1f3ee6c06
 --- /dev/null
 +++ b/build.config.lightbox
 @@ -0,0 +1,20 @@
@@ -37,7 +37,7 @@ index 000000000..52a374841
 +DEFCONFIG=lightbox_gki_defconfig
 +PRE_DEFCONFIG_CMDS="cat ${ROOT_DIR}/${KERNEL_DIR}/arch/arm64/configs/gki_defconfig ${ROOT_DIR}/${KERNEL_DIR}/arch/arm64/configs/lightbox_gki.fragment > ${ROOT_DIR}/${KERNEL_DIR}/arch/arm64/configs/${DEFCONFIG};"
 +POST_DEFCONFIG_CMDS="rm ${ROOT_DIR}/${KERNEL_DIR}/arch/arm64/configs/${DEFCONFIG}"
-+POST_KERNEL_BUILD_CMDS="/bin/cp -r --remove-destination ${ROOT_DIR}/common/scripts/gdb ${ROOT_DIR}/out/android12-5.10/common/scripts/;ln -sf ${ROOT_DIR}/out/android12-5.10/common/scripts/gdb/vmlinux-gdb.py ${ROOT_DIR}/out/android12-5.10/common/vmlinux-gdb.py"
++POST_KERNEL_BUILD_CMDS="/bin/cp -r --remove-destination ${ROOT_DIR}/common/scripts/gdb ${ROOT_DIR}/out/android-mainline/common/scripts/;ln -sf ${ROOT_DIR}/out/android-mainline/common/scripts/gdb/vmlinux-gdb.py ${ROOT_DIR}/out/android-mainline/common/vmlinux-gdb.py"
 +
 +MAKE_GOALS="${MAKE_GOALS}
 +Image.lz4

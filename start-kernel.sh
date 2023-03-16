@@ -80,7 +80,7 @@ QEMU_EXEC=$(realpath ./prebuilts/qemu/bin/qemu-system-aarch64)
 INITRD_PATH=$(realpath ${INITRD})
 DTB_PATH=$(realpath ${DTB})
 DEBUG_PORT=$((10000 + $RANDOM % 10000))
-SHARE_PARAM="-fsdev local,security_model=mapped,id=fsdev0,path=$(realpath ${SHARE_FOLDER}) -device virtio-9p-device,id=fs0,fsdev=fsdev0,mount_tag=hostshare"
+SHARE_PARAM="-fsdev local,security_model=mapped,id=fsdev0,path=$(realpath ${SHARE_FOLDER}) -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare"
 
 QEMU_TITTLE="QEMU@localhost:$DEBUG_PORT"
 
