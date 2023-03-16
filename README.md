@@ -105,6 +105,14 @@ You can also use a custom share folder:
 ./start-kernel --kernel=<kernel_dir> --share="./host-share"
 ```
 
+**Support for gnome and xfce4 terminal**
+
+By default, lightbox uses gnome terminal, in some cases you may choose to use xfce4 terminal:
+
+```
+./start-kernel --kernel=<kernel_dir> --terminal="xfce4"
+```
+
 Contact
 -----------------------------
 
