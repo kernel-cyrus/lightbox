@@ -25,6 +25,7 @@ index 000000000..a0ddc4553
 +CONFIG_9P_FS=y
 +CONFIG_PCI=y
 +CONFIG_VIRTIO_PCI=y
++CONFIG_CPUFREQ_DUMMY=y
 diff --git a/build.config.lightbox b/build.config.lightbox
 new file mode 100644
 index 000000000..1f3ee6c06
