@@ -142,3 +142,4 @@ elif [ $DEBUGGER == "ddd" ]; then
 fi
 
 killall qemu-system-aarch64
+
