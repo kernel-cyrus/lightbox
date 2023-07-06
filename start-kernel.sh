@@ -79,8 +79,13 @@ GDB_DATA=${GDB_DIR}/usr/local/share/gdb
 QEMU_EXEC=$(realpath ./prebuilts/qemu/bin/qemu-system-aarch64)
 INITRD_PATH=$(realpath ${INITRD})
 DTB_PATH=$(realpath ${DTB})
-DEBUG_PORT=$((10000 + $RANDOM % 10000))
 SHARE_PARAM="-fsdev local,security_model=mapped,id=fsdev0,path=$(realpath ${SHARE_FOLDER}) -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare"
+
+if [[ $TERMINAL == cli* ]]; then
+    DEBUG_PORT=12880
+else
+    DEBUG_PORT=$((10000 + $RANDOM % 10000))
+fi
 
 QEMU_TITTLE="QEMU@localhost:$DEBUG_PORT"
 
@@ -102,6 +107,11 @@ if [ $TERMINAL == "gnome" ]; then
     gnome-terminal -t "$QEMU_TITLE" -- bash -c "$QEMU_CMD" &
 elif [ $TERMINAL == "xfce4" ]; then
     xfce4-terminal -T "$QEMU_TITLE" --command "bash -c \"$QEMU_CMD\"" &
+elif [ $TERMINAL == "cli-qemu" ]; then
+    bash -c "$QEMU_CMD"
+    return
+elif [ $TERMINAL == "cli-gdb" ]; then
+    echo "QEMU start successfully, waiting for GDB connection..."
 else
     echo "Invalid param: --terminal=\"$TERMINAL\", please use \"gnome\" or \"xfce4\""
     return

@@ -113,6 +113,22 @@ By default, lightbox uses gnome terminal, in some cases you may choose to use xf
 ./start-kernel --kernel=<kernel_dir> --terminal="xfce4"
 ```
 
+**Run in cli mode**
+
+For pure cli environment like ssh without desktop display, you can start qemu and gdb seperately.
+
+Start qemu from one cli session:
+
+```
+./start-kernel --kernel=<kernel_dir> --terminal="cli-qemu"
+```
+
+And then start gdb in another cli session:
+
+```
+./start-kernel --kernel=<kernel_dir> --terminal="cli-gdb"
+```
+
 Contact
 -----------------------------
 
