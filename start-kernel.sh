@@ -74,9 +74,9 @@ elif [ $KERNEL_TYPE == "linux" ]; then
 fi
 
 GDB_DIR=$(cd ./prebuilts/gdb; pwd)
-GDB_EXEC=${GDB_DIR}/usr/local/bin/aarch64-linux-gnu-gdb
-GDB_DATA=${GDB_DIR}/usr/local/share/gdb
-QEMU_EXEC=$(realpath ./prebuilts/qemu/bin/qemu-system-aarch64)
+GDB_EXEC=gdb
+GDB_DATA=/usr/share/gdb
+QEMU_EXEC=qemu-system-aarch64
 INITRD_PATH=$(realpath ${INITRD})
 DTB_PATH=$(realpath ${DTB})
 SHARE_PARAM="-fsdev local,security_model=mapped,id=fsdev0,path=$(realpath ${SHARE_FOLDER}) -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare"
@@ -108,10 +108,11 @@ if [ $TERMINAL == "gnome" ]; then
 elif [ $TERMINAL == "xfce4" ]; then
     xfce4-terminal -T "$QEMU_TITLE" --command "bash -c \"$QEMU_CMD\"" &
 elif [ $TERMINAL == "cli-qemu" ]; then
+    echo "QEMU start, waiting for GDB connection..."
     bash -c "$QEMU_CMD"
     return
 elif [ $TERMINAL == "cli-gdb" ]; then
-    echo "QEMU start successfully, waiting for GDB connection..."
+    echo "Try to connect QEMU..."
 else
     echo "Invalid param: --terminal=\"$TERMINAL\", please use \"gnome\" or \"xfce4\""
     return
