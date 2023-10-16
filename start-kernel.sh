@@ -41,12 +41,12 @@ done
 
 if [ -z "$KERNEL" ]; then
     echo "Please pass the kernel path: --kernel=<path>"
-    return
+    return 0
 fi
 
 if [ ! -d "$KERNEL" ]; then
     echo "ERROR: Directory not found: --kernel=<path>"
-    return
+    return 0
 fi
 
 if [ -d "$KERNEL/common" ]; then
@@ -110,12 +110,12 @@ elif [ $TERMINAL == "xfce4" ]; then
 elif [ $TERMINAL == "cli-qemu" ]; then
     echo "QEMU start, waiting for GDB connection..."
     bash -c "$QEMU_CMD"
-    return
+    exit
 elif [ $TERMINAL == "cli-gdb" ]; then
     echo "Try to connect QEMU..."
 else
-    echo "Invalid param: --terminal=\"$TERMINAL\", please use \"gnome\" or \"xfce4\""
-    return
+    echo "Invalid param: --terminal=\"$TERMINAL\", please use \"gnome\", \"xfce4\", \"cli-qemu\", \"cli-gdb\""
+    return 0
 fi
 
 if [ $DEBUGGER == "gdb" ]; then
