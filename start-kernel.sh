@@ -73,7 +73,6 @@ elif [ $KERNEL_TYPE == "linux" ]; then
     RELOC_SECTIONS="-s .head.text 0x40200000 -s .text 0x40210000 -s .init.text 0x418b0000"
 fi
 
-GDB_DIR=$(cd ./prebuilts/gdb; pwd)
 GDB_EXEC=gdb
 GDB_DATA=/usr/share/gdb
 QEMU_EXEC=qemu-system-aarch64
@@ -113,6 +112,9 @@ elif [ $TERMINAL == "cli-qemu" ]; then
     exit
 elif [ $TERMINAL == "cli-gdb" ]; then
     echo "Try to connect QEMU..."
+elif [ $TERMINAL == "tmux" ]; then
+    # FIXME: tmux new-session -d -s mysession 'bash' ; split-window -h 'bash' ; attach-session -d -t mysession
+    return 0
 else
     echo "Invalid param: --terminal=\"$TERMINAL\", please use \"gnome\", \"xfce4\", \"cli-qemu\", \"cli-gdb\""
     return 0
