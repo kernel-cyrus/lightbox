@@ -21,7 +21,9 @@ The envionment include:
 - support debug with ddd for aarch64
 - support 9pfs share folder
 
-Host environment tested: x86 PC + Ubuntu 20.04
+Host environment tested: 
+- x86 PC + Ubuntu 20.04 (OK)
+- Macbook M1 (arm64) + UTM (virtual machine) + Ubuntu 20.04 (OK)
 
 Download Lightbox
 -----------------------------
