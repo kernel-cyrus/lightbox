@@ -26,17 +26,17 @@ Host environment tested:
 - Raspberry Pi 4B + Ubuntu 22.04 (OK)
 - Macbook Air M1 + UTM (virtual machine) + Ubuntu 20.04 (OK)
 
-Install GDB and QEMU (for ARM64 Host Only)
+Install GDB and QEMU
 -----------------------------
 
-When you run on ARM64 host, like Raspberry Pi or Macbook M1, you need install GDB and QEMU first:
+When your host is x86, lightbox will use the prebuild binary, you can skip this step.
+
+When your host is arm64 (raspberry pi or macbook m1), you need install GDB and QEMU:
 
 ```
 sudo apt install gdb
 sudo apt install qemu qemu-system-arm
 ```
-
-x86 host will use the prebuild binary, you don't need to install anything.
 
 Download Lightbox
 -----------------------------
