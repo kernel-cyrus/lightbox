@@ -73,9 +73,17 @@ elif [ $KERNEL_TYPE == "linux" ]; then
     RELOC_SECTIONS="-s .head.text 0x40200000 -s .text 0x40210000 -s .init.text 0x418b0000"
 fi
 
-GDB_EXEC=gdb
-GDB_DATA=/usr/share/gdb
-QEMU_EXEC=qemu-system-aarch64
+if [[ "$(uname -m)" == "aarch64" ]]; then
+    GDB_EXEC=gdb
+    GDB_DATA=/usr/share/gdb
+    QEMU_EXEC=qemu-system-aarch64
+else
+    GDB_DIR=$(cd ./prebuilts/gdb; pwd)
+    GDB_EXEC=${GDB_DIR}/usr/local/bin/aarch64-linux-gnu-gdb
+    GDB_DATA=${GDB_DIR}/usr/local/share/gdb
+    QEMU_EXEC=$(realpath ./prebuilts/qemu/bin/qemu-system-aarch64)
+fi
+
 INITRD_PATH=$(realpath ${INITRD})
 DTB_PATH=$(realpath ${DTB})
 SHARE_PARAM="-fsdev local,security_model=mapped,id=fsdev0,path=$(realpath ${SHARE_FOLDER}) -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare"

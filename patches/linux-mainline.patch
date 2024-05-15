@@ -1,16 +1,16 @@
 diff --git a/Makefile b/Makefile
-index 8973b285ce6c..a1c4cbc6f0ea 100644
+index 967e97878..705720604 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -519,7 +519,7 @@ LINUXINCLUDE    := \
+@@ -549,7 +549,7 @@ LINUXINCLUDE    := \
  		-I$(objtree)/include \
  		$(USERINCLUDE)
  
 -KBUILD_AFLAGS   := -D__ASSEMBLY__ -fno-PIE
 +KBUILD_AFLAGS   := -g -D__ASSEMBLY__ -fno-PIE
- KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
- 		   -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
- 		   -Werror=implicit-function-declaration -Werror=implicit-int \
+ 
+ KBUILD_CFLAGS :=
+ KBUILD_CFLAGS += -std=gnu11
 diff --git a/arch/arm64/configs/lightbox_defconfig b/arch/arm64/configs/lightbox_defconfig
 new file mode 100644
 index 000000000000..0dda0f68acab
