@@ -4,7 +4,13 @@ DTB=$(realpath ./prebuilts/dts/lightbox.dtb)
 CMDLINE=""
 DEBUGGER="gdb"
 SHARE_FOLDER=$(realpath ./host-share)
-TERMINAL="gnome"
+
+if type tmux >/dev/null 2>&1; then
+    TERMINAL="tmux"
+else
+    TERMINAL="gnome"
+fi
+
 PARAMS="$@"
 
 for i in "$@"; do
@@ -126,10 +132,10 @@ elif [ $TERMINAL == "tmux" ]; then
     tmux kill-session -t lightbox
     tmux new-session -d -s lightbox "bash"
     tmux send-keys -t lightbox "cd $DIR" C-m
-    tmux send-keys -t lightbox "source ./start-kernel.sh ${PARAMS/tmux/cli-qemu}" C-m
+    tmux send-keys -t lightbox "source ./start-kernel.sh ${PARAMS/tmux/cli-qemu} --terminal=cli-qemu" C-m
     tmux split-window -h "bash"
     tmux send-keys -t lightbox "cd $DIR" C-m
-    tmux send-keys -t lightbox "source ./start-kernel.sh ${PARAMS/tmux/cli-gdb}" C-m
+    tmux send-keys -t lightbox "source ./start-kernel.sh ${PARAMS/tmux/cli-gdb} --terminal=cli-gdb" C-m
     tmux attach-session -d -t lightbox
     tmux kill-session -t lightbox
     return 0
