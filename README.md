@@ -29,7 +29,7 @@ Host environment tested:
 Install GDB and QEMU (for ARM64 Host Only)
 -----------------------------
 
-When you run on ARM64 host, you need install GDB and QEMU first:
+When you run on ARM64 host, like Raspberry Pi or Macbook M1, you need install GDB and QEMU first:
 
 ```
 sudo apt install gdb
