@@ -5,6 +5,7 @@ CMDLINE=""
 DEBUGGER="gdb"
 SHARE_FOLDER=$(realpath ./host-share)
 TERMINAL="gnome"
+PARAMS="$@"
 
 for i in "$@"; do
     case $i in
@@ -121,10 +122,19 @@ elif [ $TERMINAL == "cli-qemu" ]; then
 elif [ $TERMINAL == "cli-gdb" ]; then
     echo "Try to connect QEMU..."
 elif [ $TERMINAL == "tmux" ]; then
-    # FIXME: tmux new-session -d -s mysession 'bash' ; split-window -h 'bash' ; attach-session -d -t mysession
+    DIR=$(pwd)
+    tmux kill-session -t lightbox
+    tmux new-session -d -s lightbox "bash"
+    tmux send-keys -t lightbox "cd $DIR" C-m
+    tmux send-keys -t lightbox "source ./start-kernel.sh ${PARAMS/tmux/cli-qemu}" C-m
+    tmux split-window -h "bash"
+    tmux send-keys -t lightbox "cd $DIR" C-m
+    tmux send-keys -t lightbox "source ./start-kernel.sh ${PARAMS/tmux/cli-gdb}" C-m
+    tmux attach-session -d -t lightbox
+    tmux kill-session -t lightbox
     return 0
 else
-    echo "Invalid param: --terminal=\"$TERMINAL\", please use \"gnome\", \"xfce4\", \"cli-qemu\", \"cli-gdb\""
+    echo "Invalid param: --terminal=\"$TERMINAL\", please use \"tmux\", \"gnome\", \"xfce4\", \"cli-qemu\", \"cli-gdb\""
     return 0
 fi
 
@@ -163,4 +173,4 @@ elif [ $DEBUGGER == "ddd" ]; then
 fi
 
 killall qemu-system-aarch64
-
+tmux kill-session -t lightbox
