@@ -12,8 +12,8 @@ You can start to run and debug the linux kernel from the very first assembly cod
 Both linux kernel and android common kernel are supported, and you can choose to use gdb-tui or ddd as the debugger's front-end.
 
 The envionment include:
-- prebuilt aarch64 qemu excutables (is used for x86 host)
-- prebuilt aarch64 gdb with tui enabled (is used for x86 host)
+- prebuilt aarch64 qemu excutables (for x86 host)
+- prebuilt aarch64 gdb with tui enabled (for x86 host)
 - prebuilt aarch64 initramfs image
 - support running with linux kernel
 - support running with android common kernel
