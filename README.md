@@ -12,8 +12,8 @@ You can start to run and debug the linux kernel from the very first assembly cod
 Both linux kernel and android common kernel are supported, and you can choose to use gdb-tui or ddd as the debugger's front-end.
 
 The envionment include:
-- prebuilt aarch64 qemu excutables
-- prebuilt aarch64 gdb with tui enabled
+- prebuilt aarch64 qemu excutables (is used for x86 host)
+- prebuilt aarch64 gdb with tui enabled (is used for x86 host)
 - prebuilt aarch64 initramfs image
 - support running with linux kernel
 - support running with android common kernel
@@ -23,7 +23,20 @@ The envionment include:
 
 Host environment tested: 
 - x86 PC + Ubuntu 20.04 (OK)
-- Macbook M1 (arm64) + UTM (virtual machine) + Ubuntu 20.04 (OK)
+- Raspberry Pi 4B + Ubuntu 22.04 (OK)
+- Macbook Air M1 + UTM (virtual machine) + Ubuntu 20.04 (OK)
+
+Install GDB and QEMU (for ARM64 Host Only)
+-----------------------------
+
+When you run on ARM64 host, you need install GDB and QEMU first:
+
+```
+sudo apt install gdb
+sudo apt install qemu qemu-system-arm
+```
+
+x86 host will use the prebuild binary, you don't need to install anything.
 
 Download Lightbox
 -----------------------------
