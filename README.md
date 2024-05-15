@@ -22,20 +22,38 @@ The envionment include:
 - support 9pfs share folder
 
 Host environment tested: 
-- x86 PC + Ubuntu 20.04 (OK)
+- Intel x86 PC + Ubuntu 20.04 (OK)
 - Raspberry Pi 4B + Ubuntu 22.04 (OK)
-- Macbook Air M1 + UTM (virtual machine) + Ubuntu 20.04 (OK)
+- Macbook M1 + UTM (virtual machine) + Ubuntu 20.04 (OK)
 
-Install GDB and QEMU
+Setup Environment
 -----------------------------
 
-When your host is x86, lightbox will use the prebuild binary, you can skip this step.
+**for x86 Host**
+
+To build arm64 linux kernel on x86 machine, you need install the cross-compiler:
+
+```
+sudo apt install gcc-aarch64-linux-gnu
+```
+
+gdb and qemu are already built as binaries. lightbox will just use the prebuild ones, and nothing else is needed.
+
+**for ARM64 Host**
 
 When your host is arm64 (raspberry pi or macbook m1), you need install GDB and QEMU:
 
 ```
 sudo apt install gdb
 sudo apt install qemu qemu-system-arm
+```
+
+**Install DDD**
+
+Lightbox support use ddd as graphic debugger, you need install it if you want to use it:
+
+```
+sudo apt install ddd
 ```
 
 Download Lightbox
