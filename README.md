@@ -39,7 +39,7 @@ sudo apt install gcc-aarch64-linux-gnu
 
 gdb and qemu are already built as binaries. lightbox will just use the prebuild ones, and nothing else is needed.
 
-**for ARM64 Host**
+**for arm64 Host**
 
 When your host is arm64 (raspberry pi or macbook m1), you need install GDB and QEMU:
 
@@ -48,9 +48,23 @@ sudo apt install gdb
 sudo apt install qemu qemu-system-arm
 ```
 
+**Install tmux**
+
+For better experience, lightbox will use tmux as default terminal when it is installed.
+
+To install tmux:
+
+```
+sudo apt install tmux
+```
+
+When tmux is not installed, lightbox will use gnome as default termninal, you can also choose to use xfce4 or cli terminal seperately.
+
 **Install DDD**
 
-Lightbox support use ddd as graphic debugger, you need install it if you want to use it:
+By default, lightbox use gdb as default debugger with tui. You can also choose to use ddd as debugger with gui. 
+
+To install ddd:
 
 ```
 sudo apt install ddd
@@ -110,6 +124,8 @@ Start Kernel
     --with=<"gdb" or "ddd">         # use gdb or ddd as debugger (OPTIONAL)
     --append=<kernel cmdline>       # append extra cmdline       (OPTIONAL)
     --share=<share folder path>     # host share folder          (OPTIONAL)
+    --terminal=<terminal to use>    # default: tmux              (OPTIONAL)
+                                    # options: tmux / gnome / xfce4 / cli-qemu / cli-gdb
 ```
 **Run kernel with gdb**
 ```
@@ -138,9 +154,11 @@ You can also use a custom share folder:
 ./start-kernel --kernel=<kernel_dir> --share="./host-share"
 ```
 
-**Support for gnome and xfce4 terminal**
+**Support for gnome and xfce4 terminals**
 
-By default, lightbox uses gnome terminal, in some cases you may choose to use xfce4 terminal:
+When tmux is not installed, lightbox will use gnome as default terminal.
+
+In some cases when your host os is not GNOME, you may choose to use xfce4 terminal:
 
 ```
 ./start-kernel --kernel=<kernel_dir> --terminal="xfce4"
@@ -148,7 +166,7 @@ By default, lightbox uses gnome terminal, in some cases you may choose to use xf
 
 **Run in cli mode**
 
-For pure cli environment like ssh without desktop display, you can start qemu and gdb seperately.
+For pure cli environment like ssh without desktop display, and also tmux is not installed, you can start qemu and gdb seperately.
 
 Start qemu from one cli session:
 
