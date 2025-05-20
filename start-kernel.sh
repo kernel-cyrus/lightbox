@@ -104,7 +104,7 @@ fi
 QEMU_TITTLE="QEMU@localhost:$DEBUG_PORT"
 
 QEMU_CMD="${QEMU_EXEC}          \
- -machine virt                  \
+ -machine virt,gic_version=3    \
  -cpu cortex-a72                \
  -m 1024                        \
  -smp 8                         \
