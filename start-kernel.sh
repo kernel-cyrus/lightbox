@@ -97,8 +97,15 @@ fi
 
 if [ -n "$ROOTFS" ]; then
     ROOTFS_PATH=$(realpath ${ROOTFS})
-    ROOTFS_PARAM="-drive if=none,file=${ROOTFS_PATH},format=raw,id=hd0 -device virtio-blk-device,drive=hd0"
-    ROOTFS_BOOTARGS="root=/dev/vda"
+    if [[ "$ROOTFS" == *.qcow2 ]]; then
+        ROOTFS_FORMAT="qcow2"
+	ROOTFS_DEVICE="/dev/vda1"
+    else
+        ROOTFS_FORMAT="raw"
+	ROOTFS_DEVICE="/dev/vda"
+    fi
+    ROOTFS_PARAM="-drive if=none,file=${ROOTFS_PATH},format=${ROOTFS_FORMAT},id=hd0 -device virtio-blk-device,drive=hd0"
+    ROOTFS_BOOTARGS="root=${ROOTFS_DEVICE}"
     echo "Using rootfs image: ${ROOTFS_PATH}"
 else
     INITRD_PATH=$(realpath ${INITRD})
