@@ -121,7 +121,7 @@ Start Kernel
 ./start-kernel.sh
     --kernel=<kernel dir>           # kernel repo dir            (REQUIRED)
     --initrd=<initrd image path>    # initrd file (.cpio.gz)     (OPTIONAL)
-    --rootfs=<rootfs image path>    # initrd file (.ext4)        (OPTIONAL)
+    --rootfs=<rootfs image path>    # rootfs file (.ext4)        (OPTIONAL)
     --with=<"gdb" or "ddd">         # use gdb or ddd as debugger (OPTIONAL)
     --append=<kernel cmdline>       # append extra cmdline       (OPTIONAL)
     --share=<share folder path>     # host share folder          (OPTIONAL)
@@ -139,8 +139,8 @@ sudo apt install ddd
 ```
 **Run with your own initramfs image or ext4 rootfs**
 ```
-./start-kernel --kernel=<kernel_dir> --initrd=<cpio.gz initramfs_file_path>
-./start-kernel --kernel=<kernel_dir> --rootfs=<ext4 image rootfs_file_path>
+./start-kernel --kernel=<kernel_dir> --initrd=<cpio.gz initramfs file path>
+./start-kernel --kernel=<kernel_dir> --rootfs=<ext4/raw/qcow2 image path>
 ```
 **Customize kernel cmdline**
 ```
