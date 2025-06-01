@@ -97,7 +97,7 @@ fi
 
 if [ -n "$ROOTFS" ]; then
     ROOTFS_PATH=$(realpath ${ROOTFS})
-    ROOTFS_PARAM="-hda ${ROOTFS_PATH}"
+    ROOTFS_PARAM="-drive if=none,file=${ROOTFS_PATH},format=raw,id=hd0 -device virtio-blk-device,drive=hd0"
     ROOTFS_BOOTARGS="root=/dev/vda"
     echo "Using rootfs image: ${ROOTFS_PATH}"
 else
