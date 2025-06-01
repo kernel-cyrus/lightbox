@@ -23,6 +23,10 @@ for i in "$@"; do
             INITRD="${i#*=}"
             shift # past argument=value
             ;;
+        -rootfs=*|--rootfs=*)
+            ROOTFS="${i#*=}"
+            shift # past argument=value
+            ;;
         -with=*|--with=*)
             DEBUGGER="${i#*=}"
             shift # past argument=value
@@ -91,7 +95,18 @@ else
     QEMU_EXEC=$(realpath ./prebuilts/qemu/bin/qemu-system-aarch64)
 fi
 
-INITRD_PATH=$(realpath ${INITRD})
+if [ -n "$ROOTFS" ]; then
+    ROOTFS_PATH=$(realpath ${ROOTFS})
+    ROOTFS_PARAM="-hda ${ROOTFS_PATH}"
+    ROOTFS_BOOTARGS="root=/dev/vda"
+    echo "Using rootfs image: ${ROOTFS_PATH}"
+else
+    INITRD_PATH=$(realpath ${INITRD})
+    ROOTFS_PARAM="-initrd ${INITRD_PATH}"
+    ROOTFS_BOOTARGS=""
+    echo "Using initrd image: ${INITRD_PATH}"
+fi
+
 DTB_PATH=$(realpath ${DTB})
 SHARE_PARAM="-fsdev local,security_model=mapped,id=fsdev0,path=$(realpath ${SHARE_FOLDER}) -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare"
 
@@ -108,14 +123,13 @@ QEMU_CMD="${QEMU_EXEC}          \
  -cpu cortex-a72                \
  -m 1024                        \
  -smp 8                         \
- -dtb ${DTB_PATH}               \
- -initrd ${INITRD_PATH}         \
  -kernel ${KERNEL_IMAGE}        \
+ ${ROOTFS_PARAM}                \
  ${SHARE_PARAM}                 \
  -serial mon:stdio              \
  -display none                  \
  -gdb tcp::${DEBUG_PORT}        \
- -S -append '${CMDLINE} earlycon=pl011,0x9000000 nokaslr'"
+ -S -append '${ROOTFS_BOOTARGS} ${CMDLINE} earlycon=pl011,0x9000000 nokaslr'"
 
 if [ $TERMINAL == "gnome" ]; then
     gnome-terminal -t "$QEMU_TITLE" -- bash -c "$QEMU_CMD" &
