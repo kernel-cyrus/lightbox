@@ -20,6 +20,8 @@ The envionment include:
 - support debug with gdb for aarch64
 - support debug with ddd for aarch64
 - support 9pfs share folder
+- support networking by default
+- support boot debian rootfs
 
 Host environment tested: 
 - Intel x86 PC + Ubuntu 20.04 (OK)
@@ -142,6 +144,11 @@ sudo apt install ddd
 ./start-kernel --kernel=<kernel_dir> --initrd=<cpio.gz initramfs file path>
 ./start-kernel --kernel=<kernel_dir> --rootfs=<ext4/raw/qcow2 image path>
 ```
+debian rootfs image is suported:
+
+- [debian-12-nocloud-arm64.qcow2](https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-nocloud-arm64.qcow2)
+- [debian-12-nocloud-arm64.raw](https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-nocloud-arm64.raw)
+
 **Customize kernel cmdline**
 ```
 ./start-kernel --kernel=<kernel_dir> --append="earlycon"
