@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Device Specification for Inter-VM shared memory device &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="PVPANIC DEVICE" href="pvpanic.html" />
+    <link rel="prev" title="EDU device" href="edu.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Guest Hardware Specifications</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pci-ids.html">PCI IDs for QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pci-serial.html">QEMU PCI serial devices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pci-testdev.html">QEMU PCI test device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-xive.html">POWER9 XIVE interrupt controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-xive.html">XIVE for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html">NUMA mechanics for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#how-the-pseries-linux-guest-calculates-numa-distances">How the pseries Linux guest calculates NUMA distances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#pseries-numa-mechanics">pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#legacy-5-1-and-older-pseries-numa-mechanics">Legacy (5.1 and older) pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hw_reduced_hotplug.html">QEMU and ACPI BIOS Generic Event Device interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tpm.html">QEMU TPM Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hest_ghes.html">APEI tables generating and CPER record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_cpu_hotplug.html">QEMU&lt;-&gt;ACPI BIOS CPU hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_mem_hotplug.html">QEMU&lt;-&gt;ACPI BIOS memory hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_pci_hotplug.html">QEMU&lt;-&gt;ACPI BIOS PCI hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_nvdimm.html">QEMU&lt;-&gt;ACPI BIOS NVDIMM interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_erst.html">ACPI ERST DEVICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sev-guest-firmware.html">QEMU/Guest Firmware Interface for AMD SEV and SEV-ES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fw_cfg.html">QEMU Firmware Configuration (fw_cfg) Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fsi.html">IBM’s Flexible Service Interface (FSI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vmw_pvscsi-spec.html">VMWare PVSCSI Device Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="edu.html">EDU device</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Device Specification for Inter-VM shared memory device</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-ivshmem-pci-device-s-guest-interface">The ivshmem PCI device’s guest interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pci-bars">PCI BARs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pci-device-registers">PCI device registers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#interrupt-infrastructure">Interrupt infrastructure</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-ivshmem-server">The ivshmem server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-ivshmem-client-server-protocol">The ivshmem Client-Server Protocol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-ivshmem-client-client-protocol">The ivshmem Client-Client Protocol</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pvpanic.html">PVPANIC DEVICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spdm.html">QEMU Security Protocols and Data Models (SPDM) Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="standard-vga.html">QEMU Standard VGA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virt-ctlr.html">Virtual System Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vmcoreinfo.html">VMCoreInfo device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vmgenid.html">Virtual Machine Generation ID Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rapl-msr.html">RAPL MSR support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rocker.html">Rocker Network Switch Register Programming Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="riscv-iommu.html">RISC-V IOMMU support for RISC-V machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="riscv-aia.html">RISC-V AIA support for RISC-V machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspeed-intc.html">ASPEED Interrupt Controller</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">System Emulation Guest Hardware Specifications</a> &raquo;</li>
+      <li>Device Specification for Inter-VM shared memory device</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/specs/ivshmem-spec.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="device-specification-for-inter-vm-shared-memory-device">
+<h1>Device Specification for Inter-VM shared memory device<a class="headerlink" href="#device-specification-for-inter-vm-shared-memory-device" title="Permalink to this headline"></a></h1>
+<p>The Inter-VM shared memory device (ivshmem) is designed to share a
+memory region between multiple QEMU processes running different guests
+and the host.  In order for all guests to be able to pick up the
+shared memory area, it is modeled by QEMU as a PCI device exposing
+said memory to the guest as a PCI BAR.</p>
+<p>The device can use a shared memory object on the host directly, or it
+can obtain one from an ivshmem server.</p>
+<p>In the latter case, the device can additionally interrupt its peers, and
+get interrupted by its peers.</p>
+<p>For information on configuring the ivshmem device on the QEMU
+command line, see <a class="reference internal" href="../system/devices/ivshmem.html"><span class="doc">Inter-VM Shared Memory device</span></a>.</p>
+<section id="the-ivshmem-pci-device-s-guest-interface">
+<h2>The ivshmem PCI device’s guest interface<a class="headerlink" href="#the-ivshmem-pci-device-s-guest-interface" title="Permalink to this headline"></a></h2>
+<p>The device has vendor ID 1af4, device ID 1110, revision 1.  Before
+QEMU 2.6.0, it had revision 0.</p>
+<section id="pci-bars">
+<h3>PCI BARs<a class="headerlink" href="#pci-bars" title="Permalink to this headline"></a></h3>
+<p>The ivshmem PCI device has two or three BARs:</p>
+<ul class="simple">
+<li><p>BAR0 holds device registers (256 Byte MMIO)</p></li>
+<li><p>BAR1 holds MSI-X table and PBA (only ivshmem-doorbell)</p></li>
+<li><p>BAR2 maps the shared memory object</p></li>
+</ul>
+<p>There are two ways to use this device:</p>
+<ul class="simple">
+<li><p>If you only need the shared memory part, BAR2 suffices.  This way,
+you have access to the shared memory in the guest and can use it as
+you see fit.</p></li>
+<li><p>If you additionally need the capability for peers to interrupt each
+other, you need BAR0 and BAR1.  You will most likely want to write a
+kernel driver to handle interrupts.  Requires the device to be
+configured for interrupts, obviously.</p></li>
+</ul>
+<p>Before QEMU 2.6.0, BAR2 can initially be invalid if the device is
+configured for interrupts.  It becomes safely accessible only after
+the ivshmem server provided the shared memory.  These devices have PCI
+revision 0 rather than 1.  Guest software should wait for the
+IVPosition register (described below) to become non-negative before
+accessing BAR2.</p>
+<p>Revision 0 of the device is not capable to tell guest software whether
+it is configured for interrupts.</p>
+</section>
+<section id="pci-device-registers">
+<h3>PCI device registers<a class="headerlink" href="#pci-device-registers" title="Permalink to this headline"></a></h3>
+<p>BAR 0 contains the following registers:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Offset</span>  <span class="n">Size</span>  <span class="n">Access</span>      <span class="n">On</span> <span class="n">reset</span>  <span class="n">Function</span>
+    <span class="mi">0</span>     <span class="mi">4</span>   <span class="n">read</span><span class="o">/</span><span class="n">write</span>        <span class="mi">0</span>   <span class="n">Interrupt</span> <span class="n">Mask</span>
+                                    <span class="n">bit</span> <span class="mi">0</span><span class="p">:</span> <span class="n">peer</span> <span class="n">interrupt</span> <span class="p">(</span><span class="n">rev</span> <span class="mi">0</span><span class="p">)</span>
+                                           <span class="n">reserved</span>       <span class="p">(</span><span class="n">rev</span> <span class="mi">1</span><span class="p">)</span>
+                                    <span class="n">bit</span> <span class="mf">1..31</span><span class="p">:</span> <span class="n">reserved</span>
+    <span class="mi">4</span>     <span class="mi">4</span>   <span class="n">read</span><span class="o">/</span><span class="n">write</span>        <span class="mi">0</span>   <span class="n">Interrupt</span> <span class="n">Status</span>
+                                    <span class="n">bit</span> <span class="mi">0</span><span class="p">:</span> <span class="n">peer</span> <span class="n">interrupt</span> <span class="p">(</span><span class="n">rev</span> <span class="mi">0</span><span class="p">)</span>
+                                           <span class="n">reserved</span>       <span class="p">(</span><span class="n">rev</span> <span class="mi">1</span><span class="p">)</span>
+                                    <span class="n">bit</span> <span class="mf">1..31</span><span class="p">:</span> <span class="n">reserved</span>
+    <span class="mi">8</span>     <span class="mi">4</span>   <span class="n">read</span><span class="o">-</span><span class="n">only</span>   <span class="mi">0</span> <span class="ow">or</span> <span class="n">ID</span>   <span class="n">IVPosition</span>
+   <span class="mi">12</span>     <span class="mi">4</span>   <span class="n">write</span><span class="o">-</span><span class="n">only</span>      <span class="n">N</span><span class="o">/</span><span class="n">A</span>   <span class="n">Doorbell</span>
+                                    <span class="n">bit</span> <span class="mf">0..15</span><span class="p">:</span> <span class="n">vector</span>
+                                    <span class="n">bit</span> <span class="mf">16..31</span><span class="p">:</span> <span class="n">peer</span> <span class="n">ID</span>
+   <span class="mi">16</span>   <span class="mi">240</span>   <span class="n">none</span>            <span class="n">N</span><span class="o">/</span><span class="n">A</span>   <span class="n">reserved</span>
+</pre></div>
+</div>
+<p>Software should only access the registers as specified in column
+“Access”.  Reserved bits should be ignored on read, and preserved on
+write.</p>
+<p>In revision 0 of the device, Interrupt Status and Mask Register
+together control the legacy INTx interrupt when the device has no
+MSI-X capability: INTx is asserted when the bit-wise AND of Status and
+Mask is non-zero and the device has no MSI-X capability.  Interrupt
+Status Register bit 0 becomes 1 when an interrupt request from a peer
+is received.  Reading the register clears it.</p>
+<p>IVPosition Register: if the device is not configured for interrupts,
+this is zero.  Else, it is the device’s ID (between 0 and 65535).</p>
+<p>Before QEMU 2.6.0, the register may read -1 for a short while after
+reset.  These devices have PCI revision 0 rather than 1.</p>
+<p>There is no good way for software to find out whether the device is
+configured for interrupts.  A positive IVPosition means interrupts,
+but zero could be either.</p>
+<p>Doorbell Register: writing this register requests to interrupt a peer.
+The written value’s high 16 bits are the ID of the peer to interrupt,
+and its low 16 bits select an interrupt vector.</p>
+<p>If the device is not configured for interrupts, the write is ignored.</p>
+<p>If the interrupt hasn’t completed setup, the write is ignored.  The
+device is not capable to tell guest software whether setup is
+complete.  Interrupts can regress to this state on migration.</p>
+<p>If the peer with the requested ID isn’t connected, or it has fewer
+interrupt vectors connected, the write is ignored.  The device is not
+capable to tell guest software what peers are connected, or how many
+interrupt vectors are connected.</p>
+<p>The peer’s interrupt for this vector then becomes pending.  There is
+no way for software to clear the pending bit, and a polling mode of
+operation is therefore impossible.</p>
+<p>If the peer is a revision 0 device without MSI-X capability, its
+Interrupt Status register is set to 1.  This asserts INTx unless
+masked by the Interrupt Mask register.  The device is not capable to
+communicate the interrupt vector to guest software then.</p>
+<p>With multiple MSI-X vectors, different vectors can be used to indicate
+different events have occurred.  The semantics of interrupt vectors
+are left to the application.</p>
+</section>
+</section>
+<section id="interrupt-infrastructure">
+<h2>Interrupt infrastructure<a class="headerlink" href="#interrupt-infrastructure" title="Permalink to this headline"></a></h2>
+<p>When configured for interrupts, the peers share eventfd objects in
+addition to shared memory.  The shared resources are managed by an
+ivshmem server.</p>
+<section id="the-ivshmem-server">
+<h3>The ivshmem server<a class="headerlink" href="#the-ivshmem-server" title="Permalink to this headline"></a></h3>
+<p>The server listens on a UNIX domain socket.</p>
+<p>For each new client that connects to the server, the server</p>
+<ul class="simple">
+<li><p>picks an ID,</p></li>
+<li><p>creates eventfd file descriptors for the interrupt vectors,</p></li>
+<li><p>sends the ID and the file descriptor for the shared memory to the
+new client,</p></li>
+<li><p>sends connect notifications for the new client to the other clients
+(these contain file descriptors for sending interrupts),</p></li>
+<li><p>sends connect notifications for the other clients to the new client,
+and</p></li>
+<li><p>sends interrupt setup messages to the new client (these contain file
+descriptors for receiving interrupts).</p></li>
+</ul>
+<p>The first client to connect to the server receives ID zero.</p>
+<p>When a client disconnects from the server, the server sends disconnect
+notifications to the other clients.</p>
+<p>The next section describes the protocol in detail.</p>
+<p>If the server terminates without sending disconnect notifications for
+its connected clients, the clients can elect to continue.  They can
+communicate with each other normally, but won’t receive disconnect
+notification on disconnect, and no new clients can connect.  There is
+no way for the clients to connect to a restarted server.  The device
+is not capable to tell guest software whether the server is still up.</p>
+<p>Example server code is in contrib/ivshmem-server/.  Not to be used in
+production.  It assumes all clients use the same number of interrupt
+vectors.</p>
+<p>A standalone client is in contrib/ivshmem-client/.  It can be useful
+for debugging.</p>
+</section>
+<section id="the-ivshmem-client-server-protocol">
+<h3>The ivshmem Client-Server Protocol<a class="headerlink" href="#the-ivshmem-client-server-protocol" title="Permalink to this headline"></a></h3>
+<p>An ivshmem device configured for interrupts connects to an ivshmem
+server.  This section details the protocol between the two.</p>
+<p>The connection is one-way: the server sends messages to the client.
+Each message consists of a single 8 byte little-endian signed number,
+and may be accompanied by a file descriptor via SCM_RIGHTS.  Both
+client and server close the connection on error.</p>
+<p>Note: QEMU currently doesn’t close the connection right on error, but
+only when the character device is destroyed.</p>
+<p>On connect, the server sends the following messages in order:</p>
+<ol class="arabic simple">
+<li><p>The protocol version number, currently zero.  The client should
+close the connection on receipt of versions it can’t handle.</p></li>
+<li><p>The client’s ID.  This is unique among all clients of this server.
+IDs must be between 0 and 65535, because the Doorbell register
+provides only 16 bits for them.</p></li>
+<li><p>The number -1, accompanied by the file descriptor for the shared
+memory.</p></li>
+<li><p>Connect notifications for existing other clients, if any.  This is
+a peer ID (number between 0 and 65535 other than the client’s ID),
+repeated N times.  Each repetition is accompanied by one file
+descriptor.  These are for interrupting the peer with that ID using
+vector 0,..,N-1, in order.  If the client is configured for fewer
+vectors, it closes the extra file descriptors.  If it is configured
+for more, the extra vectors remain unconnected.</p></li>
+<li><p>Interrupt setup.  This is the client’s own ID, repeated N times.
+Each repetition is accompanied by one file descriptor.  These are
+for receiving interrupts from peers using vector 0,..,N-1, in
+order.  If the client is configured for fewer vectors, it closes
+the extra file descriptors.  If it is configured for more, the
+extra vectors remain unconnected.</p></li>
+</ol>
+<p>From then on, the server sends these kinds of messages:</p>
+<ol class="arabic simple" start="6">
+<li><p>Connection / disconnection notification.  This is a peer ID.</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>If the number comes with a file descriptor, it’s a connection
+notification, exactly like in step 4.</p></li>
+<li><p>Else, it’s a disconnection notification for the peer with that ID.</p></li>
+</ul>
+</div></blockquote>
+<p>Known bugs:</p>
+<ul class="simple">
+<li><p>The protocol changed incompatibly in QEMU 2.5.  Before, messages
+were native endian long, and there was no version number.</p></li>
+<li><p>The protocol is poorly designed.</p></li>
+</ul>
+</section>
+<section id="the-ivshmem-client-client-protocol">
+<h3>The ivshmem Client-Client Protocol<a class="headerlink" href="#the-ivshmem-client-client-protocol" title="Permalink to this headline"></a></h3>
+<p>An ivshmem device configured for interrupts receives eventfd file
+descriptors for interrupting peers and getting interrupted by peers
+from the server, as explained in the previous section.</p>
+<p>To interrupt a peer, the device writes the 8-byte integer 1 in native
+byte order to the respective file descriptor.</p>
+<p>To receive an interrupt, the device reads and discards as many 8-byte
+integers as it can.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="edu.html" class="btn btn-neutral float-left" title="EDU device" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pvpanic.html" class="btn btn-neutral float-right" title="PVPANIC DEVICE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

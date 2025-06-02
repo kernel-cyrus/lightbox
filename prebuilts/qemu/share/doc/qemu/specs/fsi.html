@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IBM’s Flexible Service Interface (FSI) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="VMWare PVSCSI Device Interface" href="vmw_pvscsi-spec.html" />
+    <link rel="prev" title="QEMU Firmware Configuration (fw_cfg) Device" href="fw_cfg.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Guest Hardware Specifications</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pci-ids.html">PCI IDs for QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pci-serial.html">QEMU PCI serial devices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pci-testdev.html">QEMU PCI test device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-xive.html">POWER9 XIVE interrupt controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-xive.html">XIVE for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html">NUMA mechanics for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#how-the-pseries-linux-guest-calculates-numa-distances">How the pseries Linux guest calculates NUMA distances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#pseries-numa-mechanics">pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#legacy-5-1-and-older-pseries-numa-mechanics">Legacy (5.1 and older) pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hw_reduced_hotplug.html">QEMU and ACPI BIOS Generic Event Device interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tpm.html">QEMU TPM Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hest_ghes.html">APEI tables generating and CPER record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_cpu_hotplug.html">QEMU&lt;-&gt;ACPI BIOS CPU hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_mem_hotplug.html">QEMU&lt;-&gt;ACPI BIOS memory hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_pci_hotplug.html">QEMU&lt;-&gt;ACPI BIOS PCI hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_nvdimm.html">QEMU&lt;-&gt;ACPI BIOS NVDIMM interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_erst.html">ACPI ERST DEVICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sev-guest-firmware.html">QEMU/Guest Firmware Interface for AMD SEV and SEV-ES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fw_cfg.html">QEMU Firmware Configuration (fw_cfg) Device</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">IBM’s Flexible Service Interface (FSI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vmw_pvscsi-spec.html">VMWare PVSCSI Device Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="edu.html">EDU device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ivshmem-spec.html">Device Specification for Inter-VM shared memory device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pvpanic.html">PVPANIC DEVICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spdm.html">QEMU Security Protocols and Data Models (SPDM) Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="standard-vga.html">QEMU Standard VGA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virt-ctlr.html">Virtual System Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vmcoreinfo.html">VMCoreInfo device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vmgenid.html">Virtual Machine Generation ID Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rapl-msr.html">RAPL MSR support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rocker.html">Rocker Network Switch Register Programming Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="riscv-iommu.html">RISC-V IOMMU support for RISC-V machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="riscv-aia.html">RISC-V AIA support for RISC-V machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspeed-intc.html">ASPEED Interrupt Controller</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">System Emulation Guest Hardware Specifications</a> &raquo;</li>
+      <li>IBM’s Flexible Service Interface (FSI)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/specs/fsi.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ibm-s-flexible-service-interface-fsi">
+<h1>IBM’s Flexible Service Interface (FSI)<a class="headerlink" href="#ibm-s-flexible-service-interface-fsi" title="Permalink to this headline"></a></h1>
+<p>The QEMU FSI emulation implements hardware interfaces between ASPEED SOC, FSI
+master/slave and the end engine.</p>
+<p>FSI is a point-to-point two wire interface which is capable of supporting
+distances of up to 4 meters. FSI interfaces have been used successfully for
+many years in IBM servers to attach IBM Flexible Support Processors(FSP) to
+CPUs and IBM ASICs.</p>
+<p>FSI allows a service processor access to the internal buses of a host POWER
+processor to perform configuration or debugging. FSI has long existed in POWER
+processes and so comes with some baggage, including how it has been integrated
+into the ASPEED SoC.</p>
+<p>Working backwards from the POWER processor, the fundamental pieces of interest
+for the implementation are: (see the <a class="reference external" href="https://openpowerfoundation.org/specifications/fsi/">FSI specification</a> for more details)</p>
+<ol class="arabic simple">
+<li><p>The Common FRU Access Macro (CFAM), an address space containing various
+“engines” that drive accesses on buses internal and external to the POWER
+chip. Examples include the SBEFIFO and I2C masters. The engines hang off of
+an internal Local Bus (LBUS) which is described by the CFAM configuration
+block.</p></li>
+<li><p>The FSI slave: The slave is the terminal point of the FSI bus for FSI
+symbols addressed to it. Slaves can be cascaded off of one another. The
+slave’s configuration registers appear in address space of the CFAM to
+which it is attached.</p></li>
+<li><p>The FSI master: A controller in the platform service processor (e.g. BMC)
+driving CFAM engine accesses into the POWER chip. At the hardware level
+FSI is a bit-based protocol supporting synchronous and DMA-driven accesses
+of engines in a CFAM.</p></li>
+<li><p>The On-Chip Peripheral Bus (OPB): A low-speed bus typically found in POWER
+processors. This now makes an appearance in the ASPEED SoC due to tight
+integration of the FSI master IP with the OPB, mainly the existence of an
+MMIO-mapping of the CFAM address straight onto a sub-region of the OPB
+address space.</p></li>
+<li><p>An APB-to-OPB bridge enabling access to the OPB from the ARM core in the
+AST2600. Hardware limitations prevent the OPB from being directly mapped
+into APB, so all accesses are indirect through the bridge.</p></li>
+</ol>
+<p>The LBUS is modelled to maintain the qdev bus hierarchy and to take advantages
+of the object model to automatically generate the CFAM configuration block.
+The configuration block presents engines in the order they are attached to the
+CFAM’s LBUS. Engine implementations should subclass the LBusDevice and set the
+‘config’ member of LBusDeviceClass to match the engine’s type.</p>
+<p>CFAM designs offer a lot of flexibility, for instance it is possible for a
+CFAM to be simultaneously driven from multiple FSI links. The modeling is not
+so complete; it’s assumed that each CFAM is attached to a single FSI slave (as
+a consequence the CFAM subclasses the FSI slave).</p>
+<p>As for FSI, its symbols and wire-protocol are not modelled at all. This is not
+necessary to get FSI off the ground thanks to the mapping of the CFAM address
+space onto the OPB address space - the models follow this directly and map the
+CFAM memory region into the OPB’s memory region.</p>
+<p>The following commands start the <code class="docutils literal notranslate"><span class="pre">rainier-bmc</span></code> machine with built-in FSI
+model. There are no model specific arguments. Please check this document to
+learn more about Aspeed <code class="docutils literal notranslate"><span class="pre">rainier-bmc</span></code> machine: (<a class="reference internal" href="../system/arm/aspeed.html"><span class="doc">Aspeed family boards (ast2500-evb, ast2600-evb, ast2700-evb, bletchley-bmc, fuji-bmc, fby35-bmc, fp5280g2-bmc, g220a-bmc, palmetto-bmc, qcom-dc-scm-v1-bmc, qcom-firework-bmc, quanta-q71l-bmc, rainier-bmc, romulus-bmc, sonorapass-bmc, supermicrox11-bmc, supermicrox11spi-bmc, tiogapass-bmc, witherspoon-bmc, yosemitev2-bmc)</span></a>)</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">qemu-system-arm -M rainier-bmc -nographic \</span>
+<span class="go">-kernel fitImage-linux.bin \</span>
+<span class="go">-dtb aspeed-bmc-ibm-rainier.dtb \</span>
+<span class="go">-initrd obmc-phosphor-initramfs.rootfs.cpio.xz \</span>
+<span class="go">-drive file=obmc-phosphor-image.rootfs.wic.qcow2,if=sd,index=2 \</span>
+<span class="go">-append &quot;rootwait console=ttyS4,115200n8 root=PARTLABEL=rofs-a&quot;</span>
+</pre></div>
+</div>
+<p>The implementation appears as following in the qemu device tree:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(qemu)</span> <span class="go">info qtree</span>
+<span class="go">bus: main-system-bus</span>
+<span class="go">  type System</span>
+<span class="go">  ...</span>
+<span class="go">  dev: aspeed.apb2opb, id &quot;&quot;</span>
+<span class="go">    gpio-out &quot;sysbus-irq&quot; 1</span>
+<span class="go">    mmio 000000001e79b000/0000000000001000</span>
+<span class="go">    bus: opb.1</span>
+<span class="go">      type opb</span>
+<span class="go">      dev: fsi.master, id &quot;&quot;</span>
+<span class="go">        bus: fsi.bus.1</span>
+<span class="go">          type fsi.bus</span>
+<span class="go">          dev: cfam.config, id &quot;&quot;</span>
+<span class="go">          dev: cfam, id &quot;&quot;</span>
+<span class="go">            bus: lbus.1</span>
+<span class="go">              type lbus</span>
+<span class="go">              dev: scratchpad, id &quot;&quot;</span>
+<span class="go">                address = 0 (0x0)</span>
+<span class="go">    bus: opb.0</span>
+<span class="go">      type opb</span>
+<span class="go">      dev: fsi.master, id &quot;&quot;</span>
+<span class="go">        bus: fsi.bus.0</span>
+<span class="go">          type fsi.bus</span>
+<span class="go">          dev: cfam.config, id &quot;&quot;</span>
+<span class="go">          dev: cfam, id &quot;&quot;</span>
+<span class="go">            bus: lbus.0</span>
+<span class="go">              type lbus</span>
+<span class="go">              dev: scratchpad, id &quot;&quot;</span>
+<span class="go">                address = 0 (0x0)</span>
+</pre></div>
+</div>
+<p>pdbg is a simple application to allow debugging of the host POWER processors
+from the BMC. (see the <a class="reference external" href="https://github.com/open-power/pdbg">pdbg source repository</a> for more details)</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">root@p10bmc:~# </span>pdbg<span class="w"> </span>-a<span class="w"> </span>getcfam<span class="w"> </span>0x0
+<span class="go">p0: 0x0 = 0xc0022d15</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fw_cfg.html" class="btn btn-neutral float-left" title="QEMU Firmware Configuration (fw_cfg) Device" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vmw_pvscsi-spec.html" class="btn btn-neutral float-right" title="VMWare PVSCSI Device Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

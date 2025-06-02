@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introduction &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Invocation" href="invocation.html" />
+    <link rel="prev" title="System Emulation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#virtualisation-accelerators">Virtualisation Accelerators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#feature-overview">Feature Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running">Running</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="targets.html">QEMU System Emulator Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="confidential-guest-support.html">Confidential Guest Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vm-templating.html">QEMU VM templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sriov.html">Compsable SR-IOV device</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">System Emulation</a> &raquo;</li>
+      <li>Introduction</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/system/introduction.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h1>
+<section id="virtualisation-accelerators">
+<span id="accelerators"></span><h2>Virtualisation Accelerators<a class="headerlink" href="#virtualisation-accelerators" title="Permalink to this headline"></a></h2>
+<p>QEMU’s system emulation provides a virtual model of a machine (CPU,
+memory and emulated devices) to run a guest OS. It supports a number
+of hypervisors (known as accelerators) as well as a JIT known as the
+Tiny Code Generator (TCG) capable of emulating many CPUs.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Supported Accelerators</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Accelerator</p></th>
+<th class="head"><p>Host OS</p></th>
+<th class="head"><p>Host Architectures</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>KVM</p></td>
+<td><p>Linux</p></td>
+<td><p>Arm (64 bit only), MIPS, PPC, RISC-V, s390x, x86</p></td>
+</tr>
+<tr class="row-odd"><td><p>Xen</p></td>
+<td><p>Linux (as dom0)</p></td>
+<td><p>Arm, x86</p></td>
+</tr>
+<tr class="row-even"><td><p>Hypervisor Framework (hvf)</p></td>
+<td><p>MacOS</p></td>
+<td><p>x86 (64 bit only), Arm (64 bit only)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Windows Hypervisor Platform (whpx)</p></td>
+<td><p>Windows</p></td>
+<td><p>x86</p></td>
+</tr>
+<tr class="row-even"><td><p>NetBSD Virtual Machine Monitor (nvmm)</p></td>
+<td><p>NetBSD</p></td>
+<td><p>x86</p></td>
+</tr>
+<tr class="row-odd"><td><p>Tiny Code Generator (tcg)</p></td>
+<td><p>Linux, other POSIX, Windows, MacOS</p></td>
+<td><p>Arm, x86, Loongarch64, MIPS, PPC, s390x, Sparc64</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="feature-overview">
+<h2>Feature Overview<a class="headerlink" href="#feature-overview" title="Permalink to this headline"></a></h2>
+<p>System emulation provides a wide range of device models to emulate
+various hardware components you may want to add to your machine. This
+includes a wide number of VirtIO devices which are specifically tuned
+for efficient operation under virtualisation. Some of the device
+emulation can be offloaded from the main QEMU process using either
+vhost-user (for VirtIO) or <a class="reference internal" href="multi-process.html#multi-process-qemu"><span class="std std-ref">Multi-process QEMU</span></a>. If the platform
+supports it QEMU also supports directly passing devices through to
+guest VMs to eliminate the device emulation overhead. See
+<a class="reference internal" href="device-emulation.html#device-emulation"><span class="std std-ref">Device Emulation</span></a> for more details.</p>
+<p>There is a full <a class="reference internal" href="../interop/live-block-operations.html#live-block-operations"><span class="std std-ref">featured block layer</span></a>
+which allows for construction of complex storage topology which can be
+stacked across multiple layers supporting redirection, networking,
+snapshots and migration support.</p>
+<p>The flexible <code class="docutils literal notranslate"><span class="pre">chardev</span></code> system allows for handling IO from character
+like devices using stdio, files, unix sockets and TCP networking.</p>
+<p>QEMU provides a number of management interfaces including a line based
+<a class="reference internal" href="monitor.html#qemu-monitor"><span class="std std-ref">Human Monitor Protocol (HMP)</span></a> that allows you to
+dynamically add and remove devices as well as introspect the system
+state. The <a class="reference internal" href="../interop/qemu-qmp-ref.html#qmp-ref"><span class="std std-ref">QEMU Monitor Protocol</span></a> (QMP) is a well
+defined, versioned, machine usable API that presents a rich interface
+to other tools to create, control and manage Virtual Machines. This is
+the interface used by higher level tools interfaces such as <a class="reference external" href="https://virt-manager.org/">Virt
+Manager</a> using the <a class="reference external" href="https://libvirt.org">libvirt framework</a>.</p>
+<p>For the common accelerators QEMU, supported debugging with its
+<a class="reference internal" href="gdb.html#gdb-usage"><span class="std std-ref">gdbstub</span></a> which allows users to connect GDB and debug
+system software images.</p>
+</section>
+<section id="running">
+<h2>Running<a class="headerlink" href="#running" title="Permalink to this headline"></a></h2>
+<p>QEMU provides a rich and complex API which can be overwhelming to
+understand. While some architectures can boot something with just a
+disk image, those examples elide a lot of details with defaults that
+may not be optimal for modern systems.</p>
+<p>For a non-x86 system where we emulate a broad range of machine types,
+the command lines are generally more explicit in defining the machine
+and boot behaviour. You will find often find example command lines in
+the <a class="reference internal" href="targets.html#system-targets-ref"><span class="std std-ref">QEMU System Emulator Targets</span></a> section of the manual.</p>
+<p>While the project doesn’t want to discourage users from using the
+command line to launch VMs, we do want to highlight that there are a
+number of projects dedicated to providing a more user friendly
+experience. Those built around the <code class="docutils literal notranslate"><span class="pre">libvirt</span></code> framework can make use
+of feature probing to build modern VM images tailored to run on the
+hardware you have.</p>
+<p>That said, the general form of a QEMU command line can be expressed
+as:</p>
+<pre class="literal-block">$ qemu-system-x86_64 [machine opts] \
+                [cpu opts] \
+                [accelerator opts] \
+                [device opts] \
+                [backend opts] \
+                [interface opts] \
+                [boot opts]</pre>
+<p>Most options will generate some help information. So for example:</p>
+<pre class="literal-block">$ qemu-system-x86_64 -M help</pre>
+<p>will list the machine types supported by that QEMU binary. <code class="docutils literal notranslate"><span class="pre">help</span></code>
+can also be passed as an argument to another option. For example:</p>
+<pre class="literal-block">$ qemu-system-x86_64 -device scsi-hd,help</pre>
+<p>will list the arguments and their default values of additional options
+that can control the behaviour of the <code class="docutils literal notranslate"><span class="pre">scsi-hd</span></code> device.</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Options Overview</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Options</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Machine</p></td>
+<td><p>Define the machine type, amount of memory etc</p></td>
+</tr>
+<tr class="row-odd"><td><p>CPU</p></td>
+<td><p>Type and number/topology of vCPUs. Most accelerators offer
+a <code class="docutils literal notranslate"><span class="pre">host</span></code> cpu option which simply passes through your host CPU
+configuration without filtering out any features.</p></td>
+</tr>
+<tr class="row-even"><td><p>Accelerator</p></td>
+<td><p>This will depend on the hypervisor you run. Note that the
+default is TCG, which is purely emulated, so you must specify an
+accelerator type to take advantage of hardware virtualization.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Devices</p></td>
+<td><p>Additional devices that are not defined by default with the
+machine type.</p></td>
+</tr>
+<tr class="row-even"><td><p>Backends</p></td>
+<td><p>Backends are how QEMU deals with the guest’s data, for example
+how a block device is stored, how network devices see the
+network or how a serial device is directed to the outside world.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Interfaces</p></td>
+<td><p>How the system is displayed, how it is managed and controlled or
+debugged.</p></td>
+</tr>
+<tr class="row-even"><td><p>Boot</p></td>
+<td><p>How the system boots, via firmware or direct kernel boot.</p></td>
+</tr>
+</tbody>
+</table>
+<p>In the following example we first define a <code class="docutils literal notranslate"><span class="pre">virt</span></code> machine which is a
+general purpose platform for running Aarch64 guests. We enable
+virtualisation so we can use KVM inside the emulated guest. As the
+<code class="docutils literal notranslate"><span class="pre">virt</span></code> machine comes with some built in pflash devices we give them
+names so we can override the defaults later.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 \
+   -machine type=virt,virtualization=on,pflash0=rom,pflash1=efivars \
+   -m 4096 \
+</pre></div>
+</div>
+<p>We then define the 4 vCPUs using the <code class="docutils literal notranslate"><span class="pre">max</span></code> option which gives us all
+the Arm features QEMU is capable of emulating. We enable a more
+emulation friendly implementation of Arm’s pointer authentication
+algorithm. We explicitly specify TCG acceleration even though QEMU
+would default to it anyway.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">cpu</span> <span class="nb">max</span> \
+<span class="o">-</span><span class="n">smp</span> <span class="mi">4</span> \
+<span class="o">-</span><span class="n">accel</span> <span class="n">tcg</span> \
+</pre></div>
+</div>
+<p>As the <code class="docutils literal notranslate"><span class="pre">virt</span></code> platform doesn’t have any default network or storage
+devices we need to define them. We give them ids so we can link them
+with the backend later on.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">device</span> <span class="n">virtio</span><span class="o">-</span><span class="n">net</span><span class="o">-</span><span class="n">pci</span><span class="p">,</span><span class="n">netdev</span><span class="o">=</span><span class="n">unet</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">virtio</span><span class="o">-</span><span class="n">scsi</span><span class="o">-</span><span class="n">pci</span> \
+<span class="o">-</span><span class="n">device</span> <span class="n">scsi</span><span class="o">-</span><span class="n">hd</span><span class="p">,</span><span class="n">drive</span><span class="o">=</span><span class="n">hd</span> \
+</pre></div>
+</div>
+<p>We connect the user-mode networking to our network device. As
+user-mode networking isn’t directly accessible from the outside world
+we forward localhost port 2222 to the ssh port on the guest.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">netdev</span> <span class="n">user</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">unet</span><span class="p">,</span><span class="n">hostfwd</span><span class="o">=</span><span class="n">tcp</span><span class="p">::</span><span class="mi">2222</span><span class="o">-</span><span class="p">:</span><span class="mi">22</span> \
+</pre></div>
+</div>
+<p>We connect the guest visible block device to an LVM partition we have
+set aside for our guest.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">blockdev</span> <span class="n">driver</span><span class="o">=</span><span class="n">raw</span><span class="p">,</span><span class="n">node</span><span class="o">-</span><span class="n">name</span><span class="o">=</span><span class="n">hd</span><span class="p">,</span><span class="n">file</span><span class="o">.</span><span class="n">driver</span><span class="o">=</span><span class="n">host_device</span><span class="p">,</span><span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="o">=/</span><span class="n">dev</span><span class="o">/</span><span class="n">lvm</span><span class="o">-</span><span class="n">disk</span><span class="o">/</span><span class="n">debian</span><span class="o">-</span><span class="n">bullseye</span><span class="o">-</span><span class="n">arm64</span> \
+</pre></div>
+</div>
+<p>We then tell QEMU to multiplex the <a class="reference internal" href="monitor.html#qemu-monitor"><span class="std std-ref">QEMU Monitor</span></a> with the serial
+port output (we can switch between the two using <a class="reference internal" href="mux-chardev.html#keys-in-the-character-backend-multiplexer"><span class="std std-ref">Keys in the character backend multiplexer</span></a>). As there is no default graphical
+device we disable the display as we can work entirely in the terminal.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">serial</span> <span class="n">mon</span><span class="p">:</span><span class="n">stdio</span> \
+<span class="o">-</span><span class="n">display</span> <span class="n">none</span> \
+</pre></div>
+</div>
+<p>Finally we override the default firmware to ensure we have some
+storage for EFI to persist its configuration. That firmware is
+responsible for finding the disk, booting grub and eventually running
+our system.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>-blockdev node-name=rom,driver=file,filename=(pwd)/pc-bios/edk2-aarch64-code.fd,read-only=true \
+-blockdev node-name=efivars,driver=file,filename=$HOME/images/qemu-arm64-efivars
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="System Emulation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="invocation.html" class="btn btn-neutral float-right" title="Invocation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

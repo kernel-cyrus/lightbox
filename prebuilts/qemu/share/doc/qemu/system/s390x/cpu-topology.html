@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CPU topology on s390x &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Sparc32 System emulator" href="../target-sparc.html" />
+    <link rel="prev" title="Protected Virtualization on s390x" href="protvirt.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../target-arm.html">Arm System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-loongarch.html">LoongArch System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../target-s390x.html#device-support">Device support</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../target-s390x.html#architectural-features">Architectural features</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vm-templating.html">QEMU VM templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sriov.html">Compsable SR-IOV device</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">System Emulation</a> &raquo;</li>
+          <li><a href="../targets.html">QEMU System Emulator Targets</a> &raquo;</li>
+          <li><a href="../target-s390x.html">s390x System emulator</a> &raquo;</li>
+      <li>CPU topology on s390x</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/system/s390x/cpu-topology.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cpu-topology-on-s390x">
+<span id="cpu-topology-s390x"></span><h1>CPU topology on s390x<a class="headerlink" href="#cpu-topology-on-s390x" title="Permalink to this headline"></a></h1>
+<p>Since QEMU 8.2, CPU topology on s390x provides up to 3 levels of
+topology containers: drawers, books and sockets. They define a
+tree-shaped hierarchy.</p>
+<p>The socket container has one or more CPU entries.
+Each of these CPU entries consists of a bitmap and three CPU attributes:</p>
+<ul class="simple">
+<li><p>CPU type</p></li>
+<li><p>entitlement</p></li>
+<li><p>dedication</p></li>
+</ul>
+<p>Each bit set in the bitmap correspond to a core-id of a vCPU with matching
+attributes.</p>
+<p>This documentation provides general information on S390 CPU topology,
+how to enable it and explains the new CPU attributes.
+For information on how to modify the S390 CPU topology and how to
+monitor polarization changes, see <code class="docutils literal notranslate"><span class="pre">docs/devel/s390-cpu-topology.rst</span></code>.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"></a></h2>
+<p>To use the CPU topology, you currently need to choose the KVM accelerator.
+See <a class="reference internal" href="../introduction.html#accelerators"><span class="std std-ref">Virtualisation Accelerators</span></a> for more details about accelerators and how to select them.</p>
+<p>The s390x host needs to use a Linux kernel v6.0 or newer (which provides the so-called
+<code class="docutils literal notranslate"><span class="pre">KVM_CAP_S390_CPU_TOPOLOGY</span></code> capability that allows QEMU to signal the
+CPU topology facility via the so-called STFLE bit 11 to the VM).</p>
+</section>
+<section id="enabling-cpu-topology">
+<h2>Enabling CPU topology<a class="headerlink" href="#enabling-cpu-topology" title="Permalink to this headline"></a></h2>
+<p>Currently, CPU topology is enabled by default only in the “host” CPU model.</p>
+<p>Enabling CPU topology in another CPU model is done by setting the CPU flag
+<code class="docutils literal notranslate"><span class="pre">ctop</span></code> to <code class="docutils literal notranslate"><span class="pre">on</span></code> as in:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>-cpu<span class="w"> </span>gen16b,ctop<span class="o">=</span>on
+</pre></div>
+</div>
+<p>Having the topology disabled by default allows migration between
+old and new QEMU without adding new flags.</p>
+</section>
+<section id="default-topology-usage">
+<h2>Default topology usage<a class="headerlink" href="#default-topology-usage" title="Permalink to this headline"></a></h2>
+<p>The CPU topology can be specified on the QEMU command line
+with the <code class="docutils literal notranslate"><span class="pre">-smp</span></code> or the <code class="docutils literal notranslate"><span class="pre">-device</span></code> QEMU command arguments.</p>
+<p>Note also that since 7.2 threads are no longer supported in the topology
+and the <code class="docutils literal notranslate"><span class="pre">-smp</span></code> command line argument accepts only <code class="docutils literal notranslate"><span class="pre">threads=1</span></code>.</p>
+<p>If none of the containers attributes (drawers, books, sockets) are
+specified for the <code class="docutils literal notranslate"><span class="pre">-smp</span></code> flag, the number of these containers
+is 1.</p>
+<p>Thus the following two options will result in the same topology:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>-smp<span class="w"> </span><span class="nv">cpus</span><span class="o">=</span><span class="m">5</span>,drawer<span class="o">=</span><span class="m">1</span>,books<span class="o">=</span><span class="m">1</span>,sockets<span class="o">=</span><span class="m">8</span>,cores<span class="o">=</span><span class="m">4</span>,maxcpus<span class="o">=</span><span class="m">32</span>
+</pre></div>
+</div>
+<p>and</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>-smp<span class="w"> </span><span class="nv">cpus</span><span class="o">=</span><span class="m">5</span>,sockets<span class="o">=</span><span class="m">8</span>,cores<span class="o">=</span><span class="m">4</span>,maxcpus<span class="o">=</span><span class="m">32</span>
+</pre></div>
+</div>
+<p>When a CPU is defined by the <code class="docutils literal notranslate"><span class="pre">-smp</span></code> command argument, its position
+inside the topology is calculated by adding the CPUs to the topology
+based on the core-id starting with core-0 at position 0 of socket-0,
+book-0, drawer-0 and filling all CPUs of socket-0 before filling socket-1
+of book-0 and so on up to the last socket of the last book of the last
+drawer.</p>
+<p>When a CPU is defined by the <code class="docutils literal notranslate"><span class="pre">-device</span></code> command argument, the
+tree topology attributes must all be defined or all not defined.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>-device<span class="w"> </span>gen16b-s390x-cpu,drawer-id<span class="o">=</span><span class="m">1</span>,book-id<span class="o">=</span><span class="m">1</span>,socket-id<span class="o">=</span><span class="m">2</span>,core-id<span class="o">=</span><span class="m">1</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>-device<span class="w"> </span>gen16b-s390x-cpu,core-id<span class="o">=</span><span class="m">1</span>,dedicated<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>If none of the tree attributes (drawer, book, sockets), are specified
+for the <code class="docutils literal notranslate"><span class="pre">-device</span></code> argument, like for all CPUs defined with the <code class="docutils literal notranslate"><span class="pre">-smp</span></code>
+command argument the topology tree attributes will be set by simply
+adding the CPUs to the topology based on the core-id.</p>
+<p>QEMU will not try to resolve collisions and will report an error if the
+CPU topology defined explicitly or implicitly on a <code class="docutils literal notranslate"><span class="pre">-device</span></code>
+argument collides with the definition of a CPU implicitly defined
+on the <code class="docutils literal notranslate"><span class="pre">-smp</span></code> argument.</p>
+<p>When the topology modifier attributes are not defined for the
+<code class="docutils literal notranslate"><span class="pre">-device</span></code> command argument they takes following default values:</p>
+<ul class="simple">
+<li><p>dedicated: <code class="docutils literal notranslate"><span class="pre">false</span></code></p></li>
+<li><p>entitlement: <code class="docutils literal notranslate"><span class="pre">medium</span></code></p></li>
+</ul>
+<section id="hot-plug">
+<h3>Hot plug<a class="headerlink" href="#hot-plug" title="Permalink to this headline"></a></h3>
+<p>New CPUs can be plugged using the device_add hmp command as in:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>qemu<span class="o">)</span><span class="w"> </span>device_add<span class="w"> </span>gen16b-s390x-cpu,core-id<span class="o">=</span><span class="m">9</span>
+</pre></div>
+</div>
+<p>The placement of the CPU is derived from the core-id as described above.</p>
+<p>The topology can of course also be fully defined:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>qemu<span class="o">)</span><span class="w"> </span>device_add<span class="w"> </span>gen16b-s390x-cpu,drawer-id<span class="o">=</span><span class="m">1</span>,book-id<span class="o">=</span><span class="m">1</span>,socket-id<span class="o">=</span><span class="m">2</span>,core-id<span class="o">=</span><span class="m">1</span>
+</pre></div>
+</div>
+</section>
+<section id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline"></a></h3>
+<p>In the following machine we define 8 sockets with 4 cores each.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>qemu-system-s390x<span class="w"> </span>-accel<span class="w"> </span>kvm<span class="w"> </span>-m<span class="w"> </span>2G<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-cpu<span class="w"> </span>gen16b,ctop<span class="o">=</span>on<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-smp<span class="w"> </span><span class="nv">cpus</span><span class="o">=</span><span class="m">5</span>,sockets<span class="o">=</span><span class="m">8</span>,cores<span class="o">=</span><span class="m">4</span>,maxcpus<span class="o">=</span><span class="m">32</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-device<span class="w"> </span>host-s390x-cpu,core-id<span class="o">=</span><span class="m">14</span><span class="w"> </span><span class="se">\</span>
+</pre></div>
+</div>
+<p>A new CPUs can be plugged using the device_add hmp command as before:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>qemu<span class="o">)</span><span class="w"> </span>device_add<span class="w"> </span>gen16b-s390x-cpu,core-id<span class="o">=</span><span class="m">9</span>
+</pre></div>
+</div>
+<p>The core-id defines the placement of the core in the topology by
+starting with core 0 in socket 0 up to maxcpus.</p>
+<p>In the example above:</p>
+<ul class="simple">
+<li><p>There are 5 CPUs provided to the guest with the <code class="docutils literal notranslate"><span class="pre">-smp</span></code> command line
+They will take the core-ids 0,1,2,3,4
+As we have 4 cores in a socket, we have 4 CPUs provided
+to the guest in socket 0, with core-ids 0,1,2,3.
+The last CPU, with core-id 4, will be on socket 1.</p></li>
+<li><p>the core with ID 14 provided by the <code class="docutils literal notranslate"><span class="pre">-device</span></code> command line will
+be placed in socket 3, with core-id 14</p></li>
+<li><p>the core with ID 9 provided by the <code class="docutils literal notranslate"><span class="pre">device_add</span></code> qmp command will
+be placed in socket 2, with core-id 9</p></li>
+</ul>
+</section>
+</section>
+<section id="polarization-entitlement-and-dedication">
+<h2>Polarization, entitlement and dedication<a class="headerlink" href="#polarization-entitlement-and-dedication" title="Permalink to this headline"></a></h2>
+<section id="polarization">
+<h3>Polarization<a class="headerlink" href="#polarization" title="Permalink to this headline"></a></h3>
+<p>The polarization affects how the CPUs of a shared host are utilized/distributed
+among guests.
+The guest determines the polarization by using the PTF instruction.</p>
+<p>Polarization defines two models of CPU provisioning: horizontal
+and vertical.</p>
+<p>The horizontal polarization is the default model on boot and after
+subsystem reset. When horizontal polarization is in effect all vCPUs should
+have about equal resource provisioning.</p>
+<p>In the vertical polarization model vCPUs are unequal, but overall more resources
+might be available.
+The guest can make use of the vCPU entitlement information provided by the host
+to optimize kernel thread scheduling.</p>
+<p>A subsystem reset puts all vCPU of the configuration into the
+horizontal polarization.</p>
+</section>
+<section id="entitlement">
+<h3>Entitlement<a class="headerlink" href="#entitlement" title="Permalink to this headline"></a></h3>
+<p>The vertical polarization specifies that the guest’s vCPU can get
+different real CPU provisioning:</p>
+<ul class="simple">
+<li><p>a vCPU with vertical high entitlement specifies that this
+vCPU gets 100% of the real CPU provisioning.</p></li>
+<li><p>a vCPU with vertical medium entitlement specifies that this
+vCPU shares the real CPU with other vCPUs.</p></li>
+<li><p>a vCPU with vertical low entitlement specifies that this
+vCPU only gets real CPU provisioning when no other vCPUs needs it.</p></li>
+</ul>
+<p>In the case a vCPU with vertical high entitlement does not use
+the real CPU, the unused “slack” can be dispatched to other vCPU
+with medium or low entitlement.</p>
+<p>A vCPU can be “dedicated” in which case the vCPU is fully dedicated to a single
+real CPU.</p>
+<p>The dedicated bit is an indication of affinity of a vCPU for a real CPU
+while the entitlement indicates the sharing or exclusivity of use.</p>
+</section>
+</section>
+<section id="defining-the-topology-on-the-command-line">
+<h2>Defining the topology on the command line<a class="headerlink" href="#defining-the-topology-on-the-command-line" title="Permalink to this headline"></a></h2>
+<p>The topology can entirely be defined using -device cpu statements,
+with the exception of CPU 0 which must be defined with the -smp
+argument.</p>
+<p>For example, here we set the position of the cores 1,2,3 to
+drawer 1, book 1, socket 2 and cores 0,9 and 14 to drawer 0,
+book 0, socket 0 without defining entitlement or dedication.
+Core 4 will be set on its default position on socket 1
+(since we have 4 core per socket) and we define it as dedicated and
+with vertical high entitlement.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>qemu-system-s390x<span class="w"> </span>-accel<span class="w"> </span>kvm<span class="w"> </span>-m<span class="w"> </span>2G<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-cpu<span class="w"> </span>gen16b,ctop<span class="o">=</span>on<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-smp<span class="w"> </span><span class="nv">cpus</span><span class="o">=</span><span class="m">1</span>,sockets<span class="o">=</span><span class="m">8</span>,cores<span class="o">=</span><span class="m">4</span>,maxcpus<span class="o">=</span><span class="m">32</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="se">\</span>
+<span class="w">  </span>-device<span class="w"> </span>gen16b-s390x-cpu,drawer-id<span class="o">=</span><span class="m">1</span>,book-id<span class="o">=</span><span class="m">1</span>,socket-id<span class="o">=</span><span class="m">2</span>,core-id<span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-device<span class="w"> </span>gen16b-s390x-cpu,drawer-id<span class="o">=</span><span class="m">1</span>,book-id<span class="o">=</span><span class="m">1</span>,socket-id<span class="o">=</span><span class="m">2</span>,core-id<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-device<span class="w"> </span>gen16b-s390x-cpu,drawer-id<span class="o">=</span><span class="m">1</span>,book-id<span class="o">=</span><span class="m">1</span>,socket-id<span class="o">=</span><span class="m">2</span>,core-id<span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="se">\</span>
+<span class="w">  </span>-device<span class="w"> </span>gen16b-s390x-cpu,drawer-id<span class="o">=</span><span class="m">0</span>,book-id<span class="o">=</span><span class="m">0</span>,socket-id<span class="o">=</span><span class="m">0</span>,core-id<span class="o">=</span><span class="m">9</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-device<span class="w"> </span>gen16b-s390x-cpu,drawer-id<span class="o">=</span><span class="m">0</span>,book-id<span class="o">=</span><span class="m">0</span>,socket-id<span class="o">=</span><span class="m">0</span>,core-id<span class="o">=</span><span class="m">14</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="se">\</span>
+<span class="w">  </span>-device<span class="w"> </span>gen16b-s390x-cpu,core-id<span class="o">=</span><span class="m">4</span>,dedicated<span class="o">=</span>on,entitlement<span class="o">=</span>high
+</pre></div>
+</div>
+<p>The entitlement defined for the CPU 4 will only be used after the guest
+successfully enables vertical polarization by using the PTF instruction.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="protvirt.html" class="btn btn-neutral float-left" title="Protected Virtualization on s390x" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../target-sparc.html" class="btn btn-neutral float-right" title="Sparc32 System emulator" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

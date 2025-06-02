@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UEFI variables &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="IOMMUFD BACKEND usage with VFIO" href="vfio-iommufd.html" />
+    <link rel="prev" title="Tracing" href="tracing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing/index.html">Testing QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rcu.html">Using RCU (Read-Copy-Update) for synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="migration/index.html">Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="s390-cpu-topology.html">QAPI interface for S390 CPU topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracing.html">Tracing</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">UEFI variables</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#guest-uefi-variable-management">Guest UEFI variable management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host-uefi-variable-service">Host UEFI variable service</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vfio-iommufd.html">IOMMUFD BACKEND usage with VFIO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crypto.html">Cryptography in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multiple-iothreads.html">Using Multiple <code class="docutils literal notranslate"><span class="pre">IOThread</span></code>s</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Developer Information</a> &raquo;</li>
+          <li><a href="index-internals.html">Internal Subsystem Information</a> &raquo;</li>
+      <li>UEFI variables</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/uefi-vars.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="uefi-variables">
+<h1>UEFI variables<a class="headerlink" href="#uefi-variables" title="Permalink to this headline"></a></h1>
+<section id="guest-uefi-variable-management">
+<h2>Guest UEFI variable management<a class="headerlink" href="#guest-uefi-variable-management" title="Permalink to this headline"></a></h2>
+<p>The traditional approach for UEFI Variable storage in qemu guests is
+to work as close as possible to physical hardware.  That means
+providing pflash as storage and leaving the management of variables
+and flash to the guest.</p>
+<p>Secure boot support comes with the requirement that the UEFI variable
+storage must be protected against direct access by the OS.  All update
+requests must pass the sanity checks.  (Parts of) the firmware must
+run with a higher privilege level than the OS so this can be enforced
+by the firmware.  On x86 this has been implemented using System
+Management Mode (SMM) in qemu and kvm, which again is the same
+approach taken by physical hardware.  Only privileged code running in
+SMM mode is allowed to access flash storage.</p>
+<p>Communication with the firmware code running in SMM mode works by
+serializing the requests to a shared buffer, then trapping into SMM
+mode via SMI.  The SMM code processes the request, stores the reply in
+the same buffer and returns.</p>
+</section>
+<section id="host-uefi-variable-service">
+<h2>Host UEFI variable service<a class="headerlink" href="#host-uefi-variable-service" title="Permalink to this headline"></a></h2>
+<p>Instead of running the privileged code inside the guest we can run it
+on the host.  The serialization protocol can be reused.  The
+communication with the host uses a virtual device, which essentially
+configures the shared buffer location and size, and traps to the host
+to process the requests.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">uefi-vars</span></code> device implements the UEFI virtual device.  It comes
+in <code class="docutils literal notranslate"><span class="pre">uefi-vars-x86</span></code> and <code class="docutils literal notranslate"><span class="pre">uefi-vars-sysbus</span></code> flavours.  The device
+reimplements the handlers needed, specifically
+<code class="docutils literal notranslate"><span class="pre">EfiSmmVariableProtocol</span></code> and <code class="docutils literal notranslate"><span class="pre">VarCheckPolicyLibMmiHandler</span></code>.  It
+also consumes events (<code class="docutils literal notranslate"><span class="pre">EfiEndOfDxeEventGroup</span></code>,
+<code class="docutils literal notranslate"><span class="pre">EfiEventReadyToBoot</span></code> and <code class="docutils literal notranslate"><span class="pre">EfiEventExitBootServices</span></code>).</p>
+<p>The advantage of the approach is that we do not need a special
+privilege level for the firmware to protect itself, i.e. it does not
+depend on SMM emulation on x64, which allows the removal of a bunch of
+complex code for SMM emulation from the linux kernel
+(CONFIG_KVM_SMM=n).  It also allows support for secure boot on arm
+without implementing secure world (el3) emulation in kvm.</p>
+<p>Of course there are also downsides.  The added device increases the
+attack surface of the host, and we are adding some code duplication
+because we have to reimplement some edk2 functionality in qemu.</p>
+<section id="usage-on-x86-64">
+<h3>usage on x86_64<a class="headerlink" href="#usage-on-x86-64" title="Permalink to this headline"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">x86_64</span> \
+   <span class="o">-</span><span class="n">device</span> <span class="n">uefi</span><span class="o">-</span><span class="nb">vars</span><span class="o">-</span><span class="n">x86</span><span class="p">,</span><span class="n">jsonfile</span><span class="o">=/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="nb">vars</span><span class="o">.</span><span class="n">json</span>
+</pre></div>
+</div>
+</section>
+<section id="usage-on-aarch64">
+<h3>usage on aarch64<a class="headerlink" href="#usage-on-aarch64" title="Permalink to this headline"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">aarch64</span> <span class="o">-</span><span class="n">M</span> <span class="n">virt</span> \
+   <span class="o">-</span><span class="n">device</span> <span class="n">uefi</span><span class="o">-</span><span class="nb">vars</span><span class="o">-</span><span class="n">sysbus</span><span class="p">,</span><span class="n">jsonfile</span><span class="o">=/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="nb">vars</span><span class="o">.</span><span class="n">json</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tracing.html" class="btn btn-neutral float-left" title="Tracing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vfio-iommufd.html" class="btn btn-neutral float-right" title="IOMMUFD BACKEND usage with VFIO" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -6,11 +6,11 @@
     "mapping": {
         "device": "flash",
         "executable": {
-            "filename": "/home/cyrus/Workspace/projects/lightbox/prebuilts/qemu/share/qemu/edk2-aarch64-code.fd",
+            "filename": "/home/cyrus/Workspace/project/lightbox/prebuilts/qemu/share/qemu/edk2-aarch64-code.fd",
             "format": "raw"
         },
         "nvram-template": {
-            "filename": "/home/cyrus/Workspace/projects/lightbox/prebuilts/qemu/share/qemu/edk2-arm-vars.fd",
+            "filename": "/home/cyrus/Workspace/project/lightbox/prebuilts/qemu/share/qemu/edk2-arm-vars.fd",
             "format": "raw"
         }
     },

@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qcow2 Image File Format &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Persistent reservation helper protocol" href="pr-helper.html" />
+    <link rel="prev" title="Parallels Disk Format" href="prl-xml.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Management and Interoperability</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">Barrier client protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitmaps.html">Dirty Bitmaps and Incremental Backup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus.html">D-Bus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-vmstate.html">D-Bus VMState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-display.html">D-Bus display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="live-block-operations.html">Live Block Device Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nbd.html">QEMU NBD protocol support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallels.html">Parallels Expandable Image File Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prl-xml.html">Parallels Disk Format</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Qcow2 Image File Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#header">Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#additional-fields-version-3-and-higher">Additional fields (version 3 and higher)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#header-padding">Header padding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#header-extensions">Header extensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#string-header-extensions">String header extensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#feature-name-table">Feature name table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bitmaps-extension">Bitmaps extension</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#full-disk-encryption-header-pointer">Full disk encryption header pointer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-encryption">Data encryption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#host-cluster-management">Host cluster management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cluster-mapping">Cluster mapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extended-l2-entries">Extended L2 Entries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snapshots">Snapshots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bitmaps">Bitmaps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bitmap-directory">Bitmap directory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bitmap-table">Bitmap table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bitmap-data">Bitmap data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dirty-tracking-bitmaps">Dirty tracking bitmaps</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pr-helper.html">Persistent reservation helper protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qmp-spec.html">QEMU Machine Protocol Specification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga.html">QEMU Guest Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga-ref.html">QEMU Guest Agent Protocol Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-qmp-ref.html">QEMU QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-storage-daemon-qmp-ref.html">QEMU Storage Daemon QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user.html">Vhost-user Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user-gpu.html">Vhost-user-gpu Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-vdpa.html">Vhost-vdpa Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-balloon-stats.html">Virtio balloon memory statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-ledstate-pseudo-encoding.html">VNC LED state Pseudo-encoding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">System Emulation Management and Interoperability</a> &raquo;</li>
+      <li>Qcow2 Image File Format</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/interop/qcow2.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qcow2-image-file-format">
+<h1>Qcow2 Image File Format<a class="headerlink" href="#qcow2-image-file-format" title="Permalink to this headline"></a></h1>
+<p>A <code class="docutils literal notranslate"><span class="pre">qcow2</span></code> image file is organized in units of constant size, which are called
+(host) clusters. A cluster is the unit in which all allocations are done,
+both for actual guest data and for image metadata.</p>
+<p>Likewise, the virtual disk as seen by the guest is divided into (guest)
+clusters of the same size.</p>
+<p>All numbers in qcow2 are stored in Big Endian byte order.</p>
+<section id="header">
+<h2>Header<a class="headerlink" href="#header" title="Permalink to this headline"></a></h2>
+<p>The first cluster of a qcow2 image contains the file header:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Byte</span>  <span class="mi">0</span> <span class="o">-</span>  <span class="mi">3</span><span class="p">:</span>   <span class="n">magic</span>
+                <span class="n">QCOW</span> <span class="n">magic</span> <span class="n">string</span> <span class="p">(</span><span class="s2">&quot;QFI</span><span class="se">\xfb</span><span class="s2">&quot;</span><span class="p">)</span>
+
+      <span class="mi">4</span> <span class="o">-</span>  <span class="mi">7</span><span class="p">:</span>   <span class="n">version</span>
+                <span class="n">Version</span> <span class="n">number</span> <span class="p">(</span><span class="n">valid</span> <span class="n">values</span> <span class="n">are</span> <span class="mi">2</span> <span class="ow">and</span> <span class="mi">3</span><span class="p">)</span>
+
+      <span class="mi">8</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span>   <span class="n">backing_file_offset</span>
+                <span class="n">Offset</span> <span class="n">into</span> <span class="n">the</span> <span class="n">image</span> <span class="n">file</span> <span class="n">at</span> <span class="n">which</span> <span class="n">the</span> <span class="n">backing</span> <span class="n">file</span> <span class="n">name</span>
+                <span class="ow">is</span> <span class="n">stored</span> <span class="p">(</span><span class="n">NB</span><span class="p">:</span> <span class="n">The</span> <span class="n">string</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">null</span> <span class="n">terminated</span><span class="p">)</span><span class="o">.</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">the</span>
+                <span class="n">image</span> <span class="n">doesn</span><span class="s1">&#39;t have a backing file.</span>
+
+                <span class="n">Note</span><span class="p">:</span> <span class="n">backing</span> <span class="n">files</span> <span class="n">are</span> <span class="n">incompatible</span> <span class="k">with</span> <span class="n">raw</span> <span class="n">external</span> <span class="n">data</span>
+                <span class="n">files</span> <span class="p">(</span><span class="n">auto</span><span class="o">-</span><span class="n">clear</span> <span class="n">feature</span> <span class="n">bit</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span>
+
+     <span class="mi">16</span> <span class="o">-</span> <span class="mi">19</span><span class="p">:</span>   <span class="n">backing_file_size</span>
+                <span class="n">Length</span> <span class="n">of</span> <span class="n">the</span> <span class="n">backing</span> <span class="n">file</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">bytes</span><span class="o">.</span> <span class="n">Must</span> <span class="ow">not</span> <span class="n">be</span>
+                <span class="n">longer</span> <span class="n">than</span> <span class="mi">1023</span> <span class="nb">bytes</span><span class="o">.</span> <span class="n">Undefined</span> <span class="k">if</span> <span class="n">the</span> <span class="n">image</span> <span class="n">doesn</span><span class="s1">&#39;t have</span>
+                <span class="n">a</span> <span class="n">backing</span> <span class="n">file</span><span class="o">.</span>
+
+     <span class="mi">20</span> <span class="o">-</span> <span class="mi">23</span><span class="p">:</span>   <span class="n">cluster_bits</span>
+                <span class="n">Number</span> <span class="n">of</span> <span class="n">bits</span> <span class="n">that</span> <span class="n">are</span> <span class="n">used</span> <span class="k">for</span> <span class="n">addressing</span> <span class="n">an</span> <span class="n">offset</span>
+                <span class="n">within</span> <span class="n">a</span> <span class="n">cluster</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">cluster_bits</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">cluster</span> <span class="n">size</span><span class="p">)</span><span class="o">.</span>
+                <span class="n">Must</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">less</span> <span class="n">than</span> <span class="mi">9</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="mi">512</span> <span class="n">byte</span> <span class="n">clusters</span><span class="p">)</span><span class="o">.</span>
+
+                <span class="n">Note</span><span class="p">:</span> <span class="n">QEMU</span> <span class="k">as</span> <span class="n">of</span> <span class="n">today</span> <span class="n">has</span> <span class="n">an</span> <span class="n">implementation</span> <span class="n">limit</span> <span class="n">of</span> <span class="mi">2</span> <span class="n">MB</span>
+                <span class="k">as</span> <span class="n">the</span> <span class="n">maximum</span> <span class="n">cluster</span> <span class="n">size</span> <span class="ow">and</span> <span class="n">won</span><span class="s1">&#39;t be able to open images</span>
+                <span class="k">with</span> <span class="n">larger</span> <span class="n">cluster</span> <span class="n">sizes</span><span class="o">.</span>
+
+                <span class="n">Note</span><span class="p">:</span> <span class="k">if</span> <span class="n">the</span> <span class="n">image</span> <span class="n">has</span> <span class="n">Extended</span> <span class="n">L2</span> <span class="n">Entries</span> <span class="n">then</span> <span class="n">cluster_bits</span>
+                <span class="n">must</span> <span class="n">be</span> <span class="n">at</span> <span class="n">least</span> <span class="mi">14</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="mi">16384</span> <span class="n">byte</span> <span class="n">clusters</span><span class="p">)</span><span class="o">.</span>
+
+     <span class="mi">24</span> <span class="o">-</span> <span class="mi">31</span><span class="p">:</span>   <span class="n">size</span>
+                <span class="n">Virtual</span> <span class="n">disk</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">bytes</span><span class="o">.</span>
+
+                <span class="n">Note</span><span class="p">:</span> <span class="n">QEMU</span> <span class="n">has</span> <span class="n">an</span> <span class="n">implementation</span> <span class="n">limit</span> <span class="n">of</span> <span class="mi">32</span> <span class="n">MB</span> <span class="k">as</span>
+                <span class="n">the</span> <span class="n">maximum</span> <span class="n">L1</span> <span class="n">table</span> <span class="n">size</span><span class="o">.</span>  <span class="n">With</span> <span class="n">a</span> <span class="mi">2</span> <span class="n">MB</span> <span class="n">cluster</span>
+                <span class="n">size</span><span class="p">,</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">unable</span> <span class="n">to</span> <span class="n">populate</span> <span class="n">a</span> <span class="n">virtual</span> <span class="n">cluster</span>
+                <span class="n">beyond</span> <span class="mi">2</span> <span class="n">EB</span> <span class="p">(</span><span class="mi">61</span> <span class="n">bits</span><span class="p">);</span> <span class="k">with</span> <span class="n">a</span> <span class="mi">512</span> <span class="n">byte</span> <span class="n">cluster</span>
+                <span class="n">size</span><span class="p">,</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">unable</span> <span class="n">to</span> <span class="n">populate</span> <span class="n">a</span> <span class="n">virtual</span> <span class="n">size</span>
+                <span class="n">larger</span> <span class="n">than</span> <span class="mi">128</span> <span class="n">GB</span> <span class="p">(</span><span class="mi">37</span> <span class="n">bits</span><span class="p">)</span><span class="o">.</span>  <span class="n">Meanwhile</span><span class="p">,</span> <span class="n">L1</span><span class="o">/</span><span class="n">L2</span>
+                <span class="n">table</span> <span class="n">layouts</span> <span class="n">limit</span> <span class="n">an</span> <span class="n">image</span> <span class="n">to</span> <span class="n">no</span> <span class="n">more</span> <span class="n">than</span> <span class="mi">64</span> <span class="n">PB</span>
+                <span class="p">(</span><span class="mi">56</span> <span class="n">bits</span><span class="p">)</span> <span class="n">of</span> <span class="n">populated</span> <span class="n">clusters</span><span class="p">,</span> <span class="ow">and</span> <span class="n">an</span> <span class="n">image</span> <span class="n">may</span>
+                <span class="n">hit</span> <span class="n">other</span> <span class="n">limits</span> <span class="n">first</span> <span class="p">(</span><span class="n">such</span> <span class="k">as</span> <span class="n">a</span> <span class="n">file</span> <span class="n">system</span><span class="s1">&#39;s</span>
+                <span class="n">maximum</span> <span class="n">size</span><span class="p">)</span><span class="o">.</span>
+
+     <span class="mi">32</span> <span class="o">-</span> <span class="mi">35</span><span class="p">:</span>   <span class="n">crypt_method</span>
+                <span class="mi">0</span> <span class="k">for</span> <span class="n">no</span> <span class="n">encryption</span>
+                <span class="mi">1</span> <span class="k">for</span> <span class="n">AES</span> <span class="n">encryption</span>
+                <span class="mi">2</span> <span class="k">for</span> <span class="n">LUKS</span> <span class="n">encryption</span>
+
+     <span class="mi">36</span> <span class="o">-</span> <span class="mi">39</span><span class="p">:</span>   <span class="n">l1_size</span>
+                <span class="n">Number</span> <span class="n">of</span> <span class="n">entries</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">active</span> <span class="n">L1</span> <span class="n">table</span>
+
+     <span class="mi">40</span> <span class="o">-</span> <span class="mi">47</span><span class="p">:</span>   <span class="n">l1_table_offset</span>
+                <span class="n">Offset</span> <span class="n">into</span> <span class="n">the</span> <span class="n">image</span> <span class="n">file</span> <span class="n">at</span> <span class="n">which</span> <span class="n">the</span> <span class="n">active</span> <span class="n">L1</span> <span class="n">table</span>
+                <span class="n">starts</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">aligned</span> <span class="n">to</span> <span class="n">a</span> <span class="n">cluster</span> <span class="n">boundary</span><span class="o">.</span>
+
+     <span class="mi">48</span> <span class="o">-</span> <span class="mi">55</span><span class="p">:</span>   <span class="n">refcount_table_offset</span>
+                <span class="n">Offset</span> <span class="n">into</span> <span class="n">the</span> <span class="n">image</span> <span class="n">file</span> <span class="n">at</span> <span class="n">which</span> <span class="n">the</span> <span class="n">refcount</span> <span class="n">table</span>
+                <span class="n">starts</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">aligned</span> <span class="n">to</span> <span class="n">a</span> <span class="n">cluster</span> <span class="n">boundary</span><span class="o">.</span>
+
+     <span class="mi">56</span> <span class="o">-</span> <span class="mi">59</span><span class="p">:</span>   <span class="n">refcount_table_clusters</span>
+                <span class="n">Number</span> <span class="n">of</span> <span class="n">clusters</span> <span class="n">that</span> <span class="n">the</span> <span class="n">refcount</span> <span class="n">table</span> <span class="n">occupies</span>
+
+     <span class="mi">60</span> <span class="o">-</span> <span class="mi">63</span><span class="p">:</span>   <span class="n">nb_snapshots</span>
+                <span class="n">Number</span> <span class="n">of</span> <span class="n">snapshots</span> <span class="n">contained</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">image</span>
+
+     <span class="mi">64</span> <span class="o">-</span> <span class="mi">71</span><span class="p">:</span>   <span class="n">snapshots_offset</span>
+                <span class="n">Offset</span> <span class="n">into</span> <span class="n">the</span> <span class="n">image</span> <span class="n">file</span> <span class="n">at</span> <span class="n">which</span> <span class="n">the</span> <span class="n">snapshot</span> <span class="n">table</span>
+                <span class="n">starts</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">aligned</span> <span class="n">to</span> <span class="n">a</span> <span class="n">cluster</span> <span class="n">boundary</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>For version 2, the header is exactly 72 bytes in length, and finishes here.
+For version 3 or higher, the header length is at least 104 bytes, including
+the next fields through <code class="docutils literal notranslate"><span class="pre">header_length</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="mi">72</span> <span class="o">-</span>  <span class="mi">79</span><span class="p">:</span>  <span class="n">incompatible_features</span>
+            <span class="n">Bitmask</span> <span class="n">of</span> <span class="n">incompatible</span> <span class="n">features</span><span class="o">.</span> <span class="n">An</span> <span class="n">implementation</span> <span class="n">must</span>
+            <span class="n">fail</span> <span class="n">to</span> <span class="nb">open</span> <span class="n">an</span> <span class="n">image</span> <span class="k">if</span> <span class="n">an</span> <span class="n">unknown</span> <span class="n">bit</span> <span class="ow">is</span> <span class="nb">set</span><span class="o">.</span>
+
+            <span class="n">Bit</span> <span class="mi">0</span><span class="p">:</span>      <span class="n">Dirty</span> <span class="n">bit</span><span class="o">.</span>  <span class="n">If</span> <span class="n">this</span> <span class="n">bit</span> <span class="ow">is</span> <span class="nb">set</span> <span class="n">then</span> <span class="n">refcounts</span>
+                        <span class="n">may</span> <span class="n">be</span> <span class="n">inconsistent</span><span class="p">,</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">to</span> <span class="n">scan</span> <span class="n">L1</span><span class="o">/</span><span class="n">L2</span>
+                        <span class="n">tables</span> <span class="n">to</span> <span class="n">repair</span> <span class="n">refcounts</span> <span class="n">before</span> <span class="n">accessing</span> <span class="n">the</span>
+                        <span class="n">image</span><span class="o">.</span>
+
+            <span class="n">Bit</span> <span class="mi">1</span><span class="p">:</span>      <span class="n">Corrupt</span> <span class="n">bit</span><span class="o">.</span>  <span class="n">If</span> <span class="n">this</span> <span class="n">bit</span> <span class="ow">is</span> <span class="nb">set</span> <span class="n">then</span> <span class="nb">any</span> <span class="n">data</span>
+                        <span class="n">structure</span> <span class="n">may</span> <span class="n">be</span> <span class="n">corrupt</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">image</span> <span class="n">must</span> <span class="ow">not</span>
+                        <span class="n">be</span> <span class="n">written</span> <span class="n">to</span> <span class="p">(</span><span class="n">unless</span> <span class="k">for</span> <span class="n">regaining</span>
+                        <span class="n">consistency</span><span class="p">)</span><span class="o">.</span>
+
+            <span class="n">Bit</span> <span class="mi">2</span><span class="p">:</span>      <span class="n">External</span> <span class="n">data</span> <span class="n">file</span> <span class="n">bit</span><span class="o">.</span>  <span class="n">If</span> <span class="n">this</span> <span class="n">bit</span> <span class="ow">is</span> <span class="nb">set</span><span class="p">,</span> <span class="n">an</span>
+                        <span class="n">external</span> <span class="n">data</span> <span class="n">file</span> <span class="ow">is</span> <span class="n">used</span><span class="o">.</span> <span class="n">Guest</span> <span class="n">clusters</span> <span class="n">are</span>
+                        <span class="n">then</span> <span class="n">stored</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">external</span> <span class="n">data</span> <span class="n">file</span><span class="o">.</span> <span class="n">For</span> <span class="n">such</span>
+                        <span class="n">images</span><span class="p">,</span> <span class="n">clusters</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">external</span> <span class="n">data</span> <span class="n">file</span> <span class="n">are</span>
+                        <span class="ow">not</span> <span class="n">refcounted</span><span class="o">.</span> <span class="n">The</span> <span class="n">offset</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">the</span>
+                        <span class="n">Standard</span> <span class="n">Cluster</span> <span class="n">Descriptor</span> <span class="n">must</span> <span class="n">match</span> <span class="n">the</span>
+                        <span class="n">guest</span> <span class="n">offset</span> <span class="ow">and</span> <span class="n">neither</span> <span class="n">compressed</span> <span class="n">clusters</span>
+                        <span class="n">nor</span> <span class="n">internal</span> <span class="n">snapshots</span> <span class="n">are</span> <span class="n">supported</span><span class="o">.</span>
+
+                        <span class="n">An</span> <span class="n">External</span> <span class="n">Data</span> <span class="n">File</span> <span class="n">Name</span> <span class="n">header</span> <span class="n">extension</span> <span class="n">may</span>
+                        <span class="n">be</span> <span class="n">present</span> <span class="k">if</span> <span class="n">this</span> <span class="n">bit</span> <span class="ow">is</span> <span class="nb">set</span><span class="o">.</span>
+
+            <span class="n">Bit</span> <span class="mi">3</span><span class="p">:</span>      <span class="n">Compression</span> <span class="nb">type</span> <span class="n">bit</span><span class="o">.</span>  <span class="n">If</span> <span class="n">this</span> <span class="n">bit</span> <span class="ow">is</span> <span class="nb">set</span><span class="p">,</span>
+                        <span class="n">a</span> <span class="n">non</span><span class="o">-</span><span class="n">default</span> <span class="n">compression</span> <span class="ow">is</span> <span class="n">used</span> <span class="k">for</span> <span class="n">compressed</span>
+                        <span class="n">clusters</span><span class="o">.</span> <span class="n">The</span> <span class="n">compression_type</span> <span class="n">field</span> <span class="n">must</span> <span class="n">be</span>
+                        <span class="n">present</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">zero</span><span class="o">.</span>
+
+            <span class="n">Bit</span> <span class="mi">4</span><span class="p">:</span>      <span class="n">Extended</span> <span class="n">L2</span> <span class="n">Entries</span><span class="o">.</span>  <span class="n">If</span> <span class="n">this</span> <span class="n">bit</span> <span class="ow">is</span> <span class="nb">set</span> <span class="n">then</span>
+                        <span class="n">L2</span> <span class="n">table</span> <span class="n">entries</span> <span class="n">use</span> <span class="n">an</span> <span class="n">extended</span> <span class="nb">format</span> <span class="n">that</span>
+                        <span class="n">allows</span> <span class="n">subcluster</span><span class="o">-</span><span class="n">based</span> <span class="n">allocation</span><span class="o">.</span> <span class="n">See</span> <span class="n">the</span>
+                        <span class="n">Extended</span> <span class="n">L2</span> <span class="n">Entries</span> <span class="n">section</span> <span class="k">for</span> <span class="n">more</span> <span class="n">details</span><span class="o">.</span>
+
+            <span class="n">Bits</span> <span class="mi">5</span><span class="o">-</span><span class="mi">63</span><span class="p">:</span>  <span class="n">Reserved</span> <span class="p">(</span><span class="nb">set</span> <span class="n">to</span> <span class="mi">0</span><span class="p">)</span>
+
+ <span class="mi">80</span> <span class="o">-</span>  <span class="mi">87</span><span class="p">:</span>  <span class="n">compatible_features</span>
+            <span class="n">Bitmask</span> <span class="n">of</span> <span class="n">compatible</span> <span class="n">features</span><span class="o">.</span> <span class="n">An</span> <span class="n">implementation</span> <span class="n">can</span>
+            <span class="n">safely</span> <span class="n">ignore</span> <span class="nb">any</span> <span class="n">unknown</span> <span class="n">bits</span> <span class="n">that</span> <span class="n">are</span> <span class="nb">set</span><span class="o">.</span>
+
+            <span class="n">Bit</span> <span class="mi">0</span><span class="p">:</span>      <span class="n">Lazy</span> <span class="n">refcounts</span> <span class="n">bit</span><span class="o">.</span>  <span class="n">If</span> <span class="n">this</span> <span class="n">bit</span> <span class="ow">is</span> <span class="nb">set</span> <span class="n">then</span>
+                        <span class="n">lazy</span> <span class="n">refcount</span> <span class="n">updates</span> <span class="n">can</span> <span class="n">be</span> <span class="n">used</span><span class="o">.</span>  <span class="n">This</span> <span class="n">means</span>
+                        <span class="n">marking</span> <span class="n">the</span> <span class="n">image</span> <span class="n">file</span> <span class="n">dirty</span> <span class="ow">and</span> <span class="n">postponing</span>
+                        <span class="n">refcount</span> <span class="n">metadata</span> <span class="n">updates</span><span class="o">.</span>
+
+            <span class="n">Bits</span> <span class="mi">1</span><span class="o">-</span><span class="mi">63</span><span class="p">:</span>  <span class="n">Reserved</span> <span class="p">(</span><span class="nb">set</span> <span class="n">to</span> <span class="mi">0</span><span class="p">)</span>
+
+ <span class="mi">88</span> <span class="o">-</span>  <span class="mi">95</span><span class="p">:</span>  <span class="n">autoclear_features</span>
+            <span class="n">Bitmask</span> <span class="n">of</span> <span class="n">auto</span><span class="o">-</span><span class="n">clear</span> <span class="n">features</span><span class="o">.</span> <span class="n">An</span> <span class="n">implementation</span> <span class="n">may</span> <span class="n">only</span>
+            <span class="n">write</span> <span class="n">to</span> <span class="n">an</span> <span class="n">image</span> <span class="k">with</span> <span class="n">unknown</span> <span class="n">auto</span><span class="o">-</span><span class="n">clear</span> <span class="n">features</span> <span class="k">if</span> <span class="n">it</span>
+            <span class="n">clears</span> <span class="n">the</span> <span class="n">respective</span> <span class="n">bits</span> <span class="kn">from</span><span class="w"> </span><span class="nn">this</span> <span class="n">field</span> <span class="n">first</span><span class="o">.</span>
+
+            <span class="n">Bit</span> <span class="mi">0</span><span class="p">:</span>      <span class="n">Bitmaps</span> <span class="n">extension</span> <span class="n">bit</span>
+                        <span class="n">This</span> <span class="n">bit</span> <span class="n">indicates</span> <span class="n">consistency</span> <span class="k">for</span> <span class="n">the</span> <span class="n">bitmaps</span>
+                        <span class="n">extension</span> <span class="n">data</span><span class="o">.</span>
+
+                        <span class="n">It</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span> <span class="k">if</span> <span class="n">this</span> <span class="n">bit</span> <span class="ow">is</span> <span class="nb">set</span> <span class="n">without</span> <span class="n">the</span>
+                        <span class="n">bitmaps</span> <span class="n">extension</span> <span class="n">present</span><span class="o">.</span>
+
+                        <span class="n">If</span> <span class="n">the</span> <span class="n">bitmaps</span> <span class="n">extension</span> <span class="ow">is</span> <span class="n">present</span> <span class="n">but</span> <span class="n">this</span>
+                        <span class="n">bit</span> <span class="ow">is</span> <span class="n">unset</span><span class="p">,</span> <span class="n">the</span> <span class="n">bitmaps</span> <span class="n">extension</span> <span class="n">data</span> <span class="n">must</span> <span class="n">be</span>
+                        <span class="n">considered</span> <span class="n">inconsistent</span><span class="o">.</span>
+
+            <span class="n">Bit</span> <span class="mi">1</span><span class="p">:</span>      <span class="n">Raw</span> <span class="n">external</span> <span class="n">data</span> <span class="n">bit</span>
+                        <span class="n">If</span> <span class="n">this</span> <span class="n">bit</span> <span class="ow">is</span> <span class="nb">set</span><span class="p">,</span> <span class="n">the</span> <span class="n">external</span> <span class="n">data</span> <span class="n">file</span> <span class="n">can</span>
+                        <span class="n">be</span> <span class="n">read</span> <span class="k">as</span> <span class="n">a</span> <span class="n">consistent</span> <span class="n">standalone</span> <span class="n">raw</span> <span class="n">image</span>
+                        <span class="n">without</span> <span class="n">looking</span> <span class="n">at</span> <span class="n">the</span> <span class="n">qcow2</span> <span class="n">metadata</span><span class="o">.</span>
+
+                        <span class="n">Setting</span> <span class="n">this</span> <span class="n">bit</span> <span class="n">has</span> <span class="n">a</span> <span class="n">performance</span> <span class="n">impact</span> <span class="k">for</span>
+                        <span class="n">some</span> <span class="n">operations</span> <span class="n">on</span> <span class="n">the</span> <span class="n">image</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">writing</span>
+                        <span class="n">zeros</span> <span class="n">requires</span> <span class="n">writing</span> <span class="n">to</span> <span class="n">the</span> <span class="n">data</span> <span class="n">file</span> <span class="n">instead</span>
+                        <span class="n">of</span> <span class="n">only</span> <span class="n">setting</span> <span class="n">the</span> <span class="n">zero</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">L2</span> <span class="n">table</span>
+                        <span class="n">entry</span><span class="p">)</span> <span class="ow">and</span> <span class="n">conflicts</span> <span class="k">with</span> <span class="n">backing</span> <span class="n">files</span><span class="o">.</span>
+
+                        <span class="n">This</span> <span class="n">bit</span> <span class="n">may</span> <span class="n">only</span> <span class="n">be</span> <span class="nb">set</span> <span class="k">if</span> <span class="n">the</span> <span class="n">External</span> <span class="n">Data</span>
+                        <span class="n">File</span> <span class="n">bit</span> <span class="p">(</span><span class="n">incompatible</span> <span class="n">feature</span> <span class="n">bit</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">is</span> <span class="n">also</span>
+                        <span class="nb">set</span><span class="o">.</span>
+
+            <span class="n">Bits</span> <span class="mi">2</span><span class="o">-</span><span class="mi">63</span><span class="p">:</span>  <span class="n">Reserved</span> <span class="p">(</span><span class="nb">set</span> <span class="n">to</span> <span class="mi">0</span><span class="p">)</span>
+
+ <span class="mi">96</span> <span class="o">-</span>  <span class="mi">99</span><span class="p">:</span>  <span class="n">refcount_order</span>
+            <span class="n">Describes</span> <span class="n">the</span> <span class="n">width</span> <span class="n">of</span> <span class="n">a</span> <span class="n">reference</span> <span class="n">count</span> <span class="n">block</span> <span class="n">entry</span> <span class="p">(</span><span class="n">width</span>
+            <span class="ow">in</span> <span class="n">bits</span><span class="p">:</span> <span class="n">refcount_bits</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">refcount_order</span><span class="p">)</span><span class="o">.</span> <span class="n">For</span> <span class="n">version</span> <span class="mi">2</span>
+            <span class="n">images</span><span class="p">,</span> <span class="n">the</span> <span class="n">order</span> <span class="ow">is</span> <span class="n">always</span> <span class="n">assumed</span> <span class="n">to</span> <span class="n">be</span> <span class="mi">4</span>
+            <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">refcount_bits</span> <span class="o">=</span> <span class="mi">16</span><span class="p">)</span><span class="o">.</span>
+            <span class="n">This</span> <span class="n">value</span> <span class="n">may</span> <span class="ow">not</span> <span class="n">exceed</span> <span class="mi">6</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">refcount_bits</span> <span class="o">=</span> <span class="mi">64</span><span class="p">)</span><span class="o">.</span>
+
+<span class="mi">100</span> <span class="o">-</span> <span class="mi">103</span><span class="p">:</span>  <span class="n">header_length</span>
+            <span class="n">Length</span> <span class="n">of</span> <span class="n">the</span> <span class="n">header</span> <span class="n">structure</span> <span class="ow">in</span> <span class="nb">bytes</span><span class="o">.</span> <span class="n">For</span> <span class="n">version</span> <span class="mi">2</span>
+            <span class="n">images</span><span class="p">,</span> <span class="n">the</span> <span class="n">length</span> <span class="ow">is</span> <span class="n">always</span> <span class="n">assumed</span> <span class="n">to</span> <span class="n">be</span> <span class="mi">72</span> <span class="nb">bytes</span><span class="o">.</span>
+            <span class="n">For</span> <span class="n">version</span> <span class="mi">3</span> <span class="n">it</span><span class="s1">&#39;s at least 104 bytes and must be a multiple</span>
+            <span class="n">of</span> <span class="mf">8.</span>
+</pre></div>
+</div>
+</section>
+<section id="additional-fields-version-3-and-higher">
+<h2>Additional fields (version 3 and higher)<a class="headerlink" href="#additional-fields-version-3-and-higher" title="Permalink to this headline"></a></h2>
+<p>In general, these fields are optional and may be safely ignored by the software,
+as well as filled by zeros (which is equal to field absence), if software needs
+to set field B, but does not care about field A which precedes B. More
+formally, additional fields have the following compatibility rules:</p>
+<ol class="arabic simple">
+<li><p>If the value of the additional field must not be ignored for correct
+handling of the file, it will be accompanied by a corresponding incompatible
+feature bit.</p></li>
+<li><p>If there are no unrecognized incompatible feature bits set, an unknown
+additional field may be safely ignored other than preserving its value when
+rewriting the image header.</p></li>
+</ol>
+<ol class="arabic simple" id="ref-rules-3" start="3">
+<li><p>An explicit value of 0 will have the same behavior as when the field is not
+present*, if not altered by a specific incompatible bit.</p></li>
+</ol>
+<p>(*) A field is considered not present when <code class="docutils literal notranslate"><span class="pre">header_length</span></code> is less than or equal
+to the field’s offset. Also, all additional fields are not present for
+version 2.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">104</span><span class="p">:</span>        <span class="n">compression_type</span>
+
+            <span class="n">Defines</span> <span class="n">the</span> <span class="n">compression</span> <span class="n">method</span> <span class="n">used</span> <span class="k">for</span> <span class="n">compressed</span> <span class="n">clusters</span><span class="o">.</span>
+            <span class="n">All</span> <span class="n">compressed</span> <span class="n">clusters</span> <span class="ow">in</span> <span class="n">an</span> <span class="n">image</span> <span class="n">use</span> <span class="n">the</span> <span class="n">same</span> <span class="n">compression</span>
+            <span class="nb">type</span><span class="o">.</span>
+
+            <span class="n">If</span> <span class="n">the</span> <span class="n">incompatible</span> <span class="n">bit</span> <span class="s2">&quot;Compression type&quot;</span> <span class="ow">is</span> <span class="nb">set</span><span class="p">:</span> <span class="n">the</span> <span class="n">field</span>
+            <span class="n">must</span> <span class="n">be</span> <span class="n">present</span> <span class="ow">and</span> <span class="n">non</span><span class="o">-</span><span class="n">zero</span> <span class="p">(</span><span class="n">which</span> <span class="n">means</span> <span class="n">non</span><span class="o">-</span><span class="n">deflate</span>
+            <span class="n">compression</span> <span class="nb">type</span><span class="p">)</span><span class="o">.</span> <span class="n">Otherwise</span><span class="p">,</span> <span class="n">this</span> <span class="n">field</span> <span class="n">must</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">present</span>
+            <span class="ow">or</span> <span class="n">must</span> <span class="n">be</span> <span class="n">zero</span> <span class="p">(</span><span class="n">which</span> <span class="n">means</span> <span class="n">deflate</span><span class="p">)</span><span class="o">.</span>
+
+            <span class="n">Available</span> <span class="n">compression</span> <span class="nb">type</span> <span class="n">values</span><span class="p">:</span>
+               <span class="o">-</span> <span class="mi">0</span><span class="p">:</span> <span class="n">deflate</span> <span class="o">&lt;</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">ietf</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">rfc</span><span class="o">/</span><span class="n">rfc1951</span><span class="o">.</span><span class="n">txt</span><span class="o">&gt;</span>
+               <span class="o">-</span> <span class="mi">1</span><span class="p">:</span> <span class="n">zstd</span> <span class="o">&lt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">facebook</span><span class="o">/</span><span class="n">zstd</span><span class="o">&gt;</span>
+
+            <span class="n">The</span> <span class="n">deflate</span> <span class="n">compression</span> <span class="nb">type</span> <span class="ow">is</span> <span class="n">called</span> <span class="s2">&quot;zlib&quot;</span>
+            <span class="o">&lt;</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">zlib</span><span class="o">.</span><span class="n">net</span><span class="o">/&gt;</span> <span class="ow">in</span> <span class="n">QEMU</span><span class="o">.</span> <span class="n">However</span><span class="p">,</span> <span class="n">clusters</span> <span class="k">with</span> <span class="n">the</span>
+            <span class="n">deflate</span> <span class="n">compression</span> <span class="nb">type</span> <span class="n">do</span> <span class="ow">not</span> <span class="n">have</span> <span class="n">zlib</span> <span class="n">headers</span><span class="o">.</span>
+
+<span class="mi">105</span> <span class="o">-</span> <span class="mi">111</span><span class="p">:</span>  <span class="n">Padding</span><span class="p">,</span> <span class="n">contents</span> <span class="n">defined</span> <span class="n">below</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+<section id="header-padding">
+<h2>Header padding<a class="headerlink" href="#header-padding" title="Permalink to this headline"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">header_length</span></code> must be a multiple of 8, which means that if the end of the last
+additional field is not aligned, some padding is needed. This padding must be
+zeroed, so that if some existing (or future) additional field will fall into
+the padding, it will be interpreted accordingly to point <a class="reference external" href="#ref_rules_3">[3.]</a> of the previous
+paragraph, i.e.  in the same manner as when this field is not present.</p>
+</section>
+<section id="header-extensions">
+<h2>Header extensions<a class="headerlink" href="#header-extensions" title="Permalink to this headline"></a></h2>
+<p>Directly after the image header, optional sections called header extensions can
+be stored. Each extension has a structure like the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Byte</span>  <span class="mi">0</span> <span class="o">-</span>  <span class="mi">3</span><span class="p">:</span>   <span class="n">Header</span> <span class="n">extension</span> <span class="nb">type</span><span class="p">:</span>
+                    <span class="mh">0x00000000</span> <span class="o">-</span> <span class="n">End</span> <span class="n">of</span> <span class="n">the</span> <span class="n">header</span> <span class="n">extension</span> <span class="n">area</span>
+                    <span class="mh">0xe2792aca</span> <span class="o">-</span> <span class="n">Backing</span> <span class="n">file</span> <span class="nb">format</span> <span class="n">name</span> <span class="n">string</span>
+                    <span class="mh">0x6803f857</span> <span class="o">-</span> <span class="n">Feature</span> <span class="n">name</span> <span class="n">table</span>
+                    <span class="mh">0x23852875</span> <span class="o">-</span> <span class="n">Bitmaps</span> <span class="n">extension</span>
+                    <span class="mh">0x0537be77</span> <span class="o">-</span> <span class="n">Full</span> <span class="n">disk</span> <span class="n">encryption</span> <span class="n">header</span> <span class="n">pointer</span>
+                    <span class="mh">0x44415441</span> <span class="o">-</span> <span class="n">External</span> <span class="n">data</span> <span class="n">file</span> <span class="n">name</span> <span class="n">string</span>
+                    <span class="n">other</span>      <span class="o">-</span> <span class="n">Unknown</span> <span class="n">header</span> <span class="n">extension</span><span class="p">,</span> <span class="n">can</span> <span class="n">be</span> <span class="n">safely</span>
+                                 <span class="n">ignored</span>
+
+      <span class="mi">4</span> <span class="o">-</span>  <span class="mi">7</span><span class="p">:</span>   <span class="n">Length</span> <span class="n">of</span> <span class="n">the</span> <span class="n">header</span> <span class="n">extension</span> <span class="n">data</span>
+
+      <span class="mi">8</span> <span class="o">-</span>  <span class="n">n</span><span class="p">:</span>   <span class="n">Header</span> <span class="n">extension</span> <span class="n">data</span>
+
+      <span class="n">n</span> <span class="o">-</span>  <span class="n">m</span><span class="p">:</span>   <span class="n">Padding</span> <span class="n">to</span> <span class="nb">round</span> <span class="n">up</span> <span class="n">the</span> <span class="n">header</span> <span class="n">extension</span> <span class="n">size</span> <span class="n">to</span> <span class="n">the</span> <span class="nb">next</span>
+                <span class="n">multiple</span> <span class="n">of</span> <span class="mf">8.</span>
+</pre></div>
+</div>
+<p>Unless stated otherwise, each header extension type shall appear at most once
+in the same image.</p>
+<p>If the image has a backing file then the backing file name should be stored in
+the remaining space between the end of the header extension area and the end of
+the first cluster. It is not allowed to store other data here, so that an
+implementation can safely modify the header and add extensions without harming
+data of compatible features that it doesn’t support. Compatible features that
+need space for additional data can use a header extension.</p>
+</section>
+<section id="string-header-extensions">
+<h2>String header extensions<a class="headerlink" href="#string-header-extensions" title="Permalink to this headline"></a></h2>
+<p>Some header extensions (such as the backing file format name and the external
+data file name) are just a single string. In this case, the header extension
+length is the string length and the string is not <code class="docutils literal notranslate"><span class="pre">\0</span></code> terminated. (The header
+extension padding can make it look like a string is <code class="docutils literal notranslate"><span class="pre">\0</span></code> terminated, but
+neither is padding always necessary nor is there a guarantee that zero bytes
+are used for padding.)</p>
+</section>
+<section id="feature-name-table">
+<h2>Feature name table<a class="headerlink" href="#feature-name-table" title="Permalink to this headline"></a></h2>
+<p>The feature name table is an optional header extension that contains the name
+for features used by the image. It can be used by applications that don’t know
+the respective feature (e.g. because the feature was introduced only later) to
+display a useful error message.</p>
+<p>The number of entries in the feature name table is determined by the length of
+the header extension data. Each entry looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Byte</span>       <span class="mi">0</span><span class="p">:</span>   <span class="n">Type</span> <span class="n">of</span> <span class="n">feature</span> <span class="p">(</span><span class="n">select</span> <span class="n">feature</span> <span class="n">bitmap</span><span class="p">)</span>
+                    <span class="mi">0</span><span class="p">:</span> <span class="n">Incompatible</span> <span class="n">feature</span>
+                    <span class="mi">1</span><span class="p">:</span> <span class="n">Compatible</span> <span class="n">feature</span>
+                    <span class="mi">2</span><span class="p">:</span> <span class="n">Autoclear</span> <span class="n">feature</span>
+
+           <span class="mi">1</span><span class="p">:</span>   <span class="n">Bit</span> <span class="n">number</span> <span class="n">within</span> <span class="n">the</span> <span class="n">selected</span> <span class="n">feature</span> <span class="n">bitmap</span> <span class="p">(</span><span class="n">valid</span>
+                <span class="n">values</span><span class="p">:</span> <span class="mi">0</span><span class="o">-</span><span class="mi">63</span><span class="p">)</span>
+
+      <span class="mi">2</span> <span class="o">-</span> <span class="mi">47</span><span class="p">:</span>   <span class="n">Feature</span> <span class="n">name</span> <span class="p">(</span><span class="n">padded</span> <span class="k">with</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">but</span> <span class="ow">not</span> <span class="n">necessarily</span> <span class="n">null</span>
+                <span class="n">terminated</span> <span class="k">if</span> <span class="n">it</span> <span class="n">has</span> <span class="n">full</span> <span class="n">length</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="bitmaps-extension">
+<h2>Bitmaps extension<a class="headerlink" href="#bitmaps-extension" title="Permalink to this headline"></a></h2>
+<p>The bitmaps extension is an optional header extension. It provides the ability
+to store bitmaps related to a virtual disk. For now, there is only one bitmap
+type: the dirty tracking bitmap, which tracks virtual disk changes from some
+point in time.</p>
+<p>The data of the extension should be considered consistent only if the
+corresponding auto-clear feature bit is set, see <code class="docutils literal notranslate"><span class="pre">autoclear_features</span></code> above.</p>
+<p>The fields of the bitmaps extension are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Byte</span>  <span class="mi">0</span> <span class="o">-</span>  <span class="mi">3</span><span class="p">:</span>  <span class="n">nb_bitmaps</span>
+               <span class="n">The</span> <span class="n">number</span> <span class="n">of</span> <span class="n">bitmaps</span> <span class="n">contained</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">image</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span>
+               <span class="n">greater</span> <span class="n">than</span> <span class="ow">or</span> <span class="n">equal</span> <span class="n">to</span> <span class="mf">1.</span>
+
+               <span class="n">Note</span><span class="p">:</span> <span class="n">QEMU</span> <span class="n">currently</span> <span class="n">only</span> <span class="n">supports</span> <span class="n">up</span> <span class="n">to</span> <span class="mi">65535</span> <span class="n">bitmaps</span> <span class="n">per</span>
+               <span class="n">image</span><span class="o">.</span>
+
+      <span class="mi">4</span> <span class="o">-</span>  <span class="mi">7</span><span class="p">:</span>  <span class="n">Reserved</span><span class="p">,</span> <span class="n">must</span> <span class="n">be</span> <span class="n">zero</span><span class="o">.</span>
+
+      <span class="mi">8</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span>  <span class="n">bitmap_directory_size</span>
+               <span class="n">Size</span> <span class="n">of</span> <span class="n">the</span> <span class="n">bitmap</span> <span class="n">directory</span> <span class="ow">in</span> <span class="nb">bytes</span><span class="o">.</span> <span class="n">It</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">cumulative</span>
+               <span class="n">size</span> <span class="n">of</span> <span class="nb">all</span> <span class="p">(</span><span class="n">nb_bitmaps</span><span class="p">)</span> <span class="n">bitmap</span> <span class="n">directory</span> <span class="n">entries</span><span class="o">.</span>
+
+     <span class="mi">16</span> <span class="o">-</span> <span class="mi">23</span><span class="p">:</span>  <span class="n">bitmap_directory_offset</span>
+               <span class="n">Offset</span> <span class="n">into</span> <span class="n">the</span> <span class="n">image</span> <span class="n">file</span> <span class="n">at</span> <span class="n">which</span> <span class="n">the</span> <span class="n">bitmap</span> <span class="n">directory</span>
+               <span class="n">starts</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">aligned</span> <span class="n">to</span> <span class="n">a</span> <span class="n">cluster</span> <span class="n">boundary</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+<section id="full-disk-encryption-header-pointer">
+<h2>Full disk encryption header pointer<a class="headerlink" href="#full-disk-encryption-header-pointer" title="Permalink to this headline"></a></h2>
+<p>The full disk encryption header must be present if, and only if, the
+<code class="docutils literal notranslate"><span class="pre">crypt_method</span></code> header requires metadata. Currently this is only true
+of the <code class="docutils literal notranslate"><span class="pre">LUKS</span></code> crypt method. The header extension must be absent for
+other methods.</p>
+<p>This header provides the offset at which the crypt method can store
+its additional data, as well as the length of such data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Byte</span>  <span class="mi">0</span> <span class="o">-</span>  <span class="mi">7</span><span class="p">:</span>   <span class="n">Offset</span> <span class="n">into</span> <span class="n">the</span> <span class="n">image</span> <span class="n">file</span> <span class="n">at</span> <span class="n">which</span> <span class="n">the</span> <span class="n">encryption</span>
+                <span class="n">header</span> <span class="n">starts</span> <span class="ow">in</span> <span class="nb">bytes</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">aligned</span> <span class="n">to</span> <span class="n">a</span> <span class="n">cluster</span>
+                <span class="n">boundary</span><span class="o">.</span>
+<span class="n">Byte</span>  <span class="mi">8</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span>   <span class="n">Length</span> <span class="n">of</span> <span class="n">the</span> <span class="n">written</span> <span class="n">encryption</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">bytes</span><span class="o">.</span>
+                <span class="n">Note</span> <span class="n">actual</span> <span class="n">space</span> <span class="n">allocated</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">qcow2</span> <span class="n">file</span> <span class="n">may</span>
+                <span class="n">be</span> <span class="n">larger</span> <span class="n">than</span> <span class="n">this</span> <span class="n">value</span><span class="p">,</span> <span class="n">since</span> <span class="n">it</span> <span class="n">will</span> <span class="n">be</span> <span class="n">rounded</span>
+                <span class="n">to</span> <span class="n">the</span> <span class="n">nearest</span> <span class="n">multiple</span> <span class="n">of</span> <span class="n">the</span> <span class="n">cluster</span> <span class="n">size</span><span class="o">.</span> <span class="n">Any</span>
+                <span class="n">unused</span> <span class="nb">bytes</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">allocated</span> <span class="n">space</span> <span class="n">will</span> <span class="n">be</span> <span class="n">initialized</span>
+                <span class="n">to</span> <span class="mf">0.</span>
+</pre></div>
+</div>
+<p>For the LUKS crypt method, the encryption header works as follows.</p>
+<p>The first 592 bytes of the header clusters will contain the LUKS
+partition header. This is then followed by the key material data areas.
+The size of the key material data areas is determined by the number of
+stripes in the key slot and key size. Refer to the LUKS format
+specification (<code class="docutils literal notranslate"><span class="pre">docs/on-disk-format.pdf</span></code> in the cryptsetup source
+package) for details of the LUKS partition header format.</p>
+<p>In the LUKS partition header, the <code class="docutils literal notranslate"><span class="pre">payload-offset</span></code> field will be
+calculated as normal for the LUKS spec. ie the size of the LUKS
+header, plus key material regions, plus padding, relative to the
+start of the LUKS header. This offset value is not required to be
+qcow2 cluster aligned. Its value is currently never used in the
+context of qcow2, since the qcow2 file format itself defines where
+the real payload offset is, but none the less a valid payload offset
+should always be present.</p>
+<p>In the LUKS key slots header, the <code class="docutils literal notranslate"><span class="pre">key-material-offset</span></code> is relative
+to the start of the LUKS header clusters in the qcow2 container,
+not the start of the qcow2 file.</p>
+<p>Logically the layout looks like</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+-----------------------------+</span>
+<span class="o">|</span> <span class="n">QCow2</span> <span class="n">header</span>                <span class="o">|</span>
+<span class="o">|</span> <span class="n">QCow2</span> <span class="n">header</span> <span class="n">extension</span> <span class="n">X</span>    <span class="o">|</span>
+<span class="o">|</span> <span class="n">QCow2</span> <span class="n">header</span> <span class="n">extension</span> <span class="n">FDE</span>  <span class="o">|</span>
+<span class="o">|</span> <span class="n">QCow2</span> <span class="n">header</span> <span class="n">extension</span> <span class="o">...</span>  <span class="o">|</span>
+<span class="o">|</span> <span class="n">QCow2</span> <span class="n">header</span> <span class="n">extension</span> <span class="n">Z</span>    <span class="o">|</span>
+<span class="o">+-----------------------------+</span>
+<span class="o">|</span> <span class="o">....</span><span class="n">other</span> <span class="n">QCow2</span> <span class="n">tables</span><span class="o">....</span>  <span class="o">|</span>
+<span class="o">.</span>                             <span class="o">.</span>
+<span class="o">.</span>                             <span class="o">.</span>
+<span class="o">+-----------------------------+</span>
+<span class="o">|</span> <span class="o">+-------------------------+</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="n">LUKS</span> <span class="n">partition</span> <span class="n">header</span>   <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">+-------------------------+</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="n">LUKS</span> <span class="n">key</span> <span class="n">material</span> <span class="mi">1</span>     <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">+-------------------------+</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="n">LUKS</span> <span class="n">key</span> <span class="n">material</span> <span class="mi">2</span>     <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">+-------------------------+</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="n">LUKS</span> <span class="n">key</span> <span class="n">material</span> <span class="o">...</span>   <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">+-------------------------+</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="n">LUKS</span> <span class="n">key</span> <span class="n">material</span> <span class="mi">8</span>     <span class="o">|</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">+-------------------------+</span> <span class="o">|</span>
+<span class="o">+-----------------------------+</span>
+<span class="o">|</span> <span class="n">QCow2</span> <span class="n">cluster</span> <span class="n">payload</span>       <span class="o">|</span>
+<span class="o">.</span>                             <span class="o">.</span>
+<span class="o">.</span>                             <span class="o">.</span>
+<span class="o">.</span>                             <span class="o">.</span>
+<span class="o">|</span>                             <span class="o">|</span>
+<span class="o">+-----------------------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="data-encryption">
+<h2>Data encryption<a class="headerlink" href="#data-encryption" title="Permalink to this headline"></a></h2>
+<p>When an encryption method is requested in the header, the image payload
+data must be encrypted/decrypted on every write/read. The image headers
+and metadata are never encrypted.</p>
+<p>The algorithms used for encryption vary depending on the method</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">AES</span></code>:</p>
+<p>The AES cipher, in CBC mode, with 256 bit keys.</p>
+<p>Initialization vectors generated using plain64 method, with
+the virtual disk sector as the input tweak.</p>
+<p>This format is no longer supported in QEMU system emulators, due
+to a number of design flaws affecting its security. It is only
+supported in the command line tools for the sake of back compatibility
+and data liberation.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LUKS</span></code>:</p>
+<p>The algorithms are specified in the LUKS header.</p>
+<p>Initialization vectors generated using the method specified
+in the LUKS header, with the physical disk sector as the
+input tweak.</p>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="host-cluster-management">
+<h2>Host cluster management<a class="headerlink" href="#host-cluster-management" title="Permalink to this headline"></a></h2>
+<p>qcow2 manages the allocation of host clusters by maintaining a reference count
+for each host cluster. A refcount of 0 means that the cluster is free, 1 means
+that it is used, and &gt;= 2 means that it is used and any write access must
+perform a COW (copy on write) operation.</p>
+<p>The refcounts are managed in a two-level table. The first level is called
+refcount table and has a variable size (which is stored in the header). The
+refcount table can cover multiple clusters, however it needs to be contiguous
+in the image file.</p>
+<p>It contains pointers to the second level structures which are called refcount
+blocks and are exactly one cluster in size.</p>
+<p>Although a large enough refcount table can reserve clusters past 64 PB
+(56 bits) (assuming the underlying protocol can even be sized that
+large), note that some qcow2 metadata such as L1/L2 tables must point
+to clusters prior to that point.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>QEMU has an implementation limit of 8 MB as the maximum refcount
+table size.  With a 2 MB cluster size and a default refcount_order of
+4, it is unable to reference host resources beyond 2 EB (61 bits); in
+the worst case, with a 512 cluster size and refcount_order of 6, it is
+unable to access beyond 32 GB (35 bits).</p>
+</aside>
+<p>Given an offset into the image file, the refcount of its cluster can be
+obtained as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">refcount_block_entries</span> <span class="o">=</span> <span class="p">(</span><span class="n">cluster_size</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">/</span> <span class="n">refcount_bits</span><span class="p">)</span>
+
+<span class="n">refcount_block_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">offset</span> <span class="o">/</span> <span class="n">cluster_size</span><span class="p">)</span> <span class="o">%</span> <span class="n">refcount_block_entries</span>
+<span class="n">refcount_table_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">offset</span> <span class="o">/</span> <span class="n">cluster_size</span><span class="p">)</span> <span class="o">/</span> <span class="n">refcount_block_entries</span>
+
+<span class="n">refcount_block</span> <span class="o">=</span> <span class="n">load_cluster</span><span class="p">(</span><span class="n">refcount_table</span><span class="p">[</span><span class="n">refcount_table_index</span><span class="p">]);</span>
+<span class="k">return</span> <span class="n">refcount_block</span><span class="p">[</span><span class="n">refcount_block_index</span><span class="p">];</span>
+</pre></div>
+</div>
+<p>Refcount table entry:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Bit</span>  <span class="mi">0</span> <span class="o">-</span>  <span class="mi">8</span><span class="p">:</span>    <span class="n">Reserved</span> <span class="p">(</span><span class="nb">set</span> <span class="n">to</span> <span class="mi">0</span><span class="p">)</span>
+
+     <span class="mi">9</span> <span class="o">-</span> <span class="mi">63</span><span class="p">:</span>    <span class="n">Bits</span> <span class="mi">9</span><span class="o">-</span><span class="mi">63</span> <span class="n">of</span> <span class="n">the</span> <span class="n">offset</span> <span class="n">into</span> <span class="n">the</span> <span class="n">image</span> <span class="n">file</span> <span class="n">at</span> <span class="n">which</span> <span class="n">the</span>
+                <span class="n">refcount</span> <span class="n">block</span> <span class="n">starts</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">aligned</span> <span class="n">to</span> <span class="n">a</span> <span class="n">cluster</span>
+                <span class="n">boundary</span><span class="o">.</span>
+
+                <span class="n">If</span> <span class="n">this</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">,</span> <span class="n">the</span> <span class="n">corresponding</span> <span class="n">refcount</span> <span class="n">block</span> <span class="n">has</span> <span class="ow">not</span> <span class="n">yet</span>
+                <span class="n">been</span> <span class="n">allocated</span><span class="o">.</span> <span class="n">All</span> <span class="n">refcounts</span> <span class="n">managed</span> <span class="n">by</span> <span class="n">this</span> <span class="n">refcount</span> <span class="n">block</span>
+                <span class="n">are</span> <span class="mf">0.</span>
+</pre></div>
+</div>
+<p>Refcount block entry <code class="docutils literal notranslate"><span class="pre">(x</span> <span class="pre">=</span> <span class="pre">refcount_bits</span> <span class="pre">-</span> <span class="pre">1)</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Bit</span>  <span class="mi">0</span> <span class="o">-</span>  <span class="n">x</span><span class="p">:</span>    <span class="n">Reference</span> <span class="n">count</span> <span class="n">of</span> <span class="n">the</span> <span class="n">cluster</span><span class="o">.</span> <span class="n">If</span> <span class="n">refcount_bits</span> <span class="n">implies</span> <span class="n">a</span>
+                <span class="n">sub</span><span class="o">-</span><span class="n">byte</span> <span class="n">width</span><span class="p">,</span> <span class="n">note</span> <span class="n">that</span> <span class="n">bit</span> <span class="mi">0</span> <span class="n">means</span> <span class="n">the</span> <span class="n">least</span> <span class="n">significant</span>
+                <span class="n">bit</span> <span class="ow">in</span> <span class="n">this</span> <span class="n">context</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+<section id="cluster-mapping">
+<h2>Cluster mapping<a class="headerlink" href="#cluster-mapping" title="Permalink to this headline"></a></h2>
+<p>Just as for refcounts, qcow2 uses a two-level structure for the mapping of
+guest clusters to host clusters. They are called L1 and L2 table.</p>
+<p>The L1 table has a variable size (stored in the header) and may use multiple
+clusters, however it must be contiguous in the image file. L2 tables are
+exactly one cluster in size.</p>
+<p>The L1 and L2 tables have implications on the maximum virtual file
+size; for a given L1 table size, a larger cluster size is required for
+the guest to have access to more space.  Furthermore, a virtual
+cluster must currently map to a host offset below 64 PB (56 bits)
+(although this limit could be relaxed by putting reserved bits into
+use).  Additionally, as cluster size increases, the maximum host
+offset for a compressed cluster is reduced (a 2M cluster size requires
+compressed clusters to reside below 512 TB (49 bits), and this limit
+cannot be relaxed without an incompatible layout change).</p>
+<p>Given an offset into the virtual disk, the offset into the image file can be
+obtained as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">l2_entries</span> <span class="o">=</span> <span class="p">(</span><span class="n">cluster_size</span> <span class="o">/</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">uint64_t</span><span class="p">))</span>        <span class="p">[</span><span class="o">*</span><span class="p">]</span>
+
+<span class="n">l2_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">offset</span> <span class="o">/</span> <span class="n">cluster_size</span><span class="p">)</span> <span class="o">%</span> <span class="n">l2_entries</span>
+<span class="n">l1_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">offset</span> <span class="o">/</span> <span class="n">cluster_size</span><span class="p">)</span> <span class="o">/</span> <span class="n">l2_entries</span>
+
+<span class="n">l2_table</span> <span class="o">=</span> <span class="n">load_cluster</span><span class="p">(</span><span class="n">l1_table</span><span class="p">[</span><span class="n">l1_index</span><span class="p">]);</span>
+<span class="n">cluster_offset</span> <span class="o">=</span> <span class="n">l2_table</span><span class="p">[</span><span class="n">l2_index</span><span class="p">];</span>
+
+<span class="k">return</span> <span class="n">cluster_offset</span> <span class="o">+</span> <span class="p">(</span><span class="n">offset</span> <span class="o">%</span> <span class="n">cluster_size</span><span class="p">)</span>
+
+<span class="p">[</span><span class="o">*</span><span class="p">]</span> <span class="n">this</span> <span class="n">changes</span> <span class="k">if</span> <span class="n">Extended</span> <span class="n">L2</span> <span class="n">Entries</span> <span class="n">are</span> <span class="n">enabled</span><span class="p">,</span> <span class="n">see</span> <span class="nb">next</span> <span class="n">section</span>
+</pre></div>
+</div>
+<p>L1 table entry:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Bit</span>  <span class="mi">0</span> <span class="o">-</span>  <span class="mi">8</span><span class="p">:</span>    <span class="n">Reserved</span> <span class="p">(</span><span class="nb">set</span> <span class="n">to</span> <span class="mi">0</span><span class="p">)</span>
+
+     <span class="mi">9</span> <span class="o">-</span> <span class="mi">55</span><span class="p">:</span>    <span class="n">Bits</span> <span class="mi">9</span><span class="o">-</span><span class="mi">55</span> <span class="n">of</span> <span class="n">the</span> <span class="n">offset</span> <span class="n">into</span> <span class="n">the</span> <span class="n">image</span> <span class="n">file</span> <span class="n">at</span> <span class="n">which</span> <span class="n">the</span> <span class="n">L2</span>
+                <span class="n">table</span> <span class="n">starts</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">aligned</span> <span class="n">to</span> <span class="n">a</span> <span class="n">cluster</span> <span class="n">boundary</span><span class="o">.</span> <span class="n">If</span> <span class="n">the</span>
+                <span class="n">offset</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">,</span> <span class="n">the</span> <span class="n">L2</span> <span class="n">table</span> <span class="ow">and</span> <span class="nb">all</span> <span class="n">clusters</span> <span class="n">described</span> <span class="n">by</span> <span class="n">this</span>
+                <span class="n">L2</span> <span class="n">table</span> <span class="n">are</span> <span class="n">unallocated</span><span class="o">.</span>
+
+    <span class="mi">56</span> <span class="o">-</span> <span class="mi">62</span><span class="p">:</span>    <span class="n">Reserved</span> <span class="p">(</span><span class="nb">set</span> <span class="n">to</span> <span class="mi">0</span><span class="p">)</span>
+
+         <span class="mi">63</span><span class="p">:</span>    <span class="mi">0</span> <span class="k">for</span> <span class="n">an</span> <span class="n">L2</span> <span class="n">table</span> <span class="n">that</span> <span class="ow">is</span> <span class="n">unused</span> <span class="ow">or</span> <span class="n">requires</span> <span class="n">COW</span><span class="p">,</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">its</span>
+                <span class="n">refcount</span> <span class="ow">is</span> <span class="n">exactly</span> <span class="n">one</span><span class="o">.</span> <span class="n">This</span> <span class="n">information</span> <span class="ow">is</span> <span class="n">only</span> <span class="n">accurate</span>
+                <span class="ow">in</span> <span class="n">the</span> <span class="n">active</span> <span class="n">L1</span> <span class="n">table</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>L2 table entry:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Bit</span>  <span class="mi">0</span> <span class="o">-</span>  <span class="mi">61</span><span class="p">:</span>   <span class="n">Cluster</span> <span class="n">descriptor</span>
+
+          <span class="mi">62</span><span class="p">:</span>   <span class="mi">0</span> <span class="k">for</span> <span class="n">standard</span> <span class="n">clusters</span>
+                <span class="mi">1</span> <span class="k">for</span> <span class="n">compressed</span> <span class="n">clusters</span>
+
+          <span class="mi">63</span><span class="p">:</span>   <span class="mi">0</span> <span class="k">for</span> <span class="n">clusters</span> <span class="n">that</span> <span class="n">are</span> <span class="n">unused</span><span class="p">,</span> <span class="n">compressed</span> <span class="ow">or</span> <span class="n">require</span> <span class="n">COW</span><span class="o">.</span>
+                <span class="mi">1</span> <span class="k">for</span> <span class="n">standard</span> <span class="n">clusters</span> <span class="n">whose</span> <span class="n">refcount</span> <span class="ow">is</span> <span class="n">exactly</span> <span class="n">one</span><span class="o">.</span>
+                <span class="n">This</span> <span class="n">information</span> <span class="ow">is</span> <span class="n">only</span> <span class="n">accurate</span> <span class="ow">in</span> <span class="n">L2</span> <span class="n">tables</span>
+                <span class="n">that</span> <span class="n">are</span> <span class="n">reachable</span> <span class="kn">from</span><span class="w"> </span><span class="nn">the</span> <span class="n">active</span> <span class="n">L1</span> <span class="n">table</span><span class="o">.</span>
+
+                <span class="n">With</span> <span class="n">external</span> <span class="n">data</span> <span class="n">files</span><span class="p">,</span> <span class="nb">all</span> <span class="n">guest</span> <span class="n">clusters</span> <span class="n">have</span> <span class="n">an</span>
+                <span class="n">implicit</span> <span class="n">refcount</span> <span class="n">of</span> <span class="mi">1</span> <span class="p">(</span><span class="n">because</span> <span class="n">of</span> <span class="n">the</span> <span class="n">fixed</span> <span class="n">host</span> <span class="o">=</span> <span class="n">guest</span>
+                <span class="n">mapping</span> <span class="k">for</span> <span class="n">guest</span> <span class="n">cluster</span> <span class="n">offsets</span><span class="p">),</span> <span class="n">so</span> <span class="n">this</span> <span class="n">bit</span> <span class="n">should</span> <span class="n">be</span> <span class="mi">1</span>
+                <span class="k">for</span> <span class="nb">all</span> <span class="n">allocated</span> <span class="n">clusters</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Standard Cluster Descriptor:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Bit</span>       <span class="mi">0</span><span class="p">:</span>    <span class="n">If</span> <span class="nb">set</span> <span class="n">to</span> <span class="mi">1</span><span class="p">,</span> <span class="n">the</span> <span class="n">cluster</span> <span class="n">reads</span> <span class="k">as</span> <span class="nb">all</span> <span class="n">zeros</span><span class="o">.</span> <span class="n">The</span> <span class="n">host</span>
+                <span class="n">cluster</span> <span class="n">offset</span> <span class="n">can</span> <span class="n">be</span> <span class="n">used</span> <span class="n">to</span> <span class="n">describe</span> <span class="n">a</span> <span class="n">preallocation</span><span class="p">,</span>
+                <span class="n">but</span> <span class="n">it</span> <span class="n">won</span><span class="s1">&#39;t be used for reading data from this cluster,</span>
+                <span class="n">nor</span> <span class="ow">is</span> <span class="n">data</span> <span class="n">read</span> <span class="kn">from</span><span class="w"> </span><span class="nn">the</span> <span class="n">backing</span> <span class="n">file</span> <span class="k">if</span> <span class="n">the</span> <span class="n">cluster</span> <span class="ow">is</span>
+                <span class="n">unallocated</span><span class="o">.</span>
+
+                <span class="n">With</span> <span class="n">version</span> <span class="mi">2</span> <span class="ow">or</span> <span class="k">with</span> <span class="n">extended</span> <span class="n">L2</span> <span class="n">entries</span> <span class="p">(</span><span class="n">see</span> <span class="n">the</span> <span class="nb">next</span>
+                <span class="n">section</span><span class="p">),</span> <span class="n">this</span> <span class="ow">is</span> <span class="n">always</span> <span class="mf">0.</span>
+
+     <span class="mi">1</span> <span class="o">-</span>  <span class="mi">8</span><span class="p">:</span>    <span class="n">Reserved</span> <span class="p">(</span><span class="nb">set</span> <span class="n">to</span> <span class="mi">0</span><span class="p">)</span>
+
+     <span class="mi">9</span> <span class="o">-</span> <span class="mi">55</span><span class="p">:</span>    <span class="n">Bits</span> <span class="mi">9</span><span class="o">-</span><span class="mi">55</span> <span class="n">of</span> <span class="n">host</span> <span class="n">cluster</span> <span class="n">offset</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">aligned</span> <span class="n">to</span> <span class="n">a</span>
+                <span class="n">cluster</span> <span class="n">boundary</span><span class="o">.</span> <span class="n">If</span> <span class="n">the</span> <span class="n">offset</span> <span class="ow">is</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">bit</span> <span class="mi">63</span> <span class="ow">is</span> <span class="n">clear</span><span class="p">,</span>
+                <span class="n">the</span> <span class="n">cluster</span> <span class="ow">is</span> <span class="n">unallocated</span><span class="o">.</span> <span class="n">The</span> <span class="n">offset</span> <span class="n">may</span> <span class="n">only</span> <span class="n">be</span> <span class="mi">0</span> <span class="k">with</span>
+                <span class="n">bit</span> <span class="mi">63</span> <span class="nb">set</span> <span class="p">(</span><span class="n">indicating</span> <span class="n">a</span> <span class="n">host</span> <span class="n">cluster</span> <span class="n">offset</span> <span class="n">of</span> <span class="mi">0</span><span class="p">)</span> <span class="n">when</span> <span class="n">an</span>
+                <span class="n">external</span> <span class="n">data</span> <span class="n">file</span> <span class="ow">is</span> <span class="n">used</span><span class="o">.</span>
+
+    <span class="mi">56</span> <span class="o">-</span> <span class="mi">61</span><span class="p">:</span>    <span class="n">Reserved</span> <span class="p">(</span><span class="nb">set</span> <span class="n">to</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Compressed Clusters Descriptor <code class="docutils literal notranslate"><span class="pre">(x</span> <span class="pre">=</span> <span class="pre">62</span> <span class="pre">-</span> <span class="pre">(cluster_bits</span> <span class="pre">-</span> <span class="pre">8))</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Bit  0 - x-1:   Host cluster offset. This is usually _not_ aligned to a
+                cluster or sector boundary!  If cluster_bits is
+                small enough that this field includes bits beyond
+                55, those upper bits must be set to 0.
+
+     x - 61:    Number of additional 512-byte sectors used for the
+                compressed data, beyond the sector containing the offset
+                in the previous field. Some of these sectors may reside
+                in the next contiguous host cluster.
+
+                Note that the compressed data does not necessarily occupy
+                all of the bytes in the final sector; rather, decompression
+                stops when it has produced a cluster of data.
+
+                Another compressed cluster may map to the tail of the final
+                sector used by this compressed cluster.
+</pre></div>
+</div>
+<p>If a cluster is unallocated, read requests shall read the data from the backing
+file (except if bit 0 in the Standard Cluster Descriptor is set). If there is
+no backing file or the backing file is smaller than the image, they shall read
+zeros for all parts that are not covered by the backing file.</p>
+</section>
+<section id="extended-l2-entries">
+<h2>Extended L2 Entries<a class="headerlink" href="#extended-l2-entries" title="Permalink to this headline"></a></h2>
+<p>An image uses Extended L2 Entries if bit 4 is set on the incompatible_features
+field of the header.</p>
+<p>In these images standard data clusters are divided into 32 subclusters of the
+same size. They are contiguous and start from the beginning of the cluster.
+Subclusters can be allocated independently and the L2 entry contains information
+indicating the status of each one of them. Compressed data clusters don’t have
+subclusters so they are treated the same as in images without this feature.</p>
+<p>The size of an extended L2 entry is 128 bits so the number of entries per table
+is calculated using this formula:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">l2_entries</span> <span class="o">=</span> <span class="p">(</span><span class="n">cluster_size</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">uint64_t</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>The first 64 bits have the same format as the standard L2 table entry described
+in the previous section, with the exception of bit 0 of the standard cluster
+descriptor.</p>
+<p>The last 64 bits contain a subcluster allocation bitmap with this format:</p>
+<p>Subcluster Allocation Bitmap (for standard clusters):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Bit</span>  <span class="mi">0</span> <span class="o">-</span> <span class="mi">31</span><span class="p">:</span>    <span class="n">Allocation</span> <span class="n">status</span> <span class="p">(</span><span class="n">one</span> <span class="n">bit</span> <span class="n">per</span> <span class="n">subcluster</span><span class="p">)</span>
+
+                <span class="mi">1</span><span class="p">:</span> <span class="n">the</span> <span class="n">subcluster</span> <span class="ow">is</span> <span class="n">allocated</span><span class="o">.</span> <span class="n">In</span> <span class="n">this</span> <span class="n">case</span> <span class="n">the</span>
+                   <span class="n">host</span> <span class="n">cluster</span> <span class="n">offset</span> <span class="n">field</span> <span class="n">must</span> <span class="n">contain</span> <span class="n">a</span> <span class="n">valid</span>
+                   <span class="n">offset</span><span class="o">.</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">the</span> <span class="n">subcluster</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">allocated</span><span class="o">.</span> <span class="n">In</span> <span class="n">this</span> <span class="n">case</span>
+                   <span class="n">read</span> <span class="n">requests</span> <span class="n">shall</span> <span class="n">go</span> <span class="n">to</span> <span class="n">the</span> <span class="n">backing</span> <span class="n">file</span> <span class="ow">or</span>
+                   <span class="k">return</span> <span class="n">zeros</span> <span class="k">if</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">no</span> <span class="n">backing</span> <span class="n">file</span> <span class="n">data</span><span class="o">.</span>
+
+                <span class="n">Bits</span> <span class="n">are</span> <span class="n">assigned</span> <span class="n">starting</span> <span class="kn">from</span><span class="w"> </span><span class="nn">the</span> <span class="n">least</span> <span class="n">significant</span>
+                <span class="n">one</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">bit</span> <span class="n">x</span> <span class="ow">is</span> <span class="n">used</span> <span class="k">for</span> <span class="n">subcluster</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span>
+
+    <span class="mi">32</span> <span class="o">-</span> <span class="mi">63</span>     <span class="n">Subcluster</span> <span class="n">reads</span> <span class="k">as</span> <span class="n">zeros</span> <span class="p">(</span><span class="n">one</span> <span class="n">bit</span> <span class="n">per</span> <span class="n">subcluster</span><span class="p">)</span>
+
+                <span class="mi">1</span><span class="p">:</span> <span class="n">the</span> <span class="n">subcluster</span> <span class="n">reads</span> <span class="k">as</span> <span class="n">zeros</span><span class="o">.</span> <span class="n">In</span> <span class="n">this</span> <span class="n">case</span> <span class="n">the</span>
+                   <span class="n">allocation</span> <span class="n">status</span> <span class="n">bit</span> <span class="n">must</span> <span class="n">be</span> <span class="n">unset</span><span class="o">.</span> <span class="n">The</span> <span class="n">host</span>
+                   <span class="n">cluster</span> <span class="n">offset</span> <span class="n">field</span> <span class="n">may</span> <span class="ow">or</span> <span class="n">may</span> <span class="ow">not</span> <span class="n">be</span> <span class="nb">set</span><span class="o">.</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">no</span> <span class="n">effect</span><span class="o">.</span>
+
+                <span class="n">Bits</span> <span class="n">are</span> <span class="n">assigned</span> <span class="n">starting</span> <span class="kn">from</span><span class="w"> </span><span class="nn">the</span> <span class="n">least</span> <span class="n">significant</span>
+                <span class="n">one</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">bit</span> <span class="n">x</span> <span class="ow">is</span> <span class="n">used</span> <span class="k">for</span> <span class="n">subcluster</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">32</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Subcluster Allocation Bitmap (for compressed clusters):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Bit</span>  <span class="mi">0</span> <span class="o">-</span> <span class="mi">63</span><span class="p">:</span>    <span class="n">Reserved</span> <span class="p">(</span><span class="nb">set</span> <span class="n">to</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">Compressed</span> <span class="n">clusters</span> <span class="n">don</span><span class="s1">&#39;t have subclusters,</span>
+                <span class="n">so</span> <span class="n">this</span> <span class="n">field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">used</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+<section id="snapshots">
+<h2>Snapshots<a class="headerlink" href="#snapshots" title="Permalink to this headline"></a></h2>
+<p>qcow2 supports internal snapshots. Their basic principle of operation is to
+switch the active L1 table, so that a different set of host clusters are
+exposed to the guest.</p>
+<p>When creating a snapshot, the L1 table should be copied and the refcount of all
+L2 tables and clusters reachable from this L1 table must be increased, so that
+a write causes a COW and isn’t visible in other snapshots.</p>
+<p>When loading a snapshot, bit 63 of all entries in the new active L1 table and
+all L2 tables referenced by it must be reconstructed from the refcount table
+as it doesn’t need to be accurate in inactive L1 tables.</p>
+<p>A directory of all snapshots is stored in the snapshot table, a contiguous area
+in the image file, whose starting offset and length are given by the header
+fields snapshots_offset and nb_snapshots. The entries of the snapshot table
+have variable length, depending on the length of ID, name and extra data.</p>
+<p>Snapshot table entry:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Byte</span> <span class="mi">0</span> <span class="o">-</span>  <span class="mi">7</span><span class="p">:</span>    <span class="n">Offset</span> <span class="n">into</span> <span class="n">the</span> <span class="n">image</span> <span class="n">file</span> <span class="n">at</span> <span class="n">which</span> <span class="n">the</span> <span class="n">L1</span> <span class="n">table</span> <span class="k">for</span> <span class="n">the</span>
+                <span class="n">snapshot</span> <span class="n">starts</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">aligned</span> <span class="n">to</span> <span class="n">a</span> <span class="n">cluster</span> <span class="n">boundary</span><span class="o">.</span>
+
+     <span class="mi">8</span> <span class="o">-</span> <span class="mi">11</span><span class="p">:</span>    <span class="n">Number</span> <span class="n">of</span> <span class="n">entries</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">L1</span> <span class="n">table</span> <span class="n">of</span> <span class="n">the</span> <span class="n">snapshots</span>
+
+    <span class="mi">12</span> <span class="o">-</span> <span class="mi">13</span><span class="p">:</span>    <span class="n">Length</span> <span class="n">of</span> <span class="n">the</span> <span class="n">unique</span> <span class="n">ID</span> <span class="n">string</span> <span class="n">describing</span> <span class="n">the</span> <span class="n">snapshot</span>
+
+    <span class="mi">14</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span>    <span class="n">Length</span> <span class="n">of</span> <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">the</span> <span class="n">snapshot</span>
+
+    <span class="mi">16</span> <span class="o">-</span> <span class="mi">19</span><span class="p">:</span>    <span class="n">Time</span> <span class="n">at</span> <span class="n">which</span> <span class="n">the</span> <span class="n">snapshot</span> <span class="n">was</span> <span class="n">taken</span> <span class="ow">in</span> <span class="n">seconds</span> <span class="n">since</span> <span class="n">the</span>
+                <span class="n">Epoch</span>
+
+    <span class="mi">20</span> <span class="o">-</span> <span class="mi">23</span><span class="p">:</span>    <span class="n">Subsecond</span> <span class="n">part</span> <span class="n">of</span> <span class="n">the</span> <span class="n">time</span> <span class="n">at</span> <span class="n">which</span> <span class="n">the</span> <span class="n">snapshot</span> <span class="n">was</span> <span class="n">taken</span>
+                <span class="ow">in</span> <span class="n">nanoseconds</span>
+
+    <span class="mi">24</span> <span class="o">-</span> <span class="mi">31</span><span class="p">:</span>    <span class="n">Time</span> <span class="n">that</span> <span class="n">the</span> <span class="n">guest</span> <span class="n">was</span> <span class="n">running</span> <span class="n">until</span> <span class="n">the</span> <span class="n">snapshot</span> <span class="n">was</span>
+                <span class="n">taken</span> <span class="ow">in</span> <span class="n">nanoseconds</span>
+
+    <span class="mi">32</span> <span class="o">-</span> <span class="mi">35</span><span class="p">:</span>    <span class="n">Size</span> <span class="n">of</span> <span class="n">the</span> <span class="n">VM</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">bytes</span><span class="o">.</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">no</span> <span class="n">VM</span> <span class="n">state</span> <span class="ow">is</span> <span class="n">saved</span><span class="o">.</span>
+                <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">VM</span> <span class="n">state</span><span class="p">,</span> <span class="n">it</span> <span class="n">starts</span> <span class="n">at</span> <span class="n">the</span> <span class="n">first</span> <span class="n">cluster</span>
+                <span class="n">described</span> <span class="n">by</span> <span class="n">first</span> <span class="n">L1</span> <span class="n">table</span> <span class="n">entry</span> <span class="n">that</span> <span class="n">doesn</span><span class="s1">&#39;t describe a</span>
+                <span class="n">regular</span> <span class="n">guest</span> <span class="n">cluster</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">VM</span> <span class="n">state</span> <span class="ow">is</span> <span class="n">stored</span> <span class="n">like</span> <span class="n">guest</span>
+                <span class="n">disk</span> <span class="n">content</span><span class="p">,</span> <span class="k">except</span> <span class="n">that</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">stored</span> <span class="n">at</span> <span class="n">offsets</span> <span class="n">that</span> <span class="n">are</span>
+                <span class="n">larger</span> <span class="n">than</span> <span class="n">the</span> <span class="n">virtual</span> <span class="n">disk</span> <span class="n">presented</span> <span class="n">to</span> <span class="n">the</span> <span class="n">guest</span><span class="p">)</span>
+
+    <span class="mi">36</span> <span class="o">-</span> <span class="mi">39</span><span class="p">:</span>    <span class="n">Size</span> <span class="n">of</span> <span class="n">extra</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">table</span> <span class="n">entry</span> <span class="p">(</span><span class="n">used</span> <span class="k">for</span> <span class="n">future</span>
+                <span class="n">extensions</span> <span class="n">of</span> <span class="n">the</span> <span class="nb">format</span><span class="p">)</span>
+
+    <span class="n">variable</span><span class="p">:</span>   <span class="n">Extra</span> <span class="n">data</span> <span class="k">for</span> <span class="n">future</span> <span class="n">extensions</span><span class="o">.</span> <span class="n">Unknown</span> <span class="n">fields</span> <span class="n">must</span> <span class="n">be</span>
+                <span class="n">ignored</span><span class="o">.</span> <span class="n">Currently</span> <span class="n">defined</span> <span class="n">are</span> <span class="p">(</span><span class="n">offset</span> <span class="n">relative</span> <span class="n">to</span> <span class="n">snapshot</span>
+                <span class="n">table</span> <span class="n">entry</span><span class="p">):</span>
+
+                <span class="n">Byte</span> <span class="mi">40</span> <span class="o">-</span> <span class="mi">47</span><span class="p">:</span>   <span class="n">Size</span> <span class="n">of</span> <span class="n">the</span> <span class="n">VM</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">bytes</span><span class="o">.</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">no</span> <span class="n">VM</span>
+                                <span class="n">state</span> <span class="ow">is</span> <span class="n">saved</span><span class="o">.</span> <span class="n">If</span> <span class="n">this</span> <span class="n">field</span> <span class="ow">is</span> <span class="n">present</span><span class="p">,</span>
+                                <span class="n">the</span> <span class="mi">32</span><span class="o">-</span><span class="n">bit</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">bytes</span> <span class="mi">32</span><span class="o">-</span><span class="mi">35</span> <span class="ow">is</span> <span class="n">ignored</span><span class="o">.</span>
+
+                <span class="n">Byte</span> <span class="mi">48</span> <span class="o">-</span> <span class="mi">55</span><span class="p">:</span>   <span class="n">Virtual</span> <span class="n">disk</span> <span class="n">size</span> <span class="n">of</span> <span class="n">the</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="nb">bytes</span>
+
+                <span class="n">Byte</span> <span class="mi">56</span> <span class="o">-</span> <span class="mi">63</span><span class="p">:</span>   <span class="n">icount</span> <span class="n">value</span> <span class="n">which</span> <span class="n">corresponds</span> <span class="n">to</span>
+                                <span class="n">the</span> <span class="n">record</span><span class="o">/</span><span class="n">replay</span> <span class="n">instruction</span> <span class="n">count</span>
+                                <span class="n">when</span> <span class="n">the</span> <span class="n">snapshot</span> <span class="n">was</span> <span class="n">taken</span><span class="o">.</span> <span class="n">Set</span> <span class="n">to</span> <span class="o">-</span><span class="mi">1</span>
+                                <span class="k">if</span> <span class="n">icount</span> <span class="n">was</span> <span class="n">disabled</span>
+
+                <span class="n">Version</span> <span class="mi">3</span> <span class="n">images</span> <span class="n">must</span> <span class="n">include</span> <span class="n">extra</span> <span class="n">data</span> <span class="n">at</span> <span class="n">least</span> <span class="n">up</span> <span class="n">to</span>
+                <span class="n">byte</span> <span class="mf">55.</span>
+
+    <span class="n">variable</span><span class="p">:</span>   <span class="n">Unique</span> <span class="n">ID</span> <span class="n">string</span> <span class="k">for</span> <span class="n">the</span> <span class="n">snapshot</span> <span class="p">(</span><span class="ow">not</span> <span class="n">null</span> <span class="n">terminated</span><span class="p">)</span>
+
+    <span class="n">variable</span><span class="p">:</span>   <span class="n">Name</span> <span class="n">of</span> <span class="n">the</span> <span class="n">snapshot</span> <span class="p">(</span><span class="ow">not</span> <span class="n">null</span> <span class="n">terminated</span><span class="p">)</span>
+
+    <span class="n">variable</span><span class="p">:</span>   <span class="n">Padding</span> <span class="n">to</span> <span class="nb">round</span> <span class="n">up</span> <span class="n">the</span> <span class="n">snapshot</span> <span class="n">table</span> <span class="n">entry</span> <span class="n">size</span> <span class="n">to</span> <span class="n">the</span>
+                <span class="nb">next</span> <span class="n">multiple</span> <span class="n">of</span> <span class="mf">8.</span>
+</pre></div>
+</div>
+</section>
+<section id="bitmaps">
+<h2>Bitmaps<a class="headerlink" href="#bitmaps" title="Permalink to this headline"></a></h2>
+<p>As mentioned above, the bitmaps extension provides the ability to store bitmaps
+related to a virtual disk. This section describes how these bitmaps are stored.</p>
+<p>All stored bitmaps are related to the virtual disk stored in the same image, so
+each bitmap size is equal to the virtual disk size.</p>
+<p>Each bit of the bitmap is responsible for strictly defined range of the virtual
+disk. For bit number bit_nr the corresponding range (in bytes) will be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">bit_nr</span> <span class="o">*</span> <span class="n">bitmap_granularity</span> <span class="o">..</span> <span class="p">(</span><span class="n">bit_nr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">bitmap_granularity</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Granularity is a property of the concrete bitmap, see below.</p>
+</section>
+<section id="bitmap-directory">
+<h2>Bitmap directory<a class="headerlink" href="#bitmap-directory" title="Permalink to this headline"></a></h2>
+<p>Each bitmap saved in the image is described in a bitmap directory entry. The
+bitmap directory is a contiguous area in the image file, whose starting offset
+and length are given by the header extension fields <code class="docutils literal notranslate"><span class="pre">bitmap_directory_offset</span></code> and
+<code class="docutils literal notranslate"><span class="pre">bitmap_directory_size</span></code>. The entries of the bitmap directory have variable
+length, depending on the lengths of the bitmap name and extra data.</p>
+<p>Structure of a bitmap directory entry:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Byte</span> <span class="mi">0</span> <span class="o">-</span>  <span class="mi">7</span><span class="p">:</span>    <span class="n">bitmap_table_offset</span>
+                <span class="n">Offset</span> <span class="n">into</span> <span class="n">the</span> <span class="n">image</span> <span class="n">file</span> <span class="n">at</span> <span class="n">which</span> <span class="n">the</span> <span class="n">bitmap</span> <span class="n">table</span>
+                <span class="p">(</span><span class="n">described</span> <span class="n">below</span><span class="p">)</span> <span class="k">for</span> <span class="n">the</span> <span class="n">bitmap</span> <span class="n">starts</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">aligned</span> <span class="n">to</span>
+                <span class="n">a</span> <span class="n">cluster</span> <span class="n">boundary</span><span class="o">.</span>
+
+     <span class="mi">8</span> <span class="o">-</span> <span class="mi">11</span><span class="p">:</span>    <span class="n">bitmap_table_size</span>
+                <span class="n">Number</span> <span class="n">of</span> <span class="n">entries</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">bitmap</span> <span class="n">table</span> <span class="n">of</span> <span class="n">the</span> <span class="n">bitmap</span><span class="o">.</span>
+
+    <span class="mi">12</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span>    <span class="n">flags</span>
+                <span class="n">Bit</span>
+                  <span class="mi">0</span><span class="p">:</span> <span class="n">in_use</span>
+                     <span class="n">The</span> <span class="n">bitmap</span> <span class="n">was</span> <span class="ow">not</span> <span class="n">saved</span> <span class="n">correctly</span> <span class="ow">and</span> <span class="n">may</span> <span class="n">be</span>
+                     <span class="n">inconsistent</span><span class="o">.</span> <span class="n">Although</span> <span class="n">the</span> <span class="n">bitmap</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="n">still</span>
+                     <span class="n">well</span><span class="o">-</span><span class="n">formed</span> <span class="kn">from</span><span class="w"> </span><span class="nn">a</span> <span class="n">qcow2</span> <span class="n">perspective</span><span class="p">,</span> <span class="n">the</span> <span class="n">metadata</span>
+                     <span class="p">(</span><span class="n">such</span> <span class="k">as</span> <span class="n">the</span> <span class="n">auto</span> <span class="n">flag</span> <span class="ow">or</span> <span class="n">bitmap</span> <span class="n">size</span><span class="p">)</span> <span class="ow">or</span> <span class="n">data</span>
+                     <span class="n">contents</span> <span class="n">may</span> <span class="n">be</span> <span class="n">outdated</span><span class="o">.</span>
+
+                  <span class="mi">1</span><span class="p">:</span> <span class="n">auto</span>
+                     <span class="n">The</span> <span class="n">bitmap</span> <span class="n">must</span> <span class="n">reflect</span> <span class="nb">all</span> <span class="n">changes</span> <span class="n">of</span> <span class="n">the</span> <span class="n">virtual</span>
+                     <span class="n">disk</span> <span class="n">by</span> <span class="nb">any</span> <span class="n">application</span> <span class="n">that</span> <span class="n">would</span> <span class="n">write</span> <span class="n">to</span> <span class="n">this</span> <span class="n">qcow2</span>
+                     <span class="n">file</span> <span class="p">(</span><span class="n">including</span> <span class="n">writes</span><span class="p">,</span> <span class="n">snapshot</span> <span class="n">switching</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span><span class="p">)</span><span class="o">.</span> <span class="n">The</span>
+                     <span class="nb">type</span> <span class="n">of</span> <span class="n">this</span> <span class="n">bitmap</span> <span class="n">must</span> <span class="n">be</span> <span class="s1">&#39;dirty tracking bitmap&#39;</span><span class="o">.</span>
+
+                  <span class="mi">2</span><span class="p">:</span> <span class="n">extra_data_compatible</span>
+                     <span class="n">This</span> <span class="n">flags</span> <span class="ow">is</span> <span class="n">meaningful</span> <span class="n">when</span> <span class="n">the</span> <span class="n">extra</span> <span class="n">data</span> <span class="ow">is</span>
+                     <span class="n">unknown</span> <span class="n">to</span> <span class="n">the</span> <span class="n">software</span> <span class="p">(</span><span class="n">currently</span> <span class="nb">any</span> <span class="n">extra</span> <span class="n">data</span> <span class="ow">is</span>
+                     <span class="n">unknown</span> <span class="n">to</span> <span class="n">QEMU</span><span class="p">)</span><span class="o">.</span>
+                     <span class="n">If</span> <span class="n">it</span> <span class="ow">is</span> <span class="nb">set</span><span class="p">,</span> <span class="n">the</span> <span class="n">bitmap</span> <span class="n">may</span> <span class="n">be</span> <span class="n">used</span> <span class="k">as</span> <span class="n">expected</span><span class="p">,</span> <span class="n">extra</span>
+                     <span class="n">data</span> <span class="n">must</span> <span class="n">be</span> <span class="n">left</span> <span class="k">as</span> <span class="ow">is</span><span class="o">.</span>
+                     <span class="n">If</span> <span class="n">it</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">,</span> <span class="n">the</span> <span class="n">bitmap</span> <span class="n">must</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">used</span><span class="p">,</span> <span class="n">but</span>
+                     <span class="n">both</span> <span class="n">it</span> <span class="ow">and</span> <span class="n">its</span> <span class="n">extra</span> <span class="n">data</span> <span class="n">be</span> <span class="n">left</span> <span class="k">as</span> <span class="ow">is</span><span class="o">.</span>
+
+                <span class="n">Bits</span> <span class="mi">3</span> <span class="o">-</span> <span class="mi">31</span> <span class="n">are</span> <span class="n">reserved</span> <span class="ow">and</span> <span class="n">must</span> <span class="n">be</span> <span class="mf">0.</span>
+
+         <span class="mi">16</span><span class="p">:</span>    <span class="nb">type</span>
+                <span class="n">This</span> <span class="n">field</span> <span class="n">describes</span> <span class="n">the</span> <span class="n">sort</span> <span class="n">of</span> <span class="n">the</span> <span class="n">bitmap</span><span class="o">.</span>
+                <span class="n">Values</span><span class="p">:</span>
+                  <span class="mi">1</span><span class="p">:</span> <span class="n">Dirty</span> <span class="n">tracking</span> <span class="n">bitmap</span>
+
+                <span class="n">Values</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">255</span> <span class="n">are</span> <span class="n">reserved</span><span class="o">.</span>
+
+         <span class="mi">17</span><span class="p">:</span>    <span class="n">granularity_bits</span>
+                <span class="n">Granularity</span> <span class="n">bits</span><span class="o">.</span> <span class="n">Valid</span> <span class="n">values</span><span class="p">:</span> <span class="mi">0</span> <span class="o">-</span> <span class="mf">63.</span>
+
+                <span class="n">Note</span><span class="p">:</span> <span class="n">QEMU</span> <span class="n">currently</span> <span class="n">supports</span> <span class="n">only</span> <span class="n">values</span> <span class="mi">9</span> <span class="o">-</span> <span class="mf">31.</span>
+
+                <span class="n">Granularity</span> <span class="ow">is</span> <span class="n">calculated</span> <span class="k">as</span>
+                    <span class="n">granularity</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">granularity_bits</span>
+
+                <span class="n">A</span> <span class="n">bitmap</span><span class="s1">&#39;s granularity is how many bytes of the image</span>
+                <span class="n">accounts</span> <span class="k">for</span> <span class="n">one</span> <span class="n">bit</span> <span class="n">of</span> <span class="n">the</span> <span class="n">bitmap</span><span class="o">.</span>
+
+    <span class="mi">18</span> <span class="o">-</span> <span class="mi">19</span><span class="p">:</span>    <span class="n">name_size</span>
+                <span class="n">Size</span> <span class="n">of</span> <span class="n">the</span> <span class="n">bitmap</span> <span class="n">name</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">non</span><span class="o">-</span><span class="n">zero</span><span class="o">.</span>
+
+                <span class="n">Note</span><span class="p">:</span> <span class="n">QEMU</span> <span class="n">currently</span> <span class="n">doesn</span><span class="s1">&#39;t support values greater than</span>
+                <span class="mf">1023.</span>
+
+    <span class="mi">20</span> <span class="o">-</span> <span class="mi">23</span><span class="p">:</span>    <span class="n">extra_data_size</span>
+                <span class="n">Size</span> <span class="n">of</span> <span class="nb">type</span><span class="o">-</span><span class="n">specific</span> <span class="n">extra</span> <span class="n">data</span><span class="o">.</span>
+
+                <span class="n">For</span> <span class="n">now</span><span class="p">,</span> <span class="k">as</span> <span class="n">no</span> <span class="n">extra</span> <span class="n">data</span> <span class="ow">is</span> <span class="n">defined</span><span class="p">,</span> <span class="n">extra_data_size</span> <span class="ow">is</span>
+                <span class="n">reserved</span> <span class="ow">and</span> <span class="n">should</span> <span class="n">be</span> <span class="n">zero</span><span class="o">.</span> <span class="n">If</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">non</span><span class="o">-</span><span class="n">zero</span> <span class="n">the</span>
+                <span class="n">behavior</span> <span class="ow">is</span> <span class="n">defined</span> <span class="n">by</span> <span class="n">extra_data_compatible</span> <span class="n">flag</span><span class="o">.</span>
+
+    <span class="n">variable</span><span class="p">:</span>   <span class="n">extra_data</span>
+                <span class="n">Extra</span> <span class="n">data</span> <span class="k">for</span> <span class="n">the</span> <span class="n">bitmap</span><span class="p">,</span> <span class="n">occupying</span> <span class="n">extra_data_size</span> <span class="nb">bytes</span><span class="o">.</span>
+                <span class="n">Extra</span> <span class="n">data</span> <span class="n">must</span> <span class="n">never</span> <span class="n">contain</span> <span class="n">references</span> <span class="n">to</span> <span class="n">clusters</span> <span class="ow">or</span> <span class="ow">in</span>
+                <span class="n">some</span> <span class="n">other</span> <span class="n">way</span> <span class="n">allocate</span> <span class="n">additional</span> <span class="n">clusters</span><span class="o">.</span>
+
+    <span class="n">variable</span><span class="p">:</span>   <span class="n">name</span>
+                <span class="n">The</span> <span class="n">name</span> <span class="n">of</span> <span class="n">the</span> <span class="n">bitmap</span> <span class="p">(</span><span class="ow">not</span> <span class="n">null</span> <span class="n">terminated</span><span class="p">),</span> <span class="n">occupying</span>
+                <span class="n">name_size</span> <span class="nb">bytes</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">unique</span> <span class="n">among</span> <span class="nb">all</span> <span class="n">bitmap</span> <span class="n">names</span>
+                <span class="n">within</span> <span class="n">the</span> <span class="n">bitmaps</span> <span class="n">extension</span><span class="o">.</span>
+
+    <span class="n">variable</span><span class="p">:</span>   <span class="n">Padding</span> <span class="n">to</span> <span class="nb">round</span> <span class="n">up</span> <span class="n">the</span> <span class="n">bitmap</span> <span class="n">directory</span> <span class="n">entry</span> <span class="n">size</span> <span class="n">to</span> <span class="n">the</span>
+                <span class="nb">next</span> <span class="n">multiple</span> <span class="n">of</span> <span class="mf">8.</span> <span class="n">All</span> <span class="nb">bytes</span> <span class="n">of</span> <span class="n">the</span> <span class="n">padding</span> <span class="n">must</span> <span class="n">be</span> <span class="n">zero</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+<section id="bitmap-table">
+<h2>Bitmap table<a class="headerlink" href="#bitmap-table" title="Permalink to this headline"></a></h2>
+<p>Each bitmap is stored using a one-level structure (as opposed to two-level
+structures like for refcounts and guest clusters mapping) for the mapping of
+bitmap data to host clusters. This structure is called the bitmap table.</p>
+<p>Each bitmap table has a variable size (stored in the bitmap directory entry)
+and may use multiple clusters, however, it must be contiguous in the image
+file.</p>
+<p>Structure of a bitmap table entry:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Bit</span>       <span class="mi">0</span><span class="p">:</span>    <span class="n">Reserved</span> <span class="ow">and</span> <span class="n">must</span> <span class="n">be</span> <span class="n">zero</span> <span class="k">if</span> <span class="n">bits</span> <span class="mi">9</span> <span class="o">-</span> <span class="mi">55</span> <span class="n">are</span> <span class="n">non</span><span class="o">-</span><span class="n">zero</span><span class="o">.</span>
+                <span class="n">If</span> <span class="n">bits</span> <span class="mi">9</span> <span class="o">-</span> <span class="mi">55</span> <span class="n">are</span> <span class="n">zero</span><span class="p">:</span>
+                  <span class="mi">0</span><span class="p">:</span> <span class="n">Cluster</span> <span class="n">should</span> <span class="n">be</span> <span class="n">read</span> <span class="k">as</span> <span class="nb">all</span> <span class="n">zeros</span><span class="o">.</span>
+                  <span class="mi">1</span><span class="p">:</span> <span class="n">Cluster</span> <span class="n">should</span> <span class="n">be</span> <span class="n">read</span> <span class="k">as</span> <span class="nb">all</span> <span class="n">ones</span><span class="o">.</span>
+
+     <span class="mi">1</span> <span class="o">-</span>  <span class="mi">8</span><span class="p">:</span>    <span class="n">Reserved</span> <span class="ow">and</span> <span class="n">must</span> <span class="n">be</span> <span class="n">zero</span><span class="o">.</span>
+
+     <span class="mi">9</span> <span class="o">-</span> <span class="mi">55</span><span class="p">:</span>    <span class="n">Bits</span> <span class="mi">9</span> <span class="o">-</span> <span class="mi">55</span> <span class="n">of</span> <span class="n">the</span> <span class="n">host</span> <span class="n">cluster</span> <span class="n">offset</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">aligned</span> <span class="n">to</span>
+                <span class="n">a</span> <span class="n">cluster</span> <span class="n">boundary</span><span class="o">.</span> <span class="n">If</span> <span class="n">the</span> <span class="n">offset</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">,</span> <span class="n">the</span> <span class="n">cluster</span> <span class="ow">is</span>
+                <span class="n">unallocated</span><span class="p">;</span> <span class="ow">in</span> <span class="n">that</span> <span class="n">case</span><span class="p">,</span> <span class="n">bit</span> <span class="mi">0</span> <span class="n">determines</span> <span class="n">how</span> <span class="n">this</span>
+                <span class="n">cluster</span> <span class="n">should</span> <span class="n">be</span> <span class="n">treated</span> <span class="n">during</span> <span class="n">reads</span><span class="o">.</span>
+
+    <span class="mi">56</span> <span class="o">-</span> <span class="mi">63</span><span class="p">:</span>    <span class="n">Reserved</span> <span class="ow">and</span> <span class="n">must</span> <span class="n">be</span> <span class="n">zero</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+<section id="bitmap-data">
+<h2>Bitmap data<a class="headerlink" href="#bitmap-data" title="Permalink to this headline"></a></h2>
+<p>As noted above, bitmap data is stored in separate clusters, described by the
+bitmap table. Given an offset (in bytes) into the bitmap data, the offset into
+the image file can be obtained as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">image_offset</span><span class="p">(</span><span class="n">bitmap_data_offset</span><span class="p">)</span> <span class="o">=</span>
+    <span class="n">bitmap_table</span><span class="p">[</span><span class="n">bitmap_data_offset</span> <span class="o">/</span> <span class="n">cluster_size</span><span class="p">]</span> <span class="o">+</span>
+        <span class="p">(</span><span class="n">bitmap_data_offset</span> <span class="o">%</span> <span class="n">cluster_size</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This offset is not defined if bits 9 - 55 of bitmap table entry are zero (see
+above).</p>
+<p>Given an offset byte_nr into the virtual disk and the bitmap’s granularity, the
+bit offset into the image file to the corresponding bit of the bitmap can be
+calculated like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bit_offset</span><span class="p">(</span><span class="n">byte_nr</span><span class="p">)</span> <span class="o">=</span>
+    <span class="n">image_offset</span><span class="p">(</span><span class="n">byte_nr</span> <span class="o">/</span> <span class="n">granularity</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">+</span>
+        <span class="p">(</span><span class="n">byte_nr</span> <span class="o">/</span> <span class="n">granularity</span><span class="p">)</span> <span class="o">%</span> <span class="mi">8</span>
+</pre></div>
+</div>
+<p>If the size of the bitmap data is not a multiple of the cluster size then the
+last cluster of the bitmap data contains some unused tail bits. These bits must
+be zero.</p>
+</section>
+<section id="dirty-tracking-bitmaps">
+<h2>Dirty tracking bitmaps<a class="headerlink" href="#dirty-tracking-bitmaps" title="Permalink to this headline"></a></h2>
+<p>Bitmaps with <code class="docutils literal notranslate"><span class="pre">type</span></code> field equal to one are dirty tracking bitmaps.</p>
+<p>When the virtual disk is in use dirty tracking bitmap may be <code class="docutils literal notranslate"><span class="pre">enabled</span></code> or
+<code class="docutils literal notranslate"><span class="pre">disabled</span></code>. While the bitmap is <code class="docutils literal notranslate"><span class="pre">enabled</span></code>, all writes to the virtual disk
+should be reflected in the bitmap. A set bit in the bitmap means that the
+corresponding range of the virtual disk (see above) was written to while the
+bitmap was <code class="docutils literal notranslate"><span class="pre">enabled</span></code>. An unset bit means that this range was not written to.</p>
+<p>The software doesn’t have to sync the bitmap in the image file with its
+representation in RAM after each write or metadata change. Flag <code class="docutils literal notranslate"><span class="pre">in_use</span></code>
+should be set while the bitmap is not synced.</p>
+<p>In the image file the <code class="docutils literal notranslate"><span class="pre">enabled</span></code> state is reflected by the <code class="docutils literal notranslate"><span class="pre">auto</span></code> flag. If this
+flag is set, the software must consider the bitmap as <code class="docutils literal notranslate"><span class="pre">enabled</span></code> and start
+tracking virtual disk changes to this bitmap from the first write to the
+virtual disk. If this flag is not set then the bitmap is disabled.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="prl-xml.html" class="btn btn-neutral float-left" title="Parallels Disk Format" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pr-helper.html" class="btn btn-neutral float-right" title="Persistent reservation helper protocol" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

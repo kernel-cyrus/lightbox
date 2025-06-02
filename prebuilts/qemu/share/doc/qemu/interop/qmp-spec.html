@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QEMU Machine Protocol Specification &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="QEMU Guest Agent" href="qemu-ga.html" />
+    <link rel="prev" title="Persistent reservation helper protocol" href="pr-helper.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Management and Interoperability</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">Barrier client protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitmaps.html">Dirty Bitmaps and Incremental Backup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus.html">D-Bus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-vmstate.html">D-Bus VMState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-display.html">D-Bus display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="live-block-operations.html">Live Block Device Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nbd.html">QEMU NBD protocol support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallels.html">Parallels Expandable Image File Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prl-xml.html">Parallels Disk Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qcow2.html">Qcow2 Image File Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-helper.html">Persistent reservation helper protocol</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">QEMU Machine Protocol Specification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#protocol-specification">Protocol Specification</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#general-definitions">General Definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#server-greeting">Server Greeting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#capabilities">Capabilities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#issuing-commands">Issuing Commands</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#out-of-band-execution">Out-of-band execution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#commands-responses">Commands Responses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#success">Success</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#error">Error</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#asynchronous-events">Asynchronous events</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forcing-the-json-parser-into-known-good-state">Forcing the JSON parser into known-good state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qga-synchronization">QGA Synchronization</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qmp-examples">QMP Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#capabilities-negotiation">Capabilities Negotiation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compatibility-considerations">Compatibility Considerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#downstream-extension-of-qmp">Downstream extension of QMP</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga.html">QEMU Guest Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga-ref.html">QEMU Guest Agent Protocol Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-qmp-ref.html">QEMU QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-storage-daemon-qmp-ref.html">QEMU Storage Daemon QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user.html">Vhost-user Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user-gpu.html">Vhost-user-gpu Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-vdpa.html">Vhost-vdpa Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-balloon-stats.html">Virtio balloon memory statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-ledstate-pseudo-encoding.html">VNC LED state Pseudo-encoding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">System Emulation Management and Interoperability</a> &raquo;</li>
+      <li>QEMU Machine Protocol Specification</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/interop/qmp-spec.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qemu-machine-protocol-specification">
+<h1><a class="toc-backref" href="#id1" role="doc-backlink">QEMU Machine Protocol Specification</a><a class="headerlink" href="#qemu-machine-protocol-specification" title="Permalink to this headline"></a></h1>
+<p>The QEMU Machine Protocol (QMP) is a JSON-based
+protocol which is available for applications to operate QEMU at the
+machine-level.  It is also in use by the QEMU Guest Agent (QGA), which
+is available for host applications to interact with the guest
+operating system. This page specifies the general format of
+the protocol; details of the commands and data structures can
+be found in the <a class="reference internal" href="qemu-qmp-ref.html"><span class="doc">QEMU QMP Reference Manual</span></a> and the <a class="reference internal" href="qemu-ga-ref.html"><span class="doc">QEMU Guest Agent Protocol Reference</span></a>.</p>
+<nav class="contents" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#qemu-machine-protocol-specification" id="id1">QEMU Machine Protocol Specification</a></p>
+<ul>
+<li><p><a class="reference internal" href="#protocol-specification" id="id2">Protocol Specification</a></p>
+<ul>
+<li><p><a class="reference internal" href="#general-definitions" id="id3">General Definitions</a></p></li>
+<li><p><a class="reference internal" href="#server-greeting" id="id4">Server Greeting</a></p></li>
+<li><p><a class="reference internal" href="#capabilities" id="id5">Capabilities</a></p></li>
+<li><p><a class="reference internal" href="#issuing-commands" id="id6">Issuing Commands</a></p></li>
+<li><p><a class="reference internal" href="#out-of-band-execution" id="id7">Out-of-band execution</a></p></li>
+<li><p><a class="reference internal" href="#commands-responses" id="id8">Commands Responses</a></p></li>
+<li><p><a class="reference internal" href="#success" id="id9">Success</a></p></li>
+<li><p><a class="reference internal" href="#error" id="id10">Error</a></p></li>
+<li><p><a class="reference internal" href="#asynchronous-events" id="id11">Asynchronous events</a></p></li>
+<li><p><a class="reference internal" href="#forcing-the-json-parser-into-known-good-state" id="id12">Forcing the JSON parser into known-good state</a></p></li>
+<li><p><a class="reference internal" href="#qga-synchronization" id="id13">QGA Synchronization</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#qmp-examples" id="id14">QMP Examples</a></p></li>
+<li><p><a class="reference internal" href="#capabilities-negotiation" id="id15">Capabilities Negotiation</a></p></li>
+<li><p><a class="reference internal" href="#compatibility-considerations" id="id16">Compatibility Considerations</a></p></li>
+<li><p><a class="reference internal" href="#downstream-extension-of-qmp" id="id17">Downstream extension of QMP</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<section id="protocol-specification">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Protocol Specification</a><a class="headerlink" href="#protocol-specification" title="Permalink to this headline"></a></h2>
+<p>This section details the protocol format. For the purpose of this
+document, “Server” is either QEMU or the QEMU Guest Agent, and
+“Client” is any application communicating with it via QMP.</p>
+<p>JSON data structures, when mentioned in this document, are always in the
+following format:</p>
+<blockquote>
+<div><p>json-DATA-STRUCTURE-NAME</p>
+</div></blockquote>
+<p>Where DATA-STRUCTURE-NAME is any valid JSON data structure, as defined
+by the <a class="reference external" href="http://www.ietf.org/rfc/rfc8259.txt">JSON standard</a>.</p>
+<p>The server expects its input to be encoded in UTF-8, and sends its
+output encoded in ASCII.</p>
+<p>For convenience, json-object members mentioned in this document will
+be in a certain order. However, in real protocol usage they can be in
+ANY order, thus no particular order should be assumed. On the other
+hand, use of json-array elements presumes that preserving order is
+important unless specifically documented otherwise.  Repeating a key
+within a json-object gives unpredictable results.</p>
+<p>Also for convenience, the server will accept an extension of
+<code class="docutils literal notranslate"><span class="pre">'single-quoted'</span></code> strings in place of the usual <code class="docutils literal notranslate"><span class="pre">&quot;double-quoted&quot;</span></code>
+json-string, and both input forms of strings understand an additional
+escape sequence of <code class="docutils literal notranslate"><span class="pre">\'</span></code> for a single quote. The server will only use
+double quoting on output.</p>
+<section id="general-definitions">
+<h3><a class="toc-backref" href="#id3" role="doc-backlink">General Definitions</a><a class="headerlink" href="#general-definitions" title="Permalink to this headline"></a></h3>
+<p>All interactions transmitted by the Server are json-objects, always
+terminating with CRLF.</p>
+<p>All json-objects members are mandatory when not specified otherwise.</p>
+</section>
+<section id="server-greeting">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Server Greeting</a><a class="headerlink" href="#server-greeting" title="Permalink to this headline"></a></h3>
+<p>Right when connected the Server will issue a greeting message, which signals
+that the connection has been successfully established and that the Server is
+ready for capabilities negotiation (for more information refer to section
+<a class="reference internal" href="#capabilities-negotiation">Capabilities Negotiation</a>).</p>
+<p>The greeting message format is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;QMP&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="nb">object</span><span class="p">,</span> <span class="s2">&quot;capabilities&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="n">array</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">version</span></code> member contains the Server’s version information (the format
+is the same as for the query-version command).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">capabilities</span></code> member specifies the availability of features beyond the
+baseline specification; the order of elements in this array has no
+particular significance.</p></li>
+</ul>
+</section>
+<section id="capabilities">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Capabilities</a><a class="headerlink" href="#capabilities" title="Permalink to this headline"></a></h3>
+<p>Currently supported capabilities are:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">oob</span></code></dt><dd><p>the QMP server supports “out-of-band” (OOB) command
+execution, as described in section <a class="reference internal" href="#out-of-band-execution">Out-of-band execution</a>.</p>
+</dd>
+</dl>
+</section>
+<section id="issuing-commands">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Issuing Commands</a><a class="headerlink" href="#issuing-commands" title="Permalink to this headline"></a></h3>
+<p>The format for command execution is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="n">string</span><span class="p">,</span> <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="nb">object</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="n">value</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;exec-oob&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="n">string</span><span class="p">,</span> <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="nb">object</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="n">value</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">execute</span></code> or <code class="docutils literal notranslate"><span class="pre">exec-oob</span></code> member identifies the command to be
+executed by the server.  The latter requests out-of-band execution.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">arguments</span></code> member is used to pass any arguments required for the
+execution of the command, it is optional when no arguments are
+required. Each command documents what contents will be considered
+valid when handling the json-argument.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">id</span></code> member is a transaction identification associated with the
+command execution, it is optional and will be part of the response
+if provided.  The <code class="docutils literal notranslate"><span class="pre">id</span></code> member can be any json-value.  A json-number
+incremented for each successive command works fine.</p></li>
+</ul>
+<p>The actual commands are documented in the <a class="reference internal" href="qemu-qmp-ref.html"><span class="doc">QEMU QMP Reference Manual</span></a>.</p>
+</section>
+<section id="out-of-band-execution">
+<h3><a class="toc-backref" href="#id7" role="doc-backlink">Out-of-band execution</a><a class="headerlink" href="#out-of-band-execution" title="Permalink to this headline"></a></h3>
+<p>The server normally reads, executes and responds to one command after
+the other.  The client therefore receives command responses in issue
+order.</p>
+<p>With out-of-band execution enabled via <a class="reference internal" href="#capabilities-negotiation">capabilities negotiation</a>,
+the server reads and queues commands as they arrive.  It executes
+commands from the queue one after the other.  Commands executed
+out-of-band jump the queue: the command get executed right away,
+possibly overtaking prior in-band commands.  The client may therefore
+receive such a command’s response before responses from prior in-band
+commands.</p>
+<p>To be able to match responses back to their commands, the client needs
+to pass <code class="docutils literal notranslate"><span class="pre">id</span></code> with out-of-band commands.  Passing it with all commands
+is recommended for clients that accept capability <code class="docutils literal notranslate"><span class="pre">oob</span></code>.</p>
+<p>If the client sends in-band commands faster than the server can
+execute them, the server will stop reading requests until the request
+queue length is reduced to an acceptable range.</p>
+<p>To ensure commands to be executed out-of-band get read and executed,
+the client should have at most eight in-band commands in flight.</p>
+<p>Only a few commands support out-of-band execution.  The ones that do
+have <code class="docutils literal notranslate"><span class="pre">&quot;allow-oob&quot;:</span> <span class="pre">true</span></code> in the output of <code class="docutils literal notranslate"><span class="pre">query-qmp-schema</span></code>.</p>
+</section>
+<section id="commands-responses">
+<h3><a class="toc-backref" href="#id8" role="doc-backlink">Commands Responses</a><a class="headerlink" href="#commands-responses" title="Permalink to this headline"></a></h3>
+<p>There are two possible responses which the Server will issue as the result
+of a command execution: success or error.</p>
+<p>As long as the commands were issued with a proper <code class="docutils literal notranslate"><span class="pre">id</span></code> field, then the
+same <code class="docutils literal notranslate"><span class="pre">id</span></code> field will be attached in the corresponding response message
+so that requests and responses can match.  Clients should drop all the
+responses that have an unknown <code class="docutils literal notranslate"><span class="pre">id</span></code> field.</p>
+</section>
+<section id="success">
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Success</a><a class="headerlink" href="#success" title="Permalink to this headline"></a></h3>
+<p>The format of a success response is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="n">value</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">return</span></code> member contains the data returned by the command, which
+is defined on a per-command basis (usually a json-object or
+json-array of json-objects, but sometimes a json-number, json-string,
+or json-array of json-strings); it is an empty json-object if the
+command does not return data.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">id</span></code> member contains the transaction identification associated
+with the command execution if issued by the Client.</p></li>
+</ul>
+</section>
+<section id="error">
+<h3><a class="toc-backref" href="#id10" role="doc-backlink">Error</a><a class="headerlink" href="#error" title="Permalink to this headline"></a></h3>
+<p>The format of an error response is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="n">string</span><span class="p">,</span> <span class="s2">&quot;desc&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="n">string</span> <span class="p">},</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="n">value</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">class</span></code> member contains the error class name (eg. <code class="docutils literal notranslate"><span class="pre">&quot;GenericError&quot;</span></code>).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">desc</span></code> member is a human-readable error message. Clients should
+not attempt to parse this message.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">id</span></code> member contains the transaction identification associated with
+the command execution if issued by the Client.</p></li>
+</ul>
+<p>NOTE: Some errors can occur before the Server is able to read the <code class="docutils literal notranslate"><span class="pre">id</span></code> member;
+in these cases the <code class="docutils literal notranslate"><span class="pre">id</span></code> member will not be part of the error response, even
+if provided by the client.</p>
+</section>
+<section id="asynchronous-events">
+<h3><a class="toc-backref" href="#id11" role="doc-backlink">Asynchronous events</a><a class="headerlink" href="#asynchronous-events" title="Permalink to this headline"></a></h3>
+<p>As a result of state changes, the Server may send messages unilaterally
+to the Client at any time, when not in the middle of any other
+response. They are called “asynchronous events”.</p>
+<p>The format of asynchronous events is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="n">string</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="nb">object</span><span class="p">,</span>
+  <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;seconds&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="n">number</span><span class="p">,</span> <span class="s2">&quot;microseconds&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">-</span><span class="n">number</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">event</span></code> member contains the event’s name.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">data</span></code> member contains event specific data, which is defined in a
+per-event basis. It is optional.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> member contains the exact time of when the event
+occurred in the Server. It is a fixed json-object with time in
+seconds and microseconds relative to the Unix Epoch (1 Jan 1970); if
+there is a failure to retrieve host time, both members of the
+timestamp will be set to -1.</p></li>
+</ul>
+<p>The actual asynchronous events are documented in the <a class="reference internal" href="qemu-qmp-ref.html"><span class="doc">QEMU QMP Reference Manual</span></a>.</p>
+<p>Some events are rate-limited to at most one per second.  If additional
+“similar” events arrive within one second, all but the last one are
+dropped, and the last one is delayed.  “Similar” normally means same
+event type.</p>
+</section>
+<section id="forcing-the-json-parser-into-known-good-state">
+<h3><a class="toc-backref" href="#id12" role="doc-backlink">Forcing the JSON parser into known-good state</a><a class="headerlink" href="#forcing-the-json-parser-into-known-good-state" title="Permalink to this headline"></a></h3>
+<p>Incomplete or invalid input can leave the server’s JSON parser in a
+state where it can’t parse additional commands.  To get it back into
+known-good state, the client should provoke a lexical error.</p>
+<p>The cleanest way to do that is sending an ASCII control character
+other than <code class="docutils literal notranslate"><span class="pre">\t</span></code> (horizontal tab), <code class="docutils literal notranslate"><span class="pre">\r</span></code> (carriage return), or
+<code class="docutils literal notranslate"><span class="pre">\n</span></code> (new line).</p>
+<p>Sadly, older versions of QEMU can fail to flag this as an error.  If a
+client needs to deal with them, it should send a 0xFF byte.</p>
+</section>
+<section id="qga-synchronization">
+<h3><a class="toc-backref" href="#id13" role="doc-backlink">QGA Synchronization</a><a class="headerlink" href="#qga-synchronization" title="Permalink to this headline"></a></h3>
+<p>When a client connects to QGA over a transport lacking proper
+connection semantics such as virtio-serial, QGA may have read partial
+input from a previous client.  The client needs to force QGA’s parser
+into known-good state using the previous section’s technique.
+Moreover, the client may receive output a previous client didn’t read.
+To help with skipping that output, QGA provides the
+<code class="docutils literal notranslate"><span class="pre">guest-sync-delimited</span></code> command.  Refer to its documentation for
+details.</p>
+</section>
+</section>
+<section id="qmp-examples">
+<h2><a class="toc-backref" href="#id14" role="doc-backlink">QMP Examples</a><a class="headerlink" href="#qmp-examples" title="Permalink to this headline"></a></h2>
+<p>This section provides some examples of real QMP usage, in all of them
+<code class="docutils literal notranslate"><span class="pre">-&gt;</span></code> marks text sent by the Client and <code class="docutils literal notranslate"><span class="pre">&lt;-</span></code> marks replies by the Server.</p>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>Server greeting</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;QMP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;qemu&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;micro&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minor&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;major&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span>
+<span class="w">     </span><span class="nt">&quot;package&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v3.0.0&quot;</span><span class="p">},</span><span class="w"> </span><span class="nt">&quot;capabilities&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;oob&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</aside>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>Capabilities negotiation</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;qmp_capabilities&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;enable&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;oob&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}}</span>
+</pre></div>
+</div>
+</aside>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>Simple ‘stop’ execution</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;stop&quot;</span><span class="w"> </span><span class="p">}</span>
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</aside>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>KVM information</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;query-kvm&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="w"> </span><span class="p">}</span>
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;return&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;present&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+</aside>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>Parsing error</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;execute&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">}</span>
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GenericError&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;desc&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;JSON parse error, expecting value&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</aside>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>Powerdown event</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;seconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1258551470</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;microseconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">802384</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;POWERDOWN&quot;</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</aside>
+<div class="admonition-example admonition">
+<p class="admonition-title">Example</p>
+<p>Out-of-band execution</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;exec-oob&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;migrate-pause&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="w"> </span><span class="p">}</span>
+<span class="gp">&lt;- </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span>
+<span class="w">     </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GenericError&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;desc&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;migrate-pause is currently only supported during postcopy-active state&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</aside>
+</section>
+<section id="capabilities-negotiation">
+<h2><a class="toc-backref" href="#id15" role="doc-backlink">Capabilities Negotiation</a><a class="headerlink" href="#capabilities-negotiation" title="Permalink to this headline"></a></h2>
+<p>When a Client successfully establishes a connection, the Server is in
+Capabilities Negotiation mode.</p>
+<p>In this mode only the <code class="docutils literal notranslate"><span class="pre">qmp_capabilities</span></code> command is allowed to run; all
+other commands will return the <code class="docutils literal notranslate"><span class="pre">CommandNotFound</span></code> error. Asynchronous
+messages are not delivered either.</p>
+<p>Clients should use the <code class="docutils literal notranslate"><span class="pre">qmp_capabilities</span></code> command to enable capabilities
+advertised in the <a class="reference internal" href="#server-greeting">Server Greeting</a> which they support.</p>
+<p>When the <code class="docutils literal notranslate"><span class="pre">qmp_capabilities</span></code> command is issued, and if it does not return an
+error, the Server enters Command mode where capabilities changes take
+effect, all commands (except <code class="docutils literal notranslate"><span class="pre">qmp_capabilities</span></code>) are allowed and asynchronous
+messages are delivered.</p>
+</section>
+<section id="compatibility-considerations">
+<h2><a class="toc-backref" href="#id16" role="doc-backlink">Compatibility Considerations</a><a class="headerlink" href="#compatibility-considerations" title="Permalink to this headline"></a></h2>
+<p>All protocol changes or new features which modify the protocol format in an
+incompatible way are disabled by default and will be advertised by the
+capabilities array (in the <a class="reference internal" href="#server-greeting">Server Greeting</a>). Thus, Clients can check
+that array and enable the capabilities they support.</p>
+<p>The QMP Server performs a type check on the arguments to a command.  It
+generates an error if a value does not have the expected type for its
+key, or if it does not understand a key that the Client included.  The
+strictness of the Server catches wrong assumptions of Clients about
+the Server’s schema.  Clients can assume that, when such validation
+errors occur, they will be reported before the command generated any
+side effect.</p>
+<p>However, Clients must not assume any particular:</p>
+<ul class="simple">
+<li><p>Length of json-arrays</p></li>
+<li><p>Size of json-objects; in particular, future versions of QEMU may add
+new keys and Clients should be able to ignore them</p></li>
+<li><p>Order of json-object members or json-array elements</p></li>
+<li><p>Amount of errors generated by a command, that is, new errors can be added
+to any existing command in newer versions of the Server</p></li>
+</ul>
+<p>Any command or member name beginning with <code class="docutils literal notranslate"><span class="pre">x-</span></code> is deemed experimental,
+and may be withdrawn or changed in an incompatible manner in a future
+release.</p>
+<p>Of course, the Server does guarantee to send valid JSON.  But apart from
+this, a Client should be “conservative in what they send, and liberal in
+what they accept”.</p>
+</section>
+<section id="downstream-extension-of-qmp">
+<h2><a class="toc-backref" href="#id17" role="doc-backlink">Downstream extension of QMP</a><a class="headerlink" href="#downstream-extension-of-qmp" title="Permalink to this headline"></a></h2>
+<p>We recommend that downstream consumers of QEMU do <em>not</em> modify QMP.
+Management tools should be able to support both upstream and downstream
+versions of QMP without special logic, and downstream extensions are
+inherently at odds with that.</p>
+<p>However, we recognize that it is sometimes impossible for downstreams to
+avoid modifying QMP.  Both upstream and downstream need to take care to
+preserve long-term compatibility and interoperability.</p>
+<p>To help with that, QMP reserves JSON object member names beginning with
+<code class="docutils literal notranslate"><span class="pre">__</span></code> (double underscore) for downstream use (“downstream names”).  This
+means upstream will never use any downstream names for its commands,
+arguments, errors, asynchronous events, and so forth.</p>
+<p>Any new names downstream wishes to add must begin with <code class="docutils literal notranslate"><span class="pre">__</span></code>.  To
+ensure compatibility with other downstreams, it is strongly
+recommended that you prefix your downstream names with <code class="docutils literal notranslate"><span class="pre">__RFQDN_</span></code> where
+RFQDN is a valid, reverse fully qualified domain name which you
+control.  For example, a qemu-kvm specific monitor command would be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">__org</span><span class="o">.</span><span class="n">linux</span><span class="o">-</span><span class="n">kvm_enable_irqchip</span>
+</pre></div>
+</div>
+<p>Downstream must not change the <a class="reference internal" href="#server-greeting">server greeting</a> other than
+to offer additional capabilities.  But see below for why even that is
+discouraged.</p>
+<p>The section <a class="reference internal" href="#compatibility-considerations">Compatibility Considerations</a> applies to downstream as well
+as to upstream, obviously.  It follows that downstream must behave
+exactly like upstream for any input not containing members with
+downstream names (“downstream members”), except it may add members
+with downstream names to its output.</p>
+<p>Thus, a client should not be able to distinguish downstream from
+upstream as long as it doesn’t send input with downstream members, and
+properly ignores any downstream members in the output it receives.</p>
+<p>Advice on downstream modifications:</p>
+<ol class="arabic simple">
+<li><p>Introducing new commands is okay.  If you want to extend an existing
+command, consider introducing a new one with the new behaviour
+instead.</p></li>
+<li><p>Introducing new asynchronous messages is okay.  If you want to extend
+an existing message, consider adding a new one instead.</p></li>
+<li><p>Introducing new errors for use in new commands is okay.  Adding new
+errors to existing commands counts as extension, so 1. applies.</p></li>
+<li><p>New capabilities are strongly discouraged.  Capabilities are for
+evolving the basic protocol, and multiple diverging basic protocol
+dialects are most undesirable.</p></li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pr-helper.html" class="btn btn-neutral float-left" title="Persistent reservation helper protocol" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qemu-ga.html" class="btn btn-neutral float-right" title="QEMU Guest Agent" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

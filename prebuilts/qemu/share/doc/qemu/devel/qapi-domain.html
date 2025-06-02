@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Sphinx QAPI Domain &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Control-Flow Integrity (CFI)" href="control-flow-integrity.html" />
+    <link rel="prev" title="How to use the QAPI code generator" href="qapi-code-gen.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-build.html">QEMU Build System</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="build-system.html">The QEMU build system architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build-environment.html">Setup build environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kconfig.html">QEMU and Kconfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="docs.html">QEMU Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qapi-code-gen.html">How to use the QAPI code generator</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">The Sphinx QAPI Domain</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#concepts">Concepts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#info-field-lists">Info Field Lists</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cross-references">Cross-references</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#directives">Directives</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="control-flow-integrity.html">Control-Flow Integrity (CFI)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing/index.html">Testing QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Developer Information</a> &raquo;</li>
+          <li><a href="index-build.html">QEMU Build System</a> &raquo;</li>
+      <li>The Sphinx QAPI Domain</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/qapi-domain.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-sphinx-qapi-domain">
+<h1>The Sphinx QAPI Domain<a class="headerlink" href="#the-sphinx-qapi-domain" title="Permalink to this headline"></a></h1>
+<p>An extension to the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html">rST syntax</a>
+in Sphinx is provided by the QAPI Domain, located in
+<code class="docutils literal notranslate"><span class="pre">docs/sphinx/qapi_domain.py</span></code>. This extension is analogous to the
+<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/domains/python.html">Python Domain</a>
+included with Sphinx, but provides special directives and roles
+speciically for annotating and documenting QAPI definitions
+specifically.</p>
+<p>A <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/domains/index.html">Domain</a>
+provides a set of special rST directives and cross-referencing roles to
+Sphinx for understanding rST markup written to document a specific
+language. By itself, this QAPI extension is only sufficient to parse rST
+markup written by hand; the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html">autodoc</a>
+functionality is provided elsewhere, in <code class="docutils literal notranslate"><span class="pre">docs/sphinx/qapidoc.py</span></code>, by
+the “Transmogrifier”.</p>
+<p>It is not expected that any developer nor documentation writer would
+never need to write <em>nor</em> read these special rST forms. However, in the
+event that something needs to be debugged, knowing the syntax of the
+domain is quite handy. This reference may also be useful as a guide for
+understanding the QAPI Domain extension code itself. Although most of
+these forms will not be needed for documentation writing purposes,
+understanding the cross-referencing syntax <em>will</em> be helpful when
+writing rST documentation elsewhere, or for enriching the body of
+QAPIDoc blocks themselves.</p>
+<section id="concepts">
+<h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline"></a></h2>
+<p>The QAPI Domain itself provides no mechanisms for reading the QAPI
+Schema or generating documentation from code that exists. It is merely
+the rST syntax used to describe things. For instance, the Sphinx Python
+domain adds syntax like <code class="docutils literal notranslate"><span class="pre">:py:func:</span></code> for describing Python functions in
+documentation, but it’s the autodoc module that is responsible for
+reading Python code and generating such syntax. QAPI is analogous here:
+qapidoc.py is responsible for reading the QAPI Schema and generating rST
+syntax, and qapi_domain.py is responsible for translating that special
+syntax and providing APIs for Sphinx internals.</p>
+<p>In other words:</p>
+<p>qapi_domain.py adds syntax like <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">qapi:command::</span></code> to Sphinx, and
+qapidoc.py transforms the documentation in <code class="docutils literal notranslate"><span class="pre">qapi/*.json</span></code> into rST
+using directives defined by the domain.</p>
+<p>Or even shorter:</p>
+<p><code class="docutils literal notranslate"><span class="pre">:py:</span></code> is to <code class="docutils literal notranslate"><span class="pre">:qapi:</span></code> as <em>autodoc</em> is to <em>qapidoc</em>.</p>
+</section>
+<section id="info-field-lists">
+<h2>Info Field Lists<a class="headerlink" href="#info-field-lists" title="Permalink to this headline"></a></h2>
+<p><a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#field-lists">Field lists</a>
+are a standard syntax in reStructuredText. Sphinx <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/domains/python.html#info-field-lists">extends that syntax</a>
+to give certain field list entries special meaning and parsing to, for
+example, add cross-references. The QAPI Domain takes advantage of this
+field list extension to document things like Arguments, Members, Values,
+and so on.</p>
+<p>The special parsing and handling of info field lists in Sphinx is provided by
+three main classes; Field, GroupedField, and TypedField. The behavior
+and formatting for each configured field list entry in the domain
+changes depending on which class is used.</p>
+<dl class="simple">
+<dt>Field:</dt><dd><ul class="simple">
+<li><p>Creates an ungrouped field: i.e., each entry will create its own
+section and they will not be combined.</p></li>
+<li><p>May <em>optionally</em> support an argument.</p></li>
+<li><p>May apply cross-reference roles to <em>either</em> the argument <em>or</em> the
+content body, both, or neither.</p></li>
+</ul>
+</dd>
+</dl>
+<p>This is used primarily for entries which are not expected to be
+repeated, i.e., items that may only show up at most once. The QAPI
+domain uses this class for “Errors” section.</p>
+<dl class="simple">
+<dt>GroupedField:</dt><dd><ul class="simple">
+<li><p>Creates a grouped field: i.e. multiple adjacent entries will be
+merged into one section, and the content will form a bulleted list.</p></li>
+<li><p><em>Must</em> take an argument.</p></li>
+<li><p>May optionally apply a cross-reference role to the argument, but not
+the body.</p></li>
+<li><p>Can be configured to remove the bulleted list if there is only a
+single entry.</p></li>
+<li><p>All items will be generated with the form: “argument – body”</p></li>
+</ul>
+</dd>
+</dl>
+<p>This is used for entries which are expected to be repeated, but aren’t
+expected to have two arguments, i.e. types without names, or names
+without types. The QAPI domain uses this class for features, returns,
+and enum values.</p>
+<dl class="simple">
+<dt>TypedField:</dt><dd><ul class="simple">
+<li><p>Creates a grouped, typed field. Multiple adjacent entres will be
+merged into one section, and the content will form a bulleted list.</p></li>
+<li><p><em>Must</em> take at least one argument, but supports up to two -
+nominally, a name and a type.</p></li>
+<li><p>May optionally apply a cross-reference role to the type or the name
+argument, but not the body.</p></li>
+<li><p>Can be configured to remove the bulleted list if there is only a
+single entry.</p></li>
+<li><p>All items will be generated with the form “name (type) – body”</p></li>
+</ul>
+</dd>
+</dl>
+<p>This is used for entries that are expected to be repeated and will have
+a name, a type, and a description. The QAPI domain uses this class for
+arguments, alternatives, and members. Wherever type names are referenced
+below, They must be a valid, documented type that will be
+cross-referenced in the HTML output; or one of the built-in JSON types
+(string, number, int, boolean, null, value, q_empty).</p>
+<section id="feat">
+<h3><code class="docutils literal notranslate"><span class="pre">:feat:</span></code><a class="headerlink" href="#feat" title="Permalink to this headline"></a></h3>
+<p>Document a feature attached to a QAPI definition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">availability<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This field list is available in the body of Command,
+Event, Enum, Object and Alternate directives.</p>
+</dd>
+<dt class="field-even">syntax<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">:feat</span> <span class="pre">name:</span> <span class="pre">Lorem</span> <span class="pre">ipsum,</span> <span class="pre">dolor</span> <span class="pre">sit</span> <span class="pre">amet...</span></code></p>
+</dd>
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pydoc.dev/sphinx/latest/sphinx.util.docfields.GroupedField.html?private=1">sphinx.util.docfields.GroupedField</a></p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>.. qapi:object:: BlockdevOptionsVirtioBlkVhostVdpa
+   :since: 7.2
+   :ifcond: CONFIG_BLKIO
+
+   Driver specific block device options for the virtio-blk-vhost-vdpa
+   backend.
+
+:memb string path: path to the vhost-vdpa character device.
+:feat fdset: Member ``path`` supports the special &quot;/dev/fdset/N&quot; path
+    (since 8.1)
+</pre></div>
+</div>
+</section>
+<section id="arg">
+<h3><code class="docutils literal notranslate"><span class="pre">:arg:</span></code><a class="headerlink" href="#arg" title="Permalink to this headline"></a></h3>
+<p>Document an argument to a QAPI command.</p>
+<dl class="field-list simple">
+<dt class="field-odd">availability<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This field list is only available in the body of the
+Command directive.</p>
+</dd>
+<dt class="field-even">syntax<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">:arg</span> <span class="pre">type</span> <span class="pre">name:</span> <span class="pre">description</span></code></p>
+</dd>
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pydoc.dev/sphinx/latest/sphinx.util.docfields.TypedField.html?private=1">sphinx.util.docfields.TypedField</a></p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">qapi</span><span class="p">:</span><span class="n">command</span><span class="p">::</span> <span class="n">job</span><span class="o">-</span><span class="n">pause</span>
+   <span class="p">:</span><span class="n">since</span><span class="p">:</span> <span class="mf">3.0</span>
+
+   <span class="n">Pause</span> <span class="n">an</span> <span class="n">active</span> <span class="n">job</span><span class="o">.</span>
+
+   <span class="n">This</span> <span class="n">command</span> <span class="n">returns</span> <span class="n">immediately</span> <span class="n">after</span> <span class="n">marking</span> <span class="n">the</span> <span class="n">active</span> <span class="n">job</span> <span class="k">for</span>
+   <span class="n">pausing</span><span class="o">.</span>  <span class="n">Pausing</span> <span class="n">an</span> <span class="n">already</span> <span class="n">paused</span> <span class="n">job</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span><span class="o">.</span>
+
+   <span class="n">The</span> <span class="n">job</span> <span class="n">will</span> <span class="n">pause</span> <span class="k">as</span> <span class="n">soon</span> <span class="k">as</span> <span class="n">possible</span><span class="p">,</span> <span class="n">which</span> <span class="n">means</span> <span class="n">transitioning</span>
+   <span class="n">into</span> <span class="n">the</span> <span class="n">PAUSED</span> <span class="n">state</span> <span class="k">if</span> <span class="n">it</span> <span class="n">was</span> <span class="n">RUNNING</span><span class="p">,</span> <span class="ow">or</span> <span class="n">into</span> <span class="n">STANDBY</span> <span class="k">if</span> <span class="n">it</span> <span class="n">was</span>
+   <span class="n">READY</span><span class="o">.</span>  <span class="n">The</span> <span class="n">corresponding</span> <span class="n">JOB_STATUS_CHANGE</span> <span class="n">event</span> <span class="n">will</span> <span class="n">be</span> <span class="n">emitted</span><span class="o">.</span>
+
+   <span class="n">Cancelling</span> <span class="n">a</span> <span class="n">paused</span> <span class="n">job</span> <span class="n">automatically</span> <span class="n">resumes</span> <span class="n">it</span><span class="o">.</span>
+
+   <span class="p">:</span><span class="n">arg</span> <span class="n">string</span> <span class="nb">id</span><span class="p">:</span> <span class="n">The</span> <span class="n">job</span> <span class="n">identifier</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+<section id="error">
+<h3><code class="docutils literal notranslate"><span class="pre">:error:</span></code><a class="headerlink" href="#error" title="Permalink to this headline"></a></h3>
+<p>Document the error condition(s) of a QAPI command.</p>
+<dl class="field-list simple">
+<dt class="field-odd">availability<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This field list is only available in the body of the
+Command directive.</p>
+</dd>
+<dt class="field-even">syntax<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">:error:</span> <span class="pre">Lorem</span> <span class="pre">ipsum</span> <span class="pre">dolor</span> <span class="pre">sit</span> <span class="pre">amet</span> <span class="pre">...</span></code></p>
+</dd>
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pydoc.dev/sphinx/latest/sphinx.util.docfields.Field.html?private=1">sphinx.util.docfields.Field</a></p>
+</dd>
+</dl>
+<p>The format of the :errors: field list description is free-form rST. The
+alternative spelling “:errors:” is also permitted, but strictly
+analogous.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">qapi</span><span class="p">:</span><span class="n">command</span><span class="p">::</span> <span class="n">block</span><span class="o">-</span><span class="n">job</span><span class="o">-</span><span class="nb">set</span><span class="o">-</span><span class="n">speed</span>
+   <span class="p">:</span><span class="n">since</span><span class="p">:</span> <span class="mf">1.1</span>
+
+   <span class="n">Set</span> <span class="n">maximum</span> <span class="n">speed</span> <span class="k">for</span> <span class="n">a</span> <span class="n">background</span> <span class="n">block</span> <span class="n">operation</span><span class="o">.</span>
+
+   <span class="n">This</span> <span class="n">command</span> <span class="n">can</span> <span class="n">only</span> <span class="n">be</span> <span class="n">issued</span> <span class="n">when</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">active</span> <span class="n">block</span> <span class="n">job</span><span class="o">.</span>
+
+   <span class="n">Throttling</span> <span class="n">can</span> <span class="n">be</span> <span class="n">disabled</span> <span class="n">by</span> <span class="n">setting</span> <span class="n">the</span> <span class="n">speed</span> <span class="n">to</span> <span class="mf">0.</span>
+
+   <span class="p">:</span><span class="n">arg</span> <span class="n">string</span> <span class="n">device</span><span class="p">:</span> <span class="n">The</span> <span class="n">job</span> <span class="n">identifier</span><span class="o">.</span>  <span class="n">This</span> <span class="n">used</span> <span class="n">to</span> <span class="n">be</span> <span class="n">a</span> <span class="n">device</span>
+       <span class="n">name</span> <span class="p">(</span><span class="n">hence</span> <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">the</span> <span class="n">parameter</span><span class="p">),</span> <span class="n">but</span> <span class="n">since</span> <span class="n">QEMU</span> <span class="mf">2.7</span> <span class="n">it</span>
+       <span class="n">can</span> <span class="n">have</span> <span class="n">other</span> <span class="n">values</span><span class="o">.</span>
+   <span class="p">:</span><span class="n">arg</span> <span class="nb">int</span> <span class="n">speed</span><span class="p">:</span> <span class="n">the</span> <span class="n">maximum</span> <span class="n">speed</span><span class="p">,</span> <span class="ow">in</span> <span class="nb">bytes</span> <span class="n">per</span> <span class="n">second</span><span class="p">,</span> <span class="ow">or</span> <span class="mi">0</span> <span class="k">for</span>
+       <span class="n">unlimited</span><span class="o">.</span>  <span class="n">Defaults</span> <span class="n">to</span> <span class="mf">0.</span>
+   <span class="p">:</span><span class="n">error</span><span class="p">:</span>
+       <span class="o">-</span> <span class="n">If</span> <span class="n">no</span> <span class="n">background</span> <span class="n">operation</span> <span class="ow">is</span> <span class="n">active</span> <span class="n">on</span> <span class="n">this</span> <span class="n">device</span><span class="p">,</span>
+         <span class="n">DeviceNotActive</span>
+</pre></div>
+</div>
+</section>
+<section id="return">
+<h3><code class="docutils literal notranslate"><span class="pre">:return:</span></code><a class="headerlink" href="#return" title="Permalink to this headline"></a></h3>
+<p>Document the return type(s) and value(s) of a QAPI command.</p>
+<dl class="field-list simple">
+<dt class="field-odd">availability<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This field list is only available in the body of the
+Command directive.</p>
+</dd>
+<dt class="field-even">syntax<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">:return</span> <span class="pre">type:</span> <span class="pre">Lorem</span> <span class="pre">ipsum</span> <span class="pre">dolor</span> <span class="pre">sit</span> <span class="pre">amet</span> <span class="pre">...</span></code></p>
+</dd>
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pydoc.dev/sphinx/latest/sphinx.util.docfields.GroupedField.html?private=1">sphinx.util.docfields.GroupedField</a></p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>.. qapi:command:: query-replay
+   :since: 5.2
+
+   Retrieve the record/replay information.  It includes current
+   instruction count which may be used for ``replay-break`` and
+   ``replay-seek`` commands.
+
+   :return ReplayInfo: record/replay information.
+
+   .. qmp-example::
+
+       -&gt; { &quot;execute&quot;: &quot;query-replay&quot; }
+       &lt;- { &quot;return&quot;: {
+              &quot;mode&quot;: &quot;play&quot;, &quot;filename&quot;: &quot;log.rr&quot;, &quot;icount&quot;: 220414 }
+          }
+</pre></div>
+</div>
+</section>
+<section id="value">
+<h3><code class="docutils literal notranslate"><span class="pre">:value:</span></code><a class="headerlink" href="#value" title="Permalink to this headline"></a></h3>
+<p>Document a possible value for a QAPI enum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">availability<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This field list is only available in the body of the Enum
+directive.</p>
+</dd>
+<dt class="field-even">syntax<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">:value</span> <span class="pre">name:</span> <span class="pre">Lorem</span> <span class="pre">ipsum,</span> <span class="pre">dolor</span> <span class="pre">sit</span> <span class="pre">amet</span> <span class="pre">...</span></code></p>
+</dd>
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pydoc.dev/sphinx/latest/sphinx.util.docfields.GroupedField.html?private=1">sphinx.util.docfields.GroupedField</a></p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">qapi</span><span class="p">:</span><span class="n">enum</span><span class="p">::</span> <span class="n">QapiErrorClass</span>
+   <span class="p">:</span><span class="n">since</span><span class="p">:</span> <span class="mf">1.2</span>
+
+   <span class="n">QEMU</span> <span class="n">error</span> <span class="n">classes</span>
+
+   <span class="p">:</span><span class="n">value</span> <span class="n">GenericError</span><span class="p">:</span> <span class="n">this</span> <span class="ow">is</span> <span class="n">used</span> <span class="k">for</span> <span class="n">errors</span> <span class="n">that</span> <span class="n">don</span><span class="s1">&#39;t require a specific</span>
+       <span class="n">error</span> <span class="n">class</span><span class="o">.</span>  <span class="n">This</span> <span class="n">should</span> <span class="n">be</span> <span class="n">the</span> <span class="n">default</span> <span class="n">case</span> <span class="k">for</span> <span class="n">most</span> <span class="n">errors</span>
+   <span class="p">:</span><span class="n">value</span> <span class="n">CommandNotFound</span><span class="p">:</span> <span class="n">the</span> <span class="n">requested</span> <span class="n">command</span> <span class="n">has</span> <span class="ow">not</span> <span class="n">been</span> <span class="n">found</span>
+   <span class="p">:</span><span class="n">value</span> <span class="n">DeviceNotActive</span><span class="p">:</span> <span class="n">a</span> <span class="n">device</span> <span class="n">has</span> <span class="n">failed</span> <span class="n">to</span> <span class="n">be</span> <span class="n">become</span> <span class="n">active</span>
+   <span class="p">:</span><span class="n">value</span> <span class="n">DeviceNotFound</span><span class="p">:</span> <span class="n">the</span> <span class="n">requested</span> <span class="n">device</span> <span class="n">has</span> <span class="ow">not</span> <span class="n">been</span> <span class="n">found</span>
+   <span class="p">:</span><span class="n">value</span> <span class="n">KVMMissingCap</span><span class="p">:</span> <span class="n">the</span> <span class="n">requested</span> <span class="n">operation</span> <span class="n">can</span><span class="s1">&#39;t be fulfilled because a</span>
+       <span class="n">required</span> <span class="n">KVM</span> <span class="n">capability</span> <span class="ow">is</span> <span class="n">missing</span>
+</pre></div>
+</div>
+</section>
+<section id="alt">
+<h3><code class="docutils literal notranslate"><span class="pre">:alt:</span></code><a class="headerlink" href="#alt" title="Permalink to this headline"></a></h3>
+<p>Document a possible branch for a QAPI alternate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">availability<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This field list is only available in the body of the
+Alternate directive.</p>
+</dd>
+<dt class="field-even">syntax<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">:alt</span> <span class="pre">type</span> <span class="pre">name:</span> <span class="pre">Lorem</span> <span class="pre">ipsum,</span> <span class="pre">dolor</span> <span class="pre">sit</span> <span class="pre">amet</span> <span class="pre">...</span></code></p>
+</dd>
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pydoc.dev/sphinx/latest/sphinx.util.docfields.TypedField.html?private=1">sphinx.util.docfields.TypedField</a></p>
+</dd>
+</dl>
+<p>As a limitation of Sphinx, we must document the “name” of the branch in
+addition to the type, even though this information is not visible on the
+wire in the QMP protocol format. This limitation <em>may</em> be lifted at a
+future date.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">qapi</span><span class="p">:</span><span class="n">alternate</span><span class="p">::</span> <span class="n">StrOrNull</span>
+   <span class="p">:</span><span class="n">since</span><span class="p">:</span> <span class="mf">2.10</span>
+
+   <span class="n">This</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">string</span> <span class="n">value</span> <span class="ow">or</span> <span class="n">the</span> <span class="n">explicit</span> <span class="n">lack</span> <span class="n">of</span> <span class="n">a</span> <span class="n">string</span> <span class="p">(</span><span class="n">null</span>
+   <span class="n">pointer</span> <span class="ow">in</span> <span class="n">C</span><span class="p">)</span><span class="o">.</span>  <span class="n">Intended</span> <span class="k">for</span> <span class="n">cases</span> <span class="n">when</span> <span class="s1">&#39;optional absent&#39;</span> <span class="n">already</span>
+   <span class="n">has</span> <span class="n">a</span> <span class="n">different</span> <span class="n">meaning</span><span class="o">.</span>
+
+    <span class="p">:</span><span class="n">alt</span> <span class="n">string</span> <span class="n">s</span><span class="p">:</span> <span class="n">the</span> <span class="n">string</span> <span class="n">value</span>
+    <span class="p">:</span><span class="n">alt</span> <span class="n">null</span> <span class="n">n</span><span class="p">:</span> <span class="n">no</span> <span class="n">string</span> <span class="n">value</span>
+</pre></div>
+</div>
+</section>
+<section id="memb">
+<h3><code class="docutils literal notranslate"><span class="pre">:memb:</span></code><a class="headerlink" href="#memb" title="Permalink to this headline"></a></h3>
+<p>Document a member of an Event or Object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">availability<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This field list is available in the body of Event or
+Object directives.</p>
+</dd>
+<dt class="field-even">syntax<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">:memb</span> <span class="pre">type</span> <span class="pre">name:</span> <span class="pre">Lorem</span> <span class="pre">ipsum,</span> <span class="pre">dolor</span> <span class="pre">sit</span> <span class="pre">amet</span> <span class="pre">...</span></code></p>
+</dd>
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pydoc.dev/sphinx/latest/sphinx.util.docfields.TypedField.html?private=1">sphinx.util.docfields.TypedField</a></p>
+</dd>
+</dl>
+<p>This is fundamentally the same as <code class="docutils literal notranslate"><span class="pre">:arg:</span></code> and <code class="docutils literal notranslate"><span class="pre">:alt:</span></code>, but uses the
+“Members” phrasing for Events and Objects (Structs and Unions).</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">qapi</span><span class="p">:</span><span class="n">event</span><span class="p">::</span> <span class="n">JOB_STATUS_CHANGE</span>
+   <span class="p">:</span><span class="n">since</span><span class="p">:</span> <span class="mf">3.0</span>
+
+   <span class="n">Emitted</span> <span class="n">when</span> <span class="n">a</span> <span class="n">job</span> <span class="n">transitions</span> <span class="n">to</span> <span class="n">a</span> <span class="n">different</span> <span class="n">status</span><span class="o">.</span>
+
+   <span class="p">:</span><span class="n">memb</span> <span class="n">string</span> <span class="nb">id</span><span class="p">:</span> <span class="n">The</span> <span class="n">job</span> <span class="n">identifier</span>
+   <span class="p">:</span><span class="n">memb</span> <span class="n">JobStatus</span> <span class="n">status</span><span class="p">:</span> <span class="n">The</span> <span class="n">new</span> <span class="n">job</span> <span class="n">status</span>
+</pre></div>
+</div>
+</section>
+<section id="arbitrary-field-lists">
+<h3>Arbitrary field lists<a class="headerlink" href="#arbitrary-field-lists" title="Permalink to this headline"></a></h3>
+<p>Other field list names, while valid rST syntax, are prohibited inside of
+QAPI directives to help prevent accidental misspellings of info field
+list names. If you want to add a new arbitrary “non-value-added” field
+list to QAPI documentation, you must add the field name to the allow
+list in <code class="docutils literal notranslate"><span class="pre">docs/conf.py</span></code></p>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qapi_allowed_fields</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;see also&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Will allow you to add arbitrary field lists in QAPI directives:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">qapi</span><span class="p">:</span><span class="n">command</span><span class="p">::</span> <span class="n">x</span><span class="o">-</span><span class="n">fake</span><span class="o">-</span><span class="n">command</span>
+
+   <span class="p">:</span><span class="n">see</span> <span class="n">also</span><span class="p">:</span> <span class="n">Lorem</span> <span class="n">ipsum</span><span class="p">,</span> <span class="n">dolor</span> <span class="n">sit</span> <span class="n">amet</span> <span class="o">...</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="cross-references">
+<h2>Cross-references<a class="headerlink" href="#cross-references" title="Permalink to this headline"></a></h2>
+<p>Cross-reference <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html">roles</a>
+in the QAPI domain are modeled closely after the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/domains/python.html#cross-referencing-python-objects">Python
+cross-referencing syntax</a>.</p>
+<p>QAPI definitions can be referenced using the standard <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/referencing.html#role-any">any</a>
+role cross-reference syntax, such as with <code class="docutils literal notranslate"><span class="pre">`query-blockstats`</span></code>.  In
+the event that disambiguation is needed, cross-references can also be
+written using a number of explicit cross-reference roles:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">:qapi:mod:`block-core`</span></code> – Reference a QAPI module. The link will
+take you to the beginning of that section in the documentation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:qapi:cmd:`query-block`</span></code> – Reference a QAPI command.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:qapi:event:`JOB_STATUS_CHANGE`</span></code> – Reference a QAPI event.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:qapi:enum:`QapiErrorClass`</span></code> – Reference a QAPI enum.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:qapi:obj:`BlockdevOptionsVirtioBlkVhostVdpa</span></code> – Reference a QAPI
+object (struct or union)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:qapi:alt:`StrOrNull`</span></code> – Reference a QAPI alternate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:qapi:type:`BlockDirtyInfo`</span></code> – Reference <em>any</em> QAPI type; this
+excludes modules, commands, and events.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:qapi:any:`block-job-set-speed`</span></code> – Reference absolutely any QAPI entity.</p></li>
+</ul>
+<p>Type arguments in info field lists are converted into references as if
+you had used the <code class="docutils literal notranslate"><span class="pre">:qapi:type:</span></code> role. All of the special syntax below
+applies to both info field lists and standalone explicit
+cross-references.</p>
+<section id="type-decorations">
+<h3>Type decorations<a class="headerlink" href="#type-decorations" title="Permalink to this headline"></a></h3>
+<p>Type names in references can be surrounded by brackets, like
+<code class="docutils literal notranslate"><span class="pre">[typename]</span></code>, to indicate an array of that type.  The cross-reference
+will apply only to the type name between the brackets. For example;
+<code class="docutils literal notranslate"><span class="pre">:qapi:type:`[Qcow2BitmapInfoFlags]`</span></code> renders to:
+<code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="../interop/qemu-qmp-ref.html#enum-QMP-block-core.Qcow2BitmapInfoFlags" title="QMP:block-core.Qcow2BitmapInfoFlags"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">QMP:Qcow2BitmapInfoFlags</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></p>
+<p>To indicate an optional argument/member in a field list, the type name
+can be suffixed with <code class="docutils literal notranslate"><span class="pre">?</span></code>. The cross-reference will be transformed to
+“type, Optional” with the link applying only to the type name. For
+example; <code class="docutils literal notranslate"><span class="pre">:qapi:type:`BitmapSyncMode?`</span></code> renders to:
+<a class="reference internal" href="../interop/qemu-qmp-ref.html#enum-QMP-block-core.BitmapSyncMode" title="QMP:block-core.BitmapSyncMode"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">QMP:BitmapSyncMode</span></code></a>, <em>optional</em></p>
+</section>
+<section id="namespaces">
+<h3>Namespaces<a class="headerlink" href="#namespaces" title="Permalink to this headline"></a></h3>
+<p>Mimicking the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/domains/python.html#target-specification">Python domain target specification syntax</a>,
+QAPI allows you to specify the fully qualified path for a data
+type.</p>
+<ul class="simple">
+<li><p>A namespace can be explicitly provided;
+e.g. <code class="docutils literal notranslate"><span class="pre">:qapi:type:`QMP:BitmapSyncMode</span></code></p></li>
+<li><p>A module can be explicitly provided;
+<code class="docutils literal notranslate"><span class="pre">:qapi:type:`QMP:block-core.BitmapSyncMode`</span></code> will render to:
+<a class="reference internal" href="../interop/qemu-qmp-ref.html#enum-QMP-block-core.BitmapSyncMode" title="QMP:block-core.BitmapSyncMode"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">QMP:block-core.BitmapSyncMode</span></code></a></p></li>
+<li><p>If you don’t want to display the “fully qualified” name, it can be
+prefixed with a tilde; <code class="docutils literal notranslate"><span class="pre">:qapi:type:`~QMP:block-core.BitmapSyncMode`</span></code>
+will render to: <a class="reference internal" href="../interop/qemu-qmp-ref.html#enum-QMP-block-core.BitmapSyncMode" title="QMP:block-core.BitmapSyncMode"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">BitmapSyncMode</span></code></a></p></li>
+</ul>
+</section>
+<section id="target-resolution">
+<h3>Target resolution<a class="headerlink" href="#target-resolution" title="Permalink to this headline"></a></h3>
+<p>Any cross-reference to a QAPI type, whether using the <code class="docutils literal notranslate"><span class="pre">`any`</span></code> style of
+reference or the more explicit <code class="docutils literal notranslate"><span class="pre">`:qapi:any:`target`</span></code> syntax, allows
+for the presence or absence of either the namespace or module
+information.</p>
+<p>When absent, their value will be inferred from context by the presence
+of any <code class="docutils literal notranslate"><span class="pre">qapi:namespace</span></code> or <code class="docutils literal notranslate"><span class="pre">qapi:module</span></code> directives preceding the
+cross-reference.</p>
+<p>If no results are found when using the inferred values, other
+namespaces/modules will be searched as a last resort; but any explicitly
+provided values must always match in order to succeed.</p>
+<p>This allows for efficient cross-referencing with a minimum of syntax in
+the large majority of cases, but additional context or namespace markup
+may be required outside of the QAPI reference documents when linking to
+items that share a name across multiple documented QAPI schema.</p>
+</section>
+<section id="custom-link-text">
+<h3>Custom link text<a class="headerlink" href="#custom-link-text" title="Permalink to this headline"></a></h3>
+<p>The name of a cross-reference link can be explicitly overridden like
+<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/referencing.html#syntax">most stock Sphinx references</a>
+using the <code class="docutils literal notranslate"><span class="pre">custom</span> <span class="pre">text</span> <span class="pre">&lt;target&gt;</span></code> syntax.</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">:qapi:cmd:`Merge</span> <span class="pre">dirty</span> <span class="pre">bitmaps</span>
+<span class="pre">&lt;block-dirty-bitmap-merge&gt;`</span></code> will render as: <a class="reference internal" href="../interop/qemu-qmp-ref.html#command-QMP-block-core.block-dirty-bitmap-merge" title="QMP:block-core.block-dirty-bitmap-merge"><code class="xref qapi qapi-cmd docutils literal notranslate"><span class="pre">Merge</span> <span class="pre">dirty</span>
+<span class="pre">bitmaps</span></code></a></p>
+</section>
+</section>
+<section id="directives">
+<h2>Directives<a class="headerlink" href="#directives" title="Permalink to this headline"></a></h2>
+<p>The QAPI domain adds a number of custom directives for documenting
+various QAPI/QMP entities. The syntax is plain rST, and follows this
+general format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">qapi</span><span class="p">:</span><span class="n">directive</span><span class="p">::</span> <span class="n">argument</span>
+   <span class="p">:</span><span class="n">option</span><span class="p">:</span>
+   <span class="p">:</span><span class="n">another</span><span class="o">-</span><span class="n">option</span><span class="p">:</span> <span class="k">with</span> <span class="n">an</span> <span class="n">argument</span>
+
+   <span class="n">Content</span> <span class="n">body</span><span class="p">,</span> <span class="n">arbitrary</span> <span class="n">rST</span> <span class="ow">is</span> <span class="n">allowed</span> <span class="n">here</span><span class="o">.</span>
+</pre></div>
+</div>
+<section id="sphinx-standard-options">
+<h3>Sphinx standard options<a class="headerlink" href="#sphinx-standard-options" title="Permalink to this headline"></a></h3>
+<p>All QAPI directives inherit a number of <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/domains/index.html#basic-markup">standard options</a>
+from Sphinx’s ObjectDescription class.</p>
+<p>The dashed spellings of the below options were added in Sphinx 7.2, the
+undashed spellings are currently retained as aliases, but will be
+removed in a future version.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">:no-index:</span></code> and <code class="docutils literal notranslate"><span class="pre">:noindex:</span></code> – Do not add this item into the
+Index, and do not make it available for cross-referencing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">no-index-entry:</span></code> and <code class="docutils literal notranslate"><span class="pre">:noindexentry:</span></code> – Do not add this item
+into the Index, but allow it to be cross-referenced.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">no-contents-entry</span></code> and <code class="docutils literal notranslate"><span class="pre">:nocontentsentry:</span></code> – Exclude this item
+from the Table of Contents.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">no-typesetting</span></code> – Create TOC, Index and cross-referencing
+entities, but don’t actually display the content.</p></li>
+</ul>
+</section>
+<section id="qapi-standard-options">
+<h3>QAPI standard options<a class="headerlink" href="#qapi-standard-options" title="Permalink to this headline"></a></h3>
+<p>All QAPI directives – <em>except</em> for namespace and module – support
+these common options.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">:namespace:</span> <span class="pre">name</span></code> – This option allows you to override the
+namespace association of a given definition.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:module:</span> <span class="pre">modname</span></code> – Borrowed from the Python domain, this option allows
+you to override the module association of a given definition.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:since:</span> <span class="pre">x.y</span></code> – Allows the documenting of “Since” information, which is
+displayed in the signature bar.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:ifcond:</span> <span class="pre">CONDITION</span></code> – Allows the documenting of conditional availability
+information, which is displayed in an eyecatch just below the
+signature bar.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:deprecated:</span></code> – Adds an eyecatch just below the signature bar that
+advertises that this definition is deprecated and should be avoided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:unstable:</span></code> – Adds an eyecatch just below the signature bar that
+advertises that this definition is unstable and should not be used in
+production code.</p></li>
+</ul>
+</section>
+<section id="qapi-namespace">
+<h3>qapi:namespace<a class="headerlink" href="#qapi-namespace" title="Permalink to this headline"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">qapi:namespace</span></code> directive marks the start of a QAPI namespace. It
+does not take a content body, nor any options. All subsequent QAPI
+directives are associated with the most recent namespace. This affects
+the definition’s “fully qualified name”, allowing two different
+namespaces to create an otherwise identically named definition.</p>
+<p>This directive also influences how reference resolution works for any
+references that do not explicitly specify a namespace, so this directive
+can be used to nudge references into preferring targets from within that
+namespace.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">qapi</span><span class="p">:</span><span class="n">namespace</span><span class="p">::</span> <span class="n">QMP</span>
+</pre></div>
+</div>
+<p>This directive has no visible effect.</p>
+</section>
+<section id="qapi-module">
+<h3>qapi:module<a class="headerlink" href="#qapi-module" title="Permalink to this headline"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">qapi:module</span></code> directive marks the start of a QAPI module. It may have
+a content body, but it can be omitted. All subsequent QAPI directives
+are associated with the most recent module; this effects their “fully
+qualified” name, but has no other effect.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>.. qapi:module:: block-core
+
+   Welcome to the block-core module!
+</pre></div>
+</div>
+<p>Will be rendered as:</p>
+<p>Welcome to the block-core module!</p>
+</section>
+<section id="qapi-command">
+<h3>qapi:command<a class="headerlink" href="#qapi-command" title="Permalink to this headline"></a></h3>
+<p>This directive documents a QMP command. It may use any of the standard
+Sphinx or QAPI options, and the documentation body may contain
+<code class="docutils literal notranslate"><span class="pre">:arg:</span></code>, <code class="docutils literal notranslate"><span class="pre">:feat:</span></code>, <code class="docutils literal notranslate"><span class="pre">:error:</span></code>, or <code class="docutils literal notranslate"><span class="pre">:return:</span></code> info field list
+entries.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>.. qapi:command:: x-fake-command
+   :since: 42.0
+   :unstable:
+
+   This command is fake, so it can&#39;t hurt you!
+
+   :arg int foo: Your favorite number.
+   :arg string? bar: Your favorite season.
+   :return [string]: A lovely computer-written poem for you.
+</pre></div>
+</div>
+<p>Will be rendered as:</p>
+<blockquote>
+<div><dl class="qapi command">
+<dt class="sig sig-object qapi">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">x-fake-command</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">42.0)</span></span></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-unstable docutils container">
+This command is unstable/experimental.</div>
+</div>
+<p>This command is fake, so it can’t hurt you!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>foo</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Your favorite number.</p></li>
+<li><p><strong>bar</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – Your favorite season.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="docutils literal notranslate"><span class="pre">[</span></code><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code><code class="docutils literal notranslate"><span class="pre">]</span></code></span> – A lovely computer-written poem for you.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div></blockquote>
+</section>
+<section id="qapi-event">
+<h3>qapi:event<a class="headerlink" href="#qapi-event" title="Permalink to this headline"></a></h3>
+<p>This directive documents a QMP event. It may use any of the standard
+Sphinx or QAPI options, and the documentation body may contain
+<code class="docutils literal notranslate"><span class="pre">:memb:</span></code> or <code class="docutils literal notranslate"><span class="pre">:feat:</span></code> info field list entries.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">qapi</span><span class="p">:</span><span class="n">event</span><span class="p">::</span> <span class="n">COMPUTER_IS_RUINED</span>
+   <span class="p">:</span><span class="n">since</span><span class="p">:</span> <span class="mf">0.1</span>
+   <span class="p">:</span><span class="n">deprecated</span><span class="p">:</span>
+
+   <span class="n">This</span> <span class="n">event</span> <span class="ow">is</span> <span class="n">emitted</span> <span class="n">when</span> <span class="n">your</span> <span class="n">computer</span> <span class="ow">is</span> <span class="o">*</span><span class="n">extremely</span><span class="o">*</span> <span class="n">ruined</span><span class="o">.</span>
+
+   <span class="p">:</span><span class="n">memb</span> <span class="n">string</span> <span class="n">reason</span><span class="p">:</span> <span class="n">Diagnostics</span> <span class="k">as</span> <span class="n">to</span> <span class="n">what</span> <span class="n">caused</span> <span class="n">your</span> <span class="n">computer</span> <span class="n">to</span>
+      <span class="n">be</span> <span class="n">ruined</span><span class="o">.</span>
+   <span class="p">:</span><span class="n">feat</span> <span class="n">sadness</span><span class="p">:</span> <span class="n">When</span> <span class="n">present</span><span class="p">,</span> <span class="n">the</span> <span class="n">diagnostic</span> <span class="n">message</span> <span class="n">will</span> <span class="n">also</span>
+      <span class="n">explain</span> <span class="n">how</span> <span class="n">sad</span> <span class="n">the</span> <span class="n">computer</span> <span class="ow">is</span> <span class="k">as</span> <span class="n">a</span> <span class="n">result</span> <span class="n">of</span> <span class="n">your</span> <span class="n">wrongdoings</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Will be rendered as:</p>
+<dl class="qapi event">
+<dt class="sig sig-object qapi">
+<em class="property"><span class="k"><span class="pre">Event</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">COMPUTER_IS_RUINED</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.1)</span></span></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-deprecated docutils container">
+This event is deprecated.</div>
+</div>
+<p>This event is emitted when your computer is <em>extremely</em> ruined.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – Diagnostics as to what caused your computer to
+be ruined.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Features<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>sadness</strong> – When present, the diagnostic message will also explain
+how sad the computer is as a result of your wrongdoings.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="qapi-enum">
+<h3>qapi:enum<a class="headerlink" href="#qapi-enum" title="Permalink to this headline"></a></h3>
+<p>This directive documents a QAPI enum. It may use any of the standard
+Sphinx or QAPI options, and the documentation body may contain
+<code class="docutils literal notranslate"><span class="pre">:value:</span></code> or <code class="docutils literal notranslate"><span class="pre">:feat:</span></code> info field list entries.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">qapi</span><span class="p">:</span><span class="n">enum</span><span class="p">::</span> <span class="n">Mood</span>
+   <span class="p">:</span><span class="n">ifcond</span><span class="p">:</span> <span class="n">LIB_PERSONALITY</span>
+
+   <span class="n">This</span> <span class="n">enum</span> <span class="n">represents</span> <span class="n">your</span> <span class="n">virtual</span> <span class="n">machine</span><span class="s1">&#39;s current mood!</span>
+
+   <span class="p">:</span><span class="n">value</span> <span class="n">Happy</span><span class="p">:</span> <span class="n">Your</span> <span class="n">VM</span> <span class="ow">is</span> <span class="n">content</span> <span class="ow">and</span> <span class="n">well</span><span class="o">-</span><span class="n">fed</span><span class="o">.</span>
+   <span class="p">:</span><span class="n">value</span> <span class="n">Hungry</span><span class="p">:</span> <span class="n">Your</span> <span class="n">VM</span> <span class="n">needs</span> <span class="n">food</span><span class="o">.</span>
+   <span class="p">:</span><span class="n">value</span> <span class="n">Melancholic</span><span class="p">:</span> <span class="n">Your</span> <span class="n">VM</span> <span class="ow">is</span> <span class="n">experiencing</span> <span class="n">existential</span> <span class="n">angst</span><span class="o">.</span>
+   <span class="p">:</span><span class="n">value</span> <span class="n">Petulant</span><span class="p">:</span> <span class="n">Your</span> <span class="n">VM</span> <span class="ow">is</span> <span class="n">throwing</span> <span class="n">a</span> <span class="n">temper</span> <span class="n">tantrum</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Will be rendered as:</p>
+<dl class="qapi enum">
+<dt class="sig sig-object qapi">
+<em class="property"><span class="k"><span class="pre">Enum</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Mood</span></span></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">LIB_PERSONALITY</span></code></div>
+</div>
+<p>This enum represents your virtual machine’s current mood!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Values<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Happy</strong> – Your VM is content and well-fed.</p></li>
+<li><p><strong>Hungry</strong> – Your VM needs food.</p></li>
+<li><p><strong>Melancholic</strong> – Your VM is experiencing existential angst.</p></li>
+<li><p><strong>Petulant</strong> – Your VM is throwing a temper tantrum.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="qapi-object">
+<h3>qapi:object<a class="headerlink" href="#qapi-object" title="Permalink to this headline"></a></h3>
+<p>This directive documents a QAPI structure or union and represents a QMP
+object. It may use any of the standard Sphinx or QAPI options, and the
+documentation body may contain <code class="docutils literal notranslate"><span class="pre">:memb:</span></code> or <code class="docutils literal notranslate"><span class="pre">:feat:</span></code> info field list
+entries.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>.. qapi:object:: BigBlobOfStuff
+
+   This object has a bunch of disparate and unrelated things in it.
+
+   :memb int Birthday: Your birthday, represented in seconds since the
+                       UNIX epoch.
+   :memb [string] Fav-Foods: A list of your favorite foods.
+   :memb boolean? Bizarre-Docs: True if the documentation reference
+      should be strange.
+</pre></div>
+</div>
+<p>Will be rendered as:</p>
+<dl class="qapi object">
+<dt class="sig sig-object qapi">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BigBlobOfStuff</span></span></dt>
+<dd><p>This object has a bunch of disparate and unrelated things in it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Birthday</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Your birthday, represented in seconds since the
+UNIX epoch.</p></li>
+<li><p><strong>Fav-Foods</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code><code class="docutils literal notranslate"><span class="pre">]</span></code></span>) – A list of your favorite foods.</p></li>
+<li><p><strong>Bizarre-Docs</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code>, <em>optional</em></span>) – True if the documentation reference
+should be strange.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="qapi-alternate">
+<h3>qapi:alternate<a class="headerlink" href="#qapi-alternate" title="Permalink to this headline"></a></h3>
+<p>This directive documents a QAPI alternate. It may use any of the
+standard Sphinx or QAPI options, and the documentation body may contain
+<code class="docutils literal notranslate"><span class="pre">:alt:</span></code> or <code class="docutils literal notranslate"><span class="pre">:feat:</span></code> info field list entries.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">qapi</span><span class="p">:</span><span class="n">alternate</span><span class="p">::</span> <span class="n">ErrorCode</span>
+
+   <span class="n">This</span> <span class="n">alternate</span> <span class="n">represents</span> <span class="n">an</span> <span class="n">Error</span> <span class="n">Code</span> <span class="kn">from</span><span class="w"> </span><span class="nn">the</span> <span class="n">VM</span><span class="o">.</span>
+
+   <span class="p">:</span><span class="n">alt</span> <span class="nb">int</span> <span class="n">ec</span><span class="p">:</span> <span class="n">An</span> <span class="n">error</span> <span class="n">code</span><span class="p">,</span> <span class="n">like</span> <span class="n">the</span> <span class="nb">type</span> <span class="n">you</span><span class="s1">&#39;re used to.</span>
+   <span class="p">:</span><span class="n">alt</span> <span class="n">string</span> <span class="n">em</span><span class="p">:</span> <span class="n">An</span> <span class="n">expletive</span><span class="o">-</span><span class="n">laced</span> <span class="n">error</span> <span class="n">message</span><span class="p">,</span> <span class="k">if</span> <span class="n">your</span>
+      <span class="n">computer</span> <span class="ow">is</span> <span class="n">feeling</span> <span class="n">particularly</span> <span class="n">cranky</span> <span class="ow">and</span> <span class="n">tired</span> <span class="n">of</span> <span class="n">your</span>
+      <span class="n">antics</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Will be rendered as:</p>
+<dl class="qapi alternate">
+<dt class="sig sig-object qapi">
+<em class="property"><span class="k"><span class="pre">Alternate</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ErrorCode</span></span></dt>
+<dd><p>This alternate represents an Error Code from the VM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Alternatives<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ec</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – An error code, like the type you’re used to.</p></li>
+<li><p><strong>em</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – An expletive-laced error message, if your
+computer is feeling particularly cranky and tired of your
+antics.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qapi-code-gen.html" class="btn btn-neutral float-left" title="How to use the QAPI code generator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="control-flow-integrity.html" class="btn btn-neutral float-right" title="Control-Flow Integrity (CFI)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

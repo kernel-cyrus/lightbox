@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glossary &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/qemu_32x32.png"/>
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/custom.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Codebase" href="devel/codebase.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="index.html" class="icon icon-home"> QEMU
+            <img src="_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="devel/index.html">Developer Information</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Glossary</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#accelerator">Accelerator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#board">Board</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#block">Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cfi">CFI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#device">Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#edk2">EDK2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gdbstub">gdbstub</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#glib2">glib2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#guest-agent">Guest agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#guest">Guest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#host">Host</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hypervisor">Hypervisor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#machine">Machine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#migration">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nbd">NBD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mailing-list">Mailing List</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mmu-softmmu">MMU / softmmu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#monitor-qmp-hmp">Monitor / QMP / HMP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mttcg">MTTCG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plugins">Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#patchew">Patchew</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pr">PR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qcow2">QCOW2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qemu">QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qom">QOM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#record-replay">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rust">Rust</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#system-mode">System mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#target">Target</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tcg">TCG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#user-mode">User mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#virtio">VirtIO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vhost-user">vhost-user</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Glossary</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/glossary.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="glossary">
+<span id="id1"></span><h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline"></a></h1>
+<p>This section of the manual presents brief definitions of acronyms and terms used
+by QEMU developers.</p>
+<section id="accelerator">
+<h2>Accelerator<a class="headerlink" href="#accelerator" title="Permalink to this headline"></a></h2>
+<p>A specific API used to accelerate execution of guest instructions. It can be
+hardware-based, through a virtualization API provided by the host OS (kvm, hvf,
+whpx, …), or software-based (tcg). See this description of <a class="reference internal" href="system/introduction.html#accelerators"><span class="std std-ref">supported
+accelerators</span></a>.</p>
+</section>
+<section id="board">
+<h2>Board<a class="headerlink" href="#board" title="Permalink to this headline"></a></h2>
+<p>Another name for <a class="reference internal" href="#machine"><span class="std std-ref">Machine</span></a>.</p>
+</section>
+<section id="block">
+<h2>Block<a class="headerlink" href="#block" title="Permalink to this headline"></a></h2>
+<p>Block drivers are the available <a class="reference internal" href="system/images.html#block-drivers"><span class="std std-ref">disk formats and front-ends</span></a> available, and block devices <a class="reference internal" href="system/invocation.html#sec-005finvocation"><span class="std std-ref">(see Block device section on
+options page)</span></a> are using them to implement disks for a
+virtual machine.</p>
+</section>
+<section id="cfi">
+<h2>CFI<a class="headerlink" href="#cfi" title="Permalink to this headline"></a></h2>
+<p>Control Flow Integrity is a hardening technique used to prevent exploits
+targeting QEMU by detecting unexpected branches during execution. QEMU <a class="reference internal" href="devel/control-flow-integrity.html#cfi"><span class="std std-ref">actively
+supports</span></a> being compiled with CFI enabled.</p>
+</section>
+<section id="device">
+<h2>Device<a class="headerlink" href="#device" title="Permalink to this headline"></a></h2>
+<p>In QEMU, a device is a piece of hardware visible to the guest. Examples include
+UARTs, PCI controllers, PCI cards, VGA controllers, and many more.</p>
+<p>QEMU is able to emulate a CPU, and all the hardware interacting with it,
+including <a class="reference internal" href="system/device-emulation.html#device-emulation"><span class="std std-ref">many devices</span></a>. When QEMU runs a virtual machine
+using a hardware-based accelerator, it is responsible for emulating, using
+software, all devices.</p>
+</section>
+<section id="edk2">
+<h2>EDK2<a class="headerlink" href="#edk2" title="Permalink to this headline"></a></h2>
+<p>EDK2, as known as <a class="reference external" href="https://www.tianocore.org/">TianoCore</a>, is an open source
+implementation of UEFI standard. QEMU virtual machines that boot a UEFI firmware
+usually use EDK2.</p>
+</section>
+<section id="gdbstub">
+<h2>gdbstub<a class="headerlink" href="#gdbstub" title="Permalink to this headline"></a></h2>
+<p>QEMU implements a <a class="reference internal" href="system/gdb.html#gdb-usage"><span class="std std-ref">gdb server</span></a>, allowing gdb to attach to it and
+debug a running virtual machine, or a program in user-mode. This allows
+debugging the guest code that is running inside QEMU.</p>
+</section>
+<section id="glib2">
+<h2>glib2<a class="headerlink" href="#glib2" title="Permalink to this headline"></a></h2>
+<p><a class="reference external" href="https://docs.gtk.org/glib/">GLib2</a> is one of the most important libraries we
+are using through the codebase. It provides many data structures, macros, string
+and thread utilities and portable functions across different OS. It’s required
+to build QEMU.</p>
+</section>
+<section id="guest-agent">
+<h2>Guest agent<a class="headerlink" href="#guest-agent" title="Permalink to this headline"></a></h2>
+<p>The <a class="reference internal" href="interop/qemu-ga.html#qemu-ga"><span class="std std-ref">QEMU Guest Agent</span></a> is a daemon intended to be run within virtual
+machines. It provides various services to help QEMU to interact with it.</p>
+</section>
+<section id="guest">
+<span id="id3"></span><h2>Guest<a class="headerlink" href="#guest" title="Permalink to this headline"></a></h2>
+<p>Guest is the architecture of the virtual machine, which is emulated.
+See also <a class="reference internal" href="#host"><span class="std std-ref">Host</span></a>.</p>
+<p>Sometimes this is called the <a class="reference internal" href="#target"><span class="std std-ref">Target</span></a> architecture, but that term
+can be ambiguous.</p>
+</section>
+<section id="host">
+<span id="id4"></span><h2>Host<a class="headerlink" href="#host" title="Permalink to this headline"></a></h2>
+<p>Host is the architecture on which QEMU is running on, which is native.
+See also <a class="reference internal" href="#guest"><span class="std std-ref">Guest</span></a>.</p>
+</section>
+<section id="hypervisor">
+<h2>Hypervisor<a class="headerlink" href="#hypervisor" title="Permalink to this headline"></a></h2>
+<p>The formal definition of an hypervisor is a program or API than can be used to
+manage a virtual machine. QEMU is a virtualizer, that interacts with various
+hypervisors.</p>
+<p>In the context of QEMU, an hypervisor is an API, provided by the Host OS,
+allowing to execute virtual machines. Linux implementation is KVM (and supports
+Xen as well). For MacOS, it’s HVF. Windows defines WHPX. And NetBSD provides
+NVMM.</p>
+</section>
+<section id="machine">
+<span id="id5"></span><h2>Machine<a class="headerlink" href="#machine" title="Permalink to this headline"></a></h2>
+<p>QEMU’s system emulation models many different types of hardware. A machine model
+(sometimes called a board model) is the model of a complete virtual system with
+RAM, one or more CPUs, and various devices. It can be selected with the option
+<code class="docutils literal notranslate"><span class="pre">-machine</span></code> of qemu-system. Our machine models can be found on this <a class="reference internal" href="system/targets.html#system-targets-ref"><span class="std std-ref">page</span></a>.</p>
+</section>
+<section id="migration">
+<h2>Migration<a class="headerlink" href="#migration" title="Permalink to this headline"></a></h2>
+<p>QEMU can save and restore the execution of a virtual machine between different
+host systems. This is provided by the <a class="reference internal" href="devel/migration/main.html#migration"><span class="std std-ref">Migration framework</span></a>.</p>
+</section>
+<section id="nbd">
+<h2>NBD<a class="headerlink" href="#nbd" title="Permalink to this headline"></a></h2>
+<p>The <a class="reference internal" href="tools/qemu-nbd.html#qemu-nbd"><span class="std std-ref">QEMU Network Block Device server</span></a> is a tool that can be used to
+mount and access QEMU images, providing functionality similar to a loop device.</p>
+</section>
+<section id="mailing-list">
+<h2>Mailing List<a class="headerlink" href="#mailing-list" title="Permalink to this headline"></a></h2>
+<p>This is <a class="reference external" href="https://wiki.qemu.org/Contribute/MailingLists">where</a> all the
+development happens! Changes are posted as series, that all developers can
+review and share feedback for.</p>
+<p>For reporting issues, our <a class="reference external" href="https://gitlab.com/qemu-project/qemu/-/issues">GitLab</a> tracker is the best place.</p>
+</section>
+<section id="mmu-softmmu">
+<span id="softmmu"></span><h2>MMU / softmmu<a class="headerlink" href="#mmu-softmmu" title="Permalink to this headline"></a></h2>
+<p>The Memory Management Unit is responsible for translating virtual addresses to
+physical addresses and managing memory protection. QEMU system mode is named
+“softmmu” precisely because it implements this in software, including a TLB
+(Translation lookaside buffer), for the guest virtual machine.</p>
+<p>QEMU user-mode does not implement a full software MMU, but “simply” translates
+virtual addresses by adding a specific offset, and relying on host MMU/OS
+instead.</p>
+</section>
+<section id="monitor-qmp-hmp">
+<h2>Monitor / QMP / HMP<a class="headerlink" href="#monitor-qmp-hmp" title="Permalink to this headline"></a></h2>
+<p>The <a class="reference internal" href="system/monitor.html#qemu-monitor"><span class="std std-ref">QEMU Monitor</span></a> is a text interface which can be used to interact
+with a running virtual machine.</p>
+<p>QMP stands for QEMU Monitor Protocol and is a json based interface.
+HMP stands for Human Monitor Protocol and is a set of text commands available
+for users who prefer natural language to json.</p>
+</section>
+<section id="mttcg">
+<h2>MTTCG<a class="headerlink" href="#mttcg" title="Permalink to this headline"></a></h2>
+<p>Multiple CPU support was first implemented using a round-robin algorithm
+running on a single thread. Later on, <a class="reference internal" href="devel/multi-thread-tcg.html#mttcg"><span class="std std-ref">Multi-threaded TCG</span></a> was developed
+to benefit from multiple cores to speed up execution.</p>
+</section>
+<section id="plugins">
+<h2>Plugins<a class="headerlink" href="#plugins" title="Permalink to this headline"></a></h2>
+<p><a class="reference internal" href="devel/tcg-plugins.html#tcg-plugins"><span class="std std-ref">TCG Plugins</span></a> is an API used to instrument guest code, in system
+and user mode. The end goal is to have a similar set of functionality compared
+to <a class="reference external" href="https://dynamorio.org/">DynamoRIO</a> or <a class="reference external" href="https://valgrind.org/">valgrind</a>.</p>
+<p>One key advantage of QEMU plugins is that they can be used to perform
+architecture agnostic instrumentation.</p>
+</section>
+<section id="patchew">
+<h2>Patchew<a class="headerlink" href="#patchew" title="Permalink to this headline"></a></h2>
+<p><a class="reference external" href="https://patchew.org/QEMU/">Patchew</a> is a website that tracks patches on the
+Mailing List.</p>
+</section>
+<section id="pr">
+<h2>PR<a class="headerlink" href="#pr" title="Permalink to this headline"></a></h2>
+<p>Once a series is reviewed and accepted by a subsystem maintainer, it will be
+included in a PR (Pull Request) that the project maintainer will merge into QEMU
+main branch, after running tests.</p>
+<p>The QEMU project doesn’t currently expect most developers to directly submit
+pull requests.</p>
+</section>
+<section id="qcow2">
+<h2>QCOW2<a class="headerlink" href="#qcow2" title="Permalink to this headline"></a></h2>
+<p>QEMU Copy On Write is a disk format developed by QEMU. It provides transparent
+compression, automatic extension, and many other advantages over a raw image.</p>
+<p>qcow2 is the recommended format to use.</p>
+</section>
+<section id="qemu">
+<h2>QEMU<a class="headerlink" href="#qemu" title="Permalink to this headline"></a></h2>
+<p><a class="reference external" href="https://www.qemu.org/">QEMU (Quick Emulator)</a> is a generic and open source
+machine emulator and virtualizer.</p>
+</section>
+<section id="qom">
+<h2>QOM<a class="headerlink" href="#qom" title="Permalink to this headline"></a></h2>
+<p><a class="reference internal" href="devel/qom.html#qom"><span class="std std-ref">QEMU Object Model</span></a> is an object oriented API used to define
+various devices and hardware in the QEMU codebase.</p>
+</section>
+<section id="record-replay">
+<h2>Record/replay<a class="headerlink" href="#record-replay" title="Permalink to this headline"></a></h2>
+<p><a class="reference internal" href="system/replay.html#replay"><span class="std std-ref">Record/replay</span></a> is a feature of QEMU allowing to have a
+deterministic and reproducible execution of a virtual machine.</p>
+</section>
+<section id="rust">
+<h2>Rust<a class="headerlink" href="#rust" title="Permalink to this headline"></a></h2>
+<p><a class="reference external" href="https://www.rust-lang.org/">A new programming language</a>, memory safe by
+default. There is a work in progress to integrate it in QEMU codebase for
+various subsystems.</p>
+</section>
+<section id="system-mode">
+<h2>System mode<a class="headerlink" href="#system-mode" title="Permalink to this headline"></a></h2>
+<p>QEMU System mode provides a virtual model of an entire machine (CPU, memory and
+emulated devices) to run a guest OS. In this mode the CPU may be fully emulated,
+or it may work with a hypervisor such as KVM, Xen or Hypervisor.Framework to
+allow the guest to run directly on the host CPU.</p>
+<p>QEMU System mode is called <a class="reference internal" href="#softmmu"><span class="std std-ref">softmmu</span></a> as well.</p>
+</section>
+<section id="target">
+<span id="id7"></span><h2>Target<a class="headerlink" href="#target" title="Permalink to this headline"></a></h2>
+<p>The term “target” can be ambiguous. In most places in QEMU it is used as a
+synonym for <a class="reference internal" href="#guest"><span class="std std-ref">Guest</span></a>. For example the code for emulating Arm CPUs is in
+<code class="docutils literal notranslate"><span class="pre">target/arm/</span></code>. However in the <a class="reference internal" href="devel/index-tcg.html#tcg"><span class="std std-ref">TCG subsystem</span></a> “target” refers to the
+architecture which QEMU is running on, i.e. the <a class="reference internal" href="#host"><span class="std std-ref">Host</span></a>.</p>
+</section>
+<section id="tcg">
+<h2>TCG<a class="headerlink" href="#tcg" title="Permalink to this headline"></a></h2>
+<p>TCG is the QEMU <a class="reference internal" href="devel/index-tcg.html#tcg"><span class="std std-ref">Tiny Code Generator</span></a>. It is the JIT (just-in-time)
+compiler we use to emulate a guest CPU in software.</p>
+<p>It is one of the accelerators supported by QEMU, and supports a lot of
+guest/host architectures.</p>
+</section>
+<section id="user-mode">
+<h2>User mode<a class="headerlink" href="#user-mode" title="Permalink to this headline"></a></h2>
+<p>QEMU User mode can launch processes compiled for one CPU on another CPU. In this
+mode the CPU is always emulated. In this mode, QEMU translate system calls from
+guest to host kernel. It is available for Linux and BSD.</p>
+</section>
+<section id="virtio">
+<h2>VirtIO<a class="headerlink" href="#virtio" title="Permalink to this headline"></a></h2>
+<p>VirtIO is an open standard used to define and implement virtual devices with a
+minimal overhead, defining a set of data structures and hypercalls (similar to
+system calls, but targeting an hypervisor, which happens to be QEMU in our
+case). It’s designed to be more efficient than emulating a real device, by
+minimizing the amount of interactions between a guest VM and its hypervisor.</p>
+</section>
+<section id="vhost-user">
+<h2>vhost-user<a class="headerlink" href="#vhost-user" title="Permalink to this headline"></a></h2>
+<p><a class="reference internal" href="system/devices/vhost-user.html#vhost-user"><span class="std std-ref">Vhost-user</span></a> is an interface used to implement VirtIO devices
+outside of QEMU itself.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="devel/codebase.html" class="btn btn-neutral float-left" title="Codebase" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parallels Disk Format &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Qcow2 Image File Format" href="qcow2.html" />
+    <link rel="prev" title="Parallels Expandable Image File Format" href="parallels.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Management and Interoperability</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">Barrier client protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitmaps.html">Dirty Bitmaps and Incremental Backup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus.html">D-Bus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-vmstate.html">D-Bus VMState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-display.html">D-Bus display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="live-block-operations.html">Live Block Device Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nbd.html">QEMU NBD protocol support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallels.html">Parallels Expandable Image File Format</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Parallels Disk Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#definitions">Definitions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#description-file">Description file</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#disk-parameters-element"><code class="docutils literal notranslate"><span class="pre">Disk_Parameters</span></code> element</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#storagedata-element"><code class="docutils literal notranslate"><span class="pre">StorageData</span></code> element</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#snapshots-element"><code class="docutils literal notranslate"><span class="pre">Snapshots</span></code> element</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qcow2.html">Qcow2 Image File Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-helper.html">Persistent reservation helper protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qmp-spec.html">QEMU Machine Protocol Specification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga.html">QEMU Guest Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga-ref.html">QEMU Guest Agent Protocol Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-qmp-ref.html">QEMU QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-storage-daemon-qmp-ref.html">QEMU Storage Daemon QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user.html">Vhost-user Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user-gpu.html">Vhost-user-gpu Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-vdpa.html">Vhost-vdpa Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-balloon-stats.html">Virtio balloon memory statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-ledstate-pseudo-encoding.html">VNC LED state Pseudo-encoding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">System Emulation Management and Interoperability</a> &raquo;</li>
+      <li>Parallels Disk Format</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/interop/prl-xml.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="parallels-disk-format">
+<h1>Parallels Disk Format<a class="headerlink" href="#parallels-disk-format" title="Permalink to this headline"></a></h1>
+<p>This specification contains minimal information about Parallels Disk Format,
+which is enough to properly work with QEMU. Nevertheless, Parallels Cloud Server
+and Parallels Desktop are able to add some unspecified nodes to the xml and use
+them, but they are for internal work and don’t affect functionality. Also it
+uses auxiliary xml <code class="docutils literal notranslate"><span class="pre">Snapshot.xml</span></code>, which allows storage of optional snapshot
+information, but this doesn’t influence open/read/write functionality. QEMU and
+other software should not use fields not covered in this document or the
+<code class="docutils literal notranslate"><span class="pre">Snapshot.xml</span></code> file, and must leave them as is.</p>
+<p>A Parallels disk consists of two parts: the set of snapshots and the disk
+descriptor file, which stores information about all files and snapshots.</p>
+<section id="definitions">
+<h2>Definitions<a class="headerlink" href="#definitions" title="Permalink to this headline"></a></h2>
+<dl class="simple">
+<dt>Snapshot</dt><dd><p>a record of the contents captured at a particular time, capable
+of storing current state. A snapshot has a UUID and a parent UUID.</p>
+</dd>
+<dt>Snapshot image</dt><dd><p>an overlay representing the difference between this
+snapshot and some earlier snapshot.</p>
+</dd>
+<dt>Overlay</dt><dd><p>an image storing the different sectors between two captured states.</p>
+</dd>
+<dt>Root image</dt><dd><p>a snapshot image with no parent, the root of the snapshot tree.</p>
+</dd>
+<dt>Storage</dt><dd><p>the backing storage for a subset of the virtual disk. When
+there is more than one storage in a Parallels disk then that
+is referred to as a split image. In this case every storage
+covers a specific address space area of the disk and has its
+particular root image. Split images are not considered here
+and are not supported. Each storage consists of disk
+parameters and a list of images. The list of images always
+contains a root image and may also contain overlays. The
+root image can be an expandable Parallels image file or
+plain. Overlays must be expandable.</p>
+</dd>
+<dt>Description file</dt><dd><p><code class="docutils literal notranslate"><span class="pre">DiskDescriptor.xml</span></code> stores information about disk parameters,
+snapshots, and storages.</p>
+</dd>
+<dt>Top Snapshot</dt><dd><p>The overlay between actual state and some previous snapshot.
+It is not a snapshot in the classical sense because it
+serves as the active image that the guest writes to.</p>
+</dd>
+<dt>Sector</dt><dd><p>a 512-byte data chunk.</p>
+</dd>
+</dl>
+</section>
+<section id="description-file">
+<h2>Description file<a class="headerlink" href="#description-file" title="Permalink to this headline"></a></h2>
+<p>All information is placed in a single XML element
+<code class="docutils literal notranslate"><span class="pre">Parallels_disk_image</span></code>.
+The element has only one attribute, <code class="docutils literal notranslate"><span class="pre">Version</span></code>, which must be <code class="docutils literal notranslate"><span class="pre">1.0</span></code>.</p>
+<p>The schema of <code class="docutils literal notranslate"><span class="pre">DiskDescriptor.xml</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Parallels_disk_image</span> <span class="n">Version</span><span class="o">=</span><span class="s2">&quot;1.0&quot;</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">Disk_Parameters</span><span class="o">&gt;</span>
+       <span class="o">...</span>
+   <span class="o">&lt;/</span><span class="n">Disk_Parameters</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">StorageData</span><span class="o">&gt;</span>
+       <span class="o">...</span>
+   <span class="o">&lt;/</span><span class="n">StorageData</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">Snapshots</span><span class="o">&gt;</span>
+       <span class="o">...</span>
+   <span class="o">&lt;/</span><span class="n">Snapshots</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">Parallels_disk_image</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<section id="disk-parameters-element">
+<h3><code class="docutils literal notranslate"><span class="pre">Disk_Parameters</span></code> element<a class="headerlink" href="#disk-parameters-element" title="Permalink to this headline"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Disk_Parameters</span></code> element describes the physical layout of the
+virtual disk and some general settings.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Disk_Parameters</span></code> element MUST contain the following child elements:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Disk_size</span></code> - number of sectors in the disk,
+desired size of the disk.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cylinders</span></code> - number of the disk cylinders.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Heads</span></code>     - number of the disk heads.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Sectors</span></code>   - number of the disk sectors per cylinder
+(sector size is 512 bytes)
+Limitation: The product of the <code class="docutils literal notranslate"><span class="pre">Heads</span></code>, <code class="docutils literal notranslate"><span class="pre">Sectors</span></code> and <code class="docutils literal notranslate"><span class="pre">Cylinders</span></code>
+values MUST be equal to the value of the Disk_size parameter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Padding</span></code>   - must be 0. Parallels Cloud Server and Parallels Desktop may
+use padding set to 1; however this case is not covered
+by this specification. QEMU and other software should not open
+such disks and should not create them.</p></li>
+</ul>
+</section>
+<section id="storagedata-element">
+<h3><code class="docutils literal notranslate"><span class="pre">StorageData</span></code> element<a class="headerlink" href="#storagedata-element" title="Permalink to this headline"></a></h3>
+<p>This element of the file describes the root image and all snapshot images.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">StorageData</span></code> element consists of the <code class="docutils literal notranslate"><span class="pre">Storage</span></code> child element,
+as shown below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">StorageData</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">Storage</span><span class="o">&gt;</span>
+       <span class="o">...</span>
+   <span class="o">&lt;/</span><span class="n">Storage</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">StorageData</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>A <code class="docutils literal notranslate"><span class="pre">Storage</span></code> element has the following child elements:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Start</span></code>     - start sector of the storage, in case of non split storage
+equals to 0.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">End</span></code>       - number of sector following the last sector, in case of non
+split storage equals to <code class="docutils literal notranslate"><span class="pre">Disk_size</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Blocksize</span></code> - storage cluster size, number of sectors per one cluster.
+The cluster size for each “Compressed” (see below) image in
+a parallels disk must be equal to this field. Note: the cluster
+size for a Parallels Expandable Image is in the <code class="docutils literal notranslate"><span class="pre">tracks</span></code> field of
+its header (see <a class="reference internal" href="parallels.html"><span class="doc">Parallels Expandable Image File Format</span></a>).</p></li>
+<li><p>Several <code class="docutils literal notranslate"><span class="pre">Image</span></code> child elements.</p></li>
+</ul>
+<p>Each <code class="docutils literal notranslate"><span class="pre">Image</span></code> element has the following child elements:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">GUID</span></code> - image identifier, UUID in curly brackets.
+For instance, <code class="docutils literal notranslate"><span class="pre">{12345678-9abc-def1-2345-6789abcdef12}.</span></code>
+The GUID is used by the Snapshots element to reference images
+(see below)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Type</span></code> - image type of the element. It can be:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Plain</span></code> for raw files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Compressed</span></code> for expanding disks.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">File</span></code> - path to image file. The path can be relative to
+<code class="docutils literal notranslate"><span class="pre">DiskDescriptor.xml</span></code> or absolute.</p></li>
+</ul>
+</section>
+<section id="snapshots-element">
+<h3><code class="docutils literal notranslate"><span class="pre">Snapshots</span></code> element<a class="headerlink" href="#snapshots-element" title="Permalink to this headline"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Snapshots</span></code> element describes the snapshot relations with the snapshot tree.</p>
+<p>The element contains the set of <code class="docutils literal notranslate"><span class="pre">Shot</span></code> child elements, as shown below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Snapshots</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">TopGUID</span><span class="o">&gt;</span> <span class="o">...</span> <span class="o">&lt;/</span><span class="n">TopGUID</span><span class="o">&gt;</span> <span class="o">/*</span> <span class="n">Optional</span> <span class="n">child</span> <span class="n">element</span> <span class="o">*/</span>
+   <span class="o">&lt;</span><span class="n">Shot</span><span class="o">&gt;</span>
+       <span class="o">...</span>
+   <span class="o">&lt;/</span><span class="n">Shot</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">Shot</span><span class="o">&gt;</span>
+       <span class="o">...</span>
+   <span class="o">&lt;/</span><span class="n">Shot</span><span class="o">&gt;</span>
+   <span class="o">...</span>
+<span class="o">&lt;/</span><span class="n">Snapshots</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Each <code class="docutils literal notranslate"><span class="pre">Shot</span></code> element contains the following child elements:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">GUID</span></code>       - an image GUID.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ParentGUID</span></code> - GUID of the image of the parent snapshot.</p></li>
+</ul>
+<p>The software may traverse snapshots from child to parent using the
+<code class="docutils literal notranslate"><span class="pre">&lt;ParentGUID&gt;</span></code> field as reference. The <code class="docutils literal notranslate"><span class="pre">ParentGUID</span></code> of the root
+snapshot is <code class="docutils literal notranslate"><span class="pre">{00000000-0000-0000-0000-000000000000}</span></code>.
+There should be only one root snapshot.</p>
+<p>The Top snapshot could be
+described via two ways: via the <code class="docutils literal notranslate"><span class="pre">TopGUID</span></code> child
+element of the <code class="docutils literal notranslate"><span class="pre">Snapshots</span></code> element, or via the predefined GUID
+<code class="docutils literal notranslate"><span class="pre">{5fbaabe3-6958-40ff-92a7-860e329aab41}</span></code>. If <code class="docutils literal notranslate"><span class="pre">TopGUID</span></code> is defined,
+the predefined GUID is interpreted as a normal GUID. All snapshot images
+(except the Top Snapshot) should be
+opened read-only.</p>
+<p>There is another predefined GUID,
+<code class="docutils literal notranslate"><span class="pre">BackupID</span> <span class="pre">=</span> <span class="pre">{704718e1-2314-44c8-9087-d78ed36b0f4e}</span></code>, which is used by
+original and some third-party software for backup. QEMU and other
+software may operate with images with <code class="docutils literal notranslate"><span class="pre">GUID</span> <span class="pre">=</span> <span class="pre">BackupID</span></code> as usual.
+However, it is not recommended to use this
+GUID for new disks. The Top snapshot cannot have this GUID.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="parallels.html" class="btn btn-neutral float-left" title="Parallels Expandable Image File Format" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qcow2.html" class="btn btn-neutral float-right" title="Qcow2 Image File Format" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

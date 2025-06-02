@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xen HVM guest support &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Xen PVH machine (xenpvh)" href="xenpvh.html" />
+    <link rel="prev" title="Hyper-V Enlightenments" href="hyperv.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../target-arm.html">Arm System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-loongarch.html">LoongArch System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../target-i386.html">x86 System emulator</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../target-i386.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../target-i386.html#architectural-features">Architectural features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-i386.html#os-requirements">OS requirements</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vm-templating.html">QEMU VM templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sriov.html">Compsable SR-IOV device</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">System Emulation</a> &raquo;</li>
+          <li><a href="../targets.html">QEMU System Emulator Targets</a> &raquo;</li>
+          <li><a href="../target-i386.html">x86 System emulator</a> &raquo;</li>
+      <li>Xen HVM guest support</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/system/i386/xen.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="xen-hvm-guest-support">
+<h1>Xen HVM guest support<a class="headerlink" href="#xen-hvm-guest-support" title="Permalink to this headline"></a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline"></a></h2>
+<p>KVM has support for hosting Xen guests, intercepting Xen hypercalls and event
+channel (Xen PV interrupt) delivery. This allows guests which expect to be
+run under Xen to be hosted in QEMU under Linux/KVM instead.</p>
+<p>Using the split irqchip is mandatory for Xen support.</p>
+</section>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this headline"></a></h2>
+<p>Xen mode is enabled by setting the <code class="docutils literal notranslate"><span class="pre">xen-version</span></code> property of the KVM
+accelerator, for example for Xen 4.17:</p>
+<pre class="literal-block">qemu-system-x86_64 --accel kvm,xen-version=0x40011,kernel-irqchip=split</pre>
+<p>Additionally, virtual APIC support can be advertised to the guest through the
+<code class="docutils literal notranslate"><span class="pre">xen-vapic</span></code> CPU flag:</p>
+<pre class="literal-block">qemu-system-x86_64 --accel kvm,xen-version=0x40011,kernel-irqchip=split --cpu host,+xen-vapic</pre>
+<p>When Xen support is enabled, QEMU changes hypervisor identification (CPUID
+0x40000000..0x4000000A) to Xen. The KVM identification and features are not
+advertised to a Xen guest. If Hyper-V is also enabled, the Xen identification
+moves to leaves 0x40000100..0x4000010A.</p>
+</section>
+<section id="properties">
+<h2>Properties<a class="headerlink" href="#properties" title="Permalink to this headline"></a></h2>
+<p>The following properties exist on the KVM accelerator object:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">xen-version</span></code></dt><dd><p>This property contains the Xen version in <code class="docutils literal notranslate"><span class="pre">XENVER_version</span></code> form, with the
+major version in the top 16 bits and the minor version in the low 16 bits.
+Setting this property enables the Xen guest support. If Xen version 4.5 or
+greater is specified, the HVM leaf in Xen CPUID is populated. Xen version
+4.6 enables the vCPU ID in CPUID, and version 4.17 advertises vCPU upcall
+vector support to the guest.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">xen-evtchn-max-pirq</span></code></dt><dd><p>Xen PIRQs represent an emulated physical interrupt, either GSI or MSI, which
+can be routed to an event channel instead of to the emulated I/O or local
+APIC. By default, QEMU permits only 256 PIRQs because this allows maximum
+compatibility with 32-bit MSI where the higher bits of the PIRQ# would need
+to be in the upper 64 bits of the MSI message. For guests with large numbers
+of PCI devices (and none which are limited to 32-bit addressing) it may be
+desirable to increase this value.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">xen-gnttab-max-frames</span></code></dt><dd><p>Xen grant tables are the means by which a Xen guest grants access to its
+memory for PV back ends (disk, network, etc.). Since QEMU only supports v1
+grant tables which are 8 bytes in size, each page (each frame) of the grant
+table can reference 512 pages of guest memory. The default number of frames
+is 64, allowing for 32768 pages of guest memory to be accessed by PV backends
+through simultaneous grants. For guests with large numbers of PV devices and
+high throughput, it may be desirable to increase this value.</p>
+</dd>
+</dl>
+</section>
+<section id="xen-paravirtual-devices">
+<h2>Xen paravirtual devices<a class="headerlink" href="#xen-paravirtual-devices" title="Permalink to this headline"></a></h2>
+<p>The Xen PCI platform device is enabled automatically for a Xen guest. This
+allows a guest to unplug all emulated devices, in order to use paravirtual
+block and network drivers instead.</p>
+<p>Those paravirtual Xen block, network (and console) devices can be created
+through the command line, and/or hot-plugged.</p>
+<p>To provide a Xen console device, define a character device and then a device
+of type <code class="docutils literal notranslate"><span class="pre">xen-console</span></code> to connect to it. For the Xen console equivalent of
+the handy <code class="docutils literal notranslate"><span class="pre">-serial</span> <span class="pre">mon:stdio</span></code> option, for example:</p>
+<pre class="literal-block">-chardev stdio,mux=on,id=char0,signal=off -mon char0 \
+-device xen-console,chardev=char0</pre>
+<p>The Xen network device is <code class="docutils literal notranslate"><span class="pre">xen-net-device</span></code>, which becomes the default NIC
+model for emulated Xen guests, meaning that just the default NIC provided
+by QEMU should automatically work and present a Xen network device to the
+guest.</p>
+<p>Disks can be configured with ‘<code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">file=${GUEST_IMAGE},if=xen</span></code>’ and will
+appear to the guest as <code class="docutils literal notranslate"><span class="pre">xvda</span></code> onwards.</p>
+<p>Under Xen, the boot disk is typically available both via IDE emulation, and
+as a PV block device. Guest bootloaders typically use IDE to load the guest
+kernel, which then unplugs the IDE and continues with the Xen PV block device.</p>
+<p>This configuration can be achieved as follows:</p>
+<pre class="literal-block">qemu-system-x86_64 --accel kvm,xen-version=0x40011,kernel-irqchip=split \
+     -drive file=${GUEST_IMAGE},if=xen \
+     -drive file=${GUEST_IMAGE},file.locking=off,if=ide</pre>
+<p>VirtIO devices can also be used; Linux guests may need to be dissuaded from
+umplugging them by adding ‘<code class="docutils literal notranslate"><span class="pre">xen_emul_unplug=never</span></code>’ on their command line.</p>
+</section>
+<section id="booting-xen-pv-guests">
+<h2>Booting Xen PV guests<a class="headerlink" href="#booting-xen-pv-guests" title="Permalink to this headline"></a></h2>
+<p>Booting PV guest kernels is possible by using the Xen PV shim (a version of Xen
+itself, designed to run inside a Xen HVM guest and provide memory management
+services for one guest alone).</p>
+<p>The Xen binary is provided as the <code class="docutils literal notranslate"><span class="pre">-kernel</span></code> and the guest kernel itself (or
+PV Grub image) as the <code class="docutils literal notranslate"><span class="pre">-initrd</span></code> image, which actually just means the first
+multiboot “module”. For example:</p>
+<pre class="literal-block">qemu-system-x86_64 --accel kvm,xen-version=0x40011,kernel-irqchip=split \
+     -chardev stdio,id=char0 -device xen-console,chardev=char0 \
+     -display none  -m 1G  -kernel xen -initrd bzImage \
+     -append &quot;pv-shim console=xen,pv -- console=hvc0 root=/dev/xvda1&quot; \
+     -drive file=${GUEST_IMAGE},if=xen</pre>
+<p>The Xen image must be built with the <code class="docutils literal notranslate"><span class="pre">CONFIG_XEN_GUEST</span></code> and <code class="docutils literal notranslate"><span class="pre">CONFIG_PV_SHIM</span></code>
+options, and as of Xen 4.17, Xen’s PV shim mode does not support using a serial
+port; it must have a Xen console or it will panic.</p>
+<p>The example above provides the guest kernel command line after a separator
+(” <code class="docutils literal notranslate"><span class="pre">--</span></code> “) on the Xen command line, and does not provide the guest kernel
+with an actual initramfs, which would need to listed as a second multiboot
+module. For more complicated alternatives, see the command line
+<a class="reference internal" href="../invocation.html#system-invocation-qemu-options-initrd"><span class="std std-ref">documentation</span></a> for the
+<code class="docutils literal notranslate"><span class="pre">-initrd</span></code> option.</p>
+</section>
+<section id="host-os-requirements">
+<h2>Host OS requirements<a class="headerlink" href="#host-os-requirements" title="Permalink to this headline"></a></h2>
+<p>The minimal Xen support in the KVM accelerator requires the host to be running
+Linux v5.12 or newer. Later versions add optimisations: Linux v5.17 added
+acceleration of interrupt delivery via the Xen PIRQ mechanism, and Linux v5.19
+accelerated Xen PV timers and inter-processor interrupts (IPIs).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="hyperv.html" class="btn btn-neutral float-left" title="Hyper-V Enlightenments" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="xenpvh.html" class="btn btn-neutral float-right" title="Xen PVH machine (xenpvh)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

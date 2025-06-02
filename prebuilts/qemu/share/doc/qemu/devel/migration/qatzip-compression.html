@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QATzip Compression &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Backwards compatibility" href="compatibility.html" />
+    <link rel="prev" title="User Space Accelerator Development Kit (UADK) Compression" href="uadk-compression.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-build.html">QEMU Build System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testing/index.html">Testing QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rcu.html">Using RCU (Read-Copy-Update) for synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Migration</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="main.html">Migration framework</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="features.html">Migration features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="compatibility.html">Backwards compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="best-practices.html">Best practices</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../s390-cpu-topology.html">QAPI interface for S390 CPU topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uefi-vars.html">UEFI variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../vfio-iommufd.html">IOMMUFD BACKEND usage with VFIO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../crypto.html">Cryptography in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multiple-iothreads.html">Using Multiple <code class="docutils literal notranslate"><span class="pre">IOThread</span></code>s</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index-tcg.html">TCG Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Developer Information</a> &raquo;</li>
+          <li><a href="../index-internals.html">Internal Subsystem Information</a> &raquo;</li>
+          <li><a href="index.html">Migration</a> &raquo;</li>
+          <li><a href="features.html">Migration features</a> &raquo;</li>
+      <li>QATzip Compression</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/migration/qatzip-compression.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qatzip-compression">
+<h1>QATzip Compression<a class="headerlink" href="#qatzip-compression" title="Permalink to this headline"></a></h1>
+<p>In scenarios with limited network bandwidth, the <code class="docutils literal notranslate"><span class="pre">QATzip</span></code> solution can help
+users save a lot of host CPU resources by accelerating compression and
+decompression through the Intel QuickAssist Technology(<code class="docutils literal notranslate"><span class="pre">QAT</span></code>) hardware.</p>
+<p>The following test was conducted using 8 multifd channels and 10Gbps network
+bandwidth. The results show that, compared to zstd, <code class="docutils literal notranslate"><span class="pre">QATzip</span></code> significantly
+saves CPU resources on the sender and reduces migration time. Compared to the
+uncompressed solution, <code class="docutils literal notranslate"><span class="pre">QATzip</span></code> greatly improves the dirty page processing
+capability, indicated by the Pages per Second metric, and also reduces the
+total migration time.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">VM</span> <span class="n">Configuration</span><span class="p">:</span> <span class="mi">16</span> <span class="n">vCPU</span> <span class="ow">and</span> <span class="mi">64</span><span class="n">G</span> <span class="n">memory</span>
+<span class="n">VM</span> <span class="n">Workload</span><span class="p">:</span> <span class="nb">all</span> <span class="n">vCPUs</span> <span class="n">are</span> <span class="n">idle</span> <span class="ow">and</span> <span class="mi">54</span><span class="n">G</span> <span class="n">memory</span> <span class="ow">is</span> <span class="n">filled</span> <span class="k">with</span> <span class="n">Silesia</span> <span class="n">data</span><span class="o">.</span>
+<span class="n">QAT</span> <span class="n">Devices</span><span class="p">:</span> <span class="mi">4</span>
+<span class="o">|-----------|--------|---------|----------|----------|------|------|</span>
+<span class="o">|</span><span class="mi">8</span> <span class="n">Channels</span> <span class="o">|</span><span class="n">Total</span>   <span class="o">|</span><span class="n">down</span>     <span class="o">|</span><span class="n">throughput</span><span class="o">|</span><span class="n">pages</span> <span class="n">per</span> <span class="o">|</span> <span class="n">send</span> <span class="o">|</span> <span class="n">recv</span> <span class="o">|</span>
+<span class="o">|</span>           <span class="o">|</span><span class="n">time</span><span class="p">(</span><span class="n">ms</span><span class="p">)</span><span class="o">|</span><span class="n">time</span><span class="p">(</span><span class="n">ms</span><span class="p">)</span> <span class="o">|</span><span class="p">(</span><span class="n">mbps</span><span class="p">)</span>    <span class="o">|</span><span class="n">second</span>    <span class="o">|</span> <span class="n">cpu</span> <span class="o">%|</span> <span class="n">cpu</span><span class="o">%</span> <span class="o">|</span>
+<span class="o">|-----------|--------|---------|----------|----------|------|------|</span>
+<span class="o">|</span><span class="n">qatzip</span>     <span class="o">|</span>   <span class="mi">16630</span><span class="o">|</span>       <span class="mi">28</span><span class="o">|</span>     <span class="mi">10467</span><span class="o">|</span>   <span class="mi">2940235</span><span class="o">|</span>   <span class="mi">160</span><span class="o">|</span>   <span class="mi">360</span><span class="o">|</span>
+<span class="o">|-----------|--------|---------|----------|----------|------|------|</span>
+<span class="o">|</span><span class="n">zstd</span>       <span class="o">|</span>   <span class="mi">20165</span><span class="o">|</span>       <span class="mi">24</span><span class="o">|</span>      <span class="mi">8579</span><span class="o">|</span>   <span class="mi">2391465</span><span class="o">|</span>   <span class="mi">810</span><span class="o">|</span>   <span class="mi">340</span><span class="o">|</span>
+<span class="o">|-----------|--------|---------|----------|----------|------|------|</span>
+<span class="o">|</span><span class="n">none</span>       <span class="o">|</span>   <span class="mi">46063</span><span class="o">|</span>       <span class="mi">40</span><span class="o">|</span>     <span class="mi">10848</span><span class="o">|</span>    <span class="mi">330240</span><span class="o">|</span>    <span class="mi">45</span><span class="o">|</span>    <span class="mi">85</span><span class="o">|</span>
+<span class="o">|-----------|--------|---------|----------|----------|------|------|</span>
+</pre></div>
+</div>
+<section id="qatzip-compression-framework">
+<h2>QATzip Compression Framework<a class="headerlink" href="#qatzip-compression-framework" title="Permalink to this headline"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">QATzip</span></code> is a user space library which builds on top of the Intel QuickAssist
+Technology to provide extended accelerated compression and decompression
+services.</p>
+<p>For more <code class="docutils literal notranslate"><span class="pre">QATzip</span></code> introduction, please refer to <a class="reference external" href="https://github.com/intel/QATzip?tab=readme-ov-file#introductionl">QATzip Introduction</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+----------------+</span>
+<span class="o">|</span> <span class="n">MultiFd</span> <span class="n">Thread</span> <span class="o">|</span>
+<span class="o">+-------+--------+</span>
+        <span class="o">|</span>
+        <span class="o">|</span> <span class="n">compress</span><span class="o">/</span><span class="n">decompress</span>
+<span class="o">+-------+--------+</span>
+<span class="o">|</span> <span class="n">QATzip</span> <span class="n">library</span> <span class="o">|</span>
+<span class="o">+-------+--------+</span>
+        <span class="o">|</span>
+<span class="o">+-------+--------+</span>
+<span class="o">|</span>  <span class="n">QAT</span> <span class="n">library</span>   <span class="o">|</span>
+<span class="o">+-------+--------+</span>
+        <span class="o">|</span>         <span class="n">user</span> <span class="n">space</span>
+<span class="o">--------+---------------------</span>
+        <span class="o">|</span>         <span class="n">kernel</span> <span class="n">space</span>
+ <span class="o">+------+-------+</span>
+ <span class="o">|</span>  <span class="n">QAT</span>  <span class="n">Driver</span> <span class="o">|</span>
+ <span class="o">+------+-------+</span>
+        <span class="o">|</span>
+ <span class="o">+------+-------+</span>
+ <span class="o">|</span> <span class="n">QAT</span> <span class="n">Devices</span>  <span class="o">|</span>
+ <span class="o">+--------------+</span>
+</pre></div>
+</div>
+<section id="qatzip-installation">
+<h3>QATzip Installation<a class="headerlink" href="#qatzip-installation" title="Permalink to this headline"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">QATzip</span></code> installation package has been integrated into some Linux
+distributions and can be installed directly. For example, the Ubuntu Server
+24.04 LTS system can be installed using below command</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1">#apt search qatzip</span>
+libqatzip-dev/noble<span class="w"> </span><span class="m">1</span>.2.0-0ubuntu3<span class="w"> </span>amd64
+<span class="w">  </span>Intel<span class="w"> </span>QuickAssist<span class="w"> </span>user<span class="w"> </span>space<span class="w"> </span>library<span class="w"> </span>development<span class="w"> </span>files
+
+libqatzip3/noble<span class="w"> </span><span class="m">1</span>.2.0-0ubuntu3<span class="w"> </span>amd64
+<span class="w">  </span>Intel<span class="w"> </span>QuickAssist<span class="w"> </span>user<span class="w"> </span>space<span class="w"> </span>library
+
+qatzip/noble,now<span class="w"> </span><span class="m">1</span>.2.0-0ubuntu3<span class="w"> </span>amd64<span class="w"> </span><span class="o">[</span>installed<span class="o">]</span>
+<span class="w">  </span>Compression<span class="w"> </span>user-space<span class="w"> </span>tool<span class="w"> </span><span class="k">for</span><span class="w"> </span>Intel<span class="w"> </span>QuickAssist<span class="w"> </span>Technology
+
+<span class="c1">#sudo apt install libqatzip-dev libqatzip3 qatzip</span>
+</pre></div>
+</div>
+<p>If your system does not support the <code class="docutils literal notranslate"><span class="pre">QATzip</span></code> installation package, you can
+use the source code to build and install, please refer to <a class="reference external" href="https://github.com/intel/QATzip?tab=readme-ov-file#build-intel-quickassist-technology-driver">QATzip source code installation</a></p>
+</section>
+<section id="qat-hardware-deployment">
+<h3>QAT Hardware Deployment<a class="headerlink" href="#qat-hardware-deployment" title="Permalink to this headline"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">QAT</span></code> supports physical functions(PFs) and virtual functions(VFs) for
+deployment, and users can configure <code class="docutils literal notranslate"><span class="pre">QAT</span></code> resources for migration according
+to actual needs. For more details about <code class="docutils literal notranslate"><span class="pre">QAT</span></code> deployment, please refer to
+<a class="reference external" href="https://intel.github.io/quickassist/index.html">Intel QuickAssist Technology Documentation</a></p>
+<p>For more <code class="docutils literal notranslate"><span class="pre">QAT</span></code> hardware introduction, please refer to <a class="reference external" href="https://www.intel.com/content/www/us/en/architecture-and-technology/intel-quick-assist-technology-overview.html">intel-quick-assist-technology-overview</a></p>
+</section>
+</section>
+<section id="how-to-use-qatzip-compression">
+<h2>How To Use QATzip Compression<a class="headerlink" href="#how-to-use-qatzip-compression" title="Permalink to this headline"></a></h2>
+<p>1 - Install <code class="docutils literal notranslate"><span class="pre">QATzip</span></code> library</p>
+<p>2 - Build <code class="docutils literal notranslate"><span class="pre">QEMU</span></code> with <code class="docutils literal notranslate"><span class="pre">--enable-qatzip</span></code> parameter</p>
+<blockquote>
+<div><p>E.g. configure –target-list=x86_64-softmmu –enable-kvm <code class="docutils literal notranslate"><span class="pre">--enable-qatzip</span></code></p>
+</div></blockquote>
+<p>3 - Set <code class="docutils literal notranslate"><span class="pre">migrate_set_parameter</span> <span class="pre">multifd-compression</span> <span class="pre">qatzip</span></code></p>
+<p>4 - Set <code class="docutils literal notranslate"><span class="pre">migrate_set_parameter</span> <span class="pre">multifd-qatzip-level</span> <span class="pre">comp_level</span></code>, the default
+comp_level value is 1, and it supports levels from 1 to 9</p>
+</section>
+<section id="qat-memory-requirements">
+<h2>QAT Memory Requirements<a class="headerlink" href="#qat-memory-requirements" title="Permalink to this headline"></a></h2>
+<p>The user needs to reserve system memory for the QAT memory management to
+allocate DMA memory. The size of the reserved system memory depends on the
+number of devices used for migration and the number of multifd channels.</p>
+<p>Because memory usage depends on QAT configuration, please refer to <a class="reference external" href="https://intel.github.io/quickassist/PG/infrastructure_debugability.html?highlight=memory">QAT Memory
+Driver Queries</a>
+for memory usage calculation.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">An example of a PF used for migration</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Number of channels</p></th>
+<th class="head"><p>Sender memory usage</p></th>
+<th class="head"><p>Receiver memory usage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>10M</p></td>
+<td><p>10M</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>12M</p></td>
+<td><p>14M</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>16M</p></td>
+<td><p>20M</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="how-to-choose-between-qatzip-and-qpl">
+<h2>How To Choose Between QATzip and QPL<a class="headerlink" href="#how-to-choose-between-qatzip-and-qpl" title="Permalink to this headline"></a></h2>
+<p>Starting from 4th Gen Intel Xeon Scalable processors, codenamed Sapphire Rapids
+processor(<code class="docutils literal notranslate"><span class="pre">SPR</span></code>), multiple built-in accelerators are supported including
+<code class="docutils literal notranslate"><span class="pre">QAT</span></code> and <code class="docutils literal notranslate"><span class="pre">IAA</span></code>.  The former can accelerate <code class="docutils literal notranslate"><span class="pre">QATzip</span></code> and the latter is
+used to accelerate <code class="docutils literal notranslate"><span class="pre">QPL</span></code>.</p>
+<p>Here are some suggestions:</p>
+<p>1 - If the live migration scenario is limited by network bandwidth and <code class="docutils literal notranslate"><span class="pre">QAT</span></code>
+hardware resources exceed <code class="docutils literal notranslate"><span class="pre">IAA</span></code>, use the <code class="docutils literal notranslate"><span class="pre">QATzip</span></code> method, which can save a
+lot of host CPU resources for compression.</p>
+<p>2 - If the system cannot support shared virtual memory (SVM) technology, use
+the <code class="docutils literal notranslate"><span class="pre">QATzip</span></code> method because <code class="docutils literal notranslate"><span class="pre">QPL</span></code> performance is not good without SVM
+support.</p>
+<p>3 - For other scenarios, use the <code class="docutils literal notranslate"><span class="pre">QPL</span></code> method first.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="uadk-compression.html" class="btn btn-neutral float-left" title="User Space Accelerator Development Kit (UADK) Compression" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="compatibility.html" class="btn btn-neutral float-right" title="Backwards compatibility" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

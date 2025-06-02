@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Migration framework &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Migration features" href="features.html" />
+    <link rel="prev" title="Migration" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-build.html">QEMU Build System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testing/index.html">Testing QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rcu.html">Using RCU (Read-Copy-Update) for synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Migration</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Migration framework</a></li>
+<li class="toctree-l4"><a class="reference internal" href="features.html">Migration features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="compatibility.html">Backwards compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="best-practices.html">Best practices</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../s390-cpu-topology.html">QAPI interface for S390 CPU topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uefi-vars.html">UEFI variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../vfio-iommufd.html">IOMMUFD BACKEND usage with VFIO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../crypto.html">Cryptography in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multiple-iothreads.html">Using Multiple <code class="docutils literal notranslate"><span class="pre">IOThread</span></code>s</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index-tcg.html">TCG Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Developer Information</a> &raquo;</li>
+          <li><a href="../index-internals.html">Internal Subsystem Information</a> &raquo;</li>
+          <li><a href="index.html">Migration</a> &raquo;</li>
+      <li>Migration framework</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/migration/main.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="migration-framework">
+<span id="migration"></span><h1><a class="toc-backref" href="#id1" role="doc-backlink">Migration framework</a><a class="headerlink" href="#migration-framework" title="Permalink to this headline"></a></h1>
+<p>QEMU has code to load/save the state of the guest that it is running.
+These are two complementary operations.  Saving the state just does
+that, saves the state for each device that the guest is running.
+Restoring a guest is just the opposite operation: we need to load the
+state of each device.</p>
+<p>For this to work, QEMU has to be launched with the same arguments the
+two times.  I.e. it can only restore the state in one guest that has
+the same devices that the one it was saved (this last requirement can
+be relaxed a bit, but for now we can consider that configuration has
+to be exactly the same).</p>
+<p>Once that we are able to save/restore a guest, a new functionality is
+requested: migration.  This means that QEMU is able to start in one
+machine and being “migrated” to another machine.  I.e. being moved to
+another machine.</p>
+<p>Next was the “live migration” functionality.  This is important
+because some guests run with a lot of state (specially RAM), and it
+can take a while to move all state from one machine to another.  Live
+migration allows the guest to continue running while the state is
+transferred.  Only while the last part of the state is transferred has
+the guest to be stopped.  Typically the time that the guest is
+unresponsive during live migration is the low hundred of milliseconds
+(notice that this depends on a lot of things).</p>
+<nav class="contents" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#migration-framework" id="id1">Migration framework</a></p>
+<ul>
+<li><p><a class="reference internal" href="#transports" id="id2">Transports</a></p></li>
+<li><p><a class="reference internal" href="#common-infrastructure" id="id3">Common infrastructure</a></p></li>
+<li><p><a class="reference internal" href="#saving-the-state-of-one-device" id="id4">Saving the state of one device</a></p>
+<ul>
+<li><p><a class="reference internal" href="#general-advice-for-device-developers" id="id5">General advice for device developers</a></p></li>
+<li><p><a class="reference internal" href="#vmstate" id="id6">VMState</a></p></li>
+<li><p><a class="reference internal" href="#legacy-way" id="id7">Legacy way</a></p></li>
+<li><p><a class="reference internal" href="#changing-migration-data-structures" id="id8">Changing migration data structures</a></p></li>
+<li><p><a class="reference internal" href="#subsections" id="id9">Subsections</a></p></li>
+<li><p><a class="reference internal" href="#connecting-subsections-to-properties" id="id10">Connecting subsections to properties</a></p></li>
+<li><p><a class="reference internal" href="#not-sending-existing-elements" id="id11">Not sending existing elements</a></p></li>
+<li><p><a class="reference internal" href="#versions" id="id12">Versions</a></p></li>
+<li><p><a class="reference internal" href="#massaging-functions" id="id13">Massaging functions</a></p></li>
+<li><p><a class="reference internal" href="#iterative-device-migration" id="id14">Iterative device migration</a></p></li>
+<li><p><a class="reference internal" href="#device-ordering" id="id15">Device ordering</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#stream-structure" id="id16">Stream structure</a></p>
+<ul>
+<li><p><a class="reference internal" href="#return-path" id="id17">Return path</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+<section id="transports">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Transports</a><a class="headerlink" href="#transports" title="Permalink to this headline"></a></h2>
+<p>The migration stream is normally just a byte stream that can be passed
+over any transport.</p>
+<ul>
+<li><p>tcp migration: do the migration using tcp sockets</p></li>
+<li><p>unix migration: do the migration using unix sockets</p></li>
+<li><p>exec migration: do the migration using the stdin/stdout through a process.</p></li>
+<li><p>fd migration: do the migration using a file descriptor that is
+passed to QEMU.  QEMU doesn’t care how this file descriptor is opened.</p></li>
+<li><p>file migration: do the migration using a file that is passed to QEMU
+by path. A file offset option is supported to allow a management
+application to add its own metadata to the start of the file without
+QEMU interference. Note that QEMU does not flush cached file
+data/metadata at the end of migration.</p>
+<p>The file migration also supports using a file that has already been
+opened. A set of file descriptors is passed to QEMU via an “fdset”
+(see add-fd QMP command documentation). This method allows a
+management application to have control over the migration file
+opening operation. There are, however, strict requirements to this
+interface if the multifd capability is enabled:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>the fdset must contain two file descriptors that are not
+duplicates between themselves;</p></li>
+<li><p>if the direct-io capability is to be used, exactly one of the
+file descriptors must have the O_DIRECT flag set;</p></li>
+<li><p>the file must be opened with WRONLY on the migration source side
+and RDONLY on the migration destination side.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>rdma migration: support is included for migration using RDMA, which
+transports the page data using <code class="docutils literal notranslate"><span class="pre">RDMA</span></code>, where the hardware takes
+care of transporting the pages, and the load on the CPU is much
+lower.  While the internals of RDMA migration are a bit different,
+this isn’t really visible outside the RAM migration code.</p></li>
+</ul>
+<p>All these migration protocols use the same infrastructure to
+save/restore state devices.  This infrastructure is shared with the
+savevm/loadvm functionality.</p>
+</section>
+<section id="common-infrastructure">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Common infrastructure</a><a class="headerlink" href="#common-infrastructure" title="Permalink to this headline"></a></h2>
+<p>The files, sockets or fd’s that carry the migration stream are abstracted by
+the  <code class="docutils literal notranslate"><span class="pre">QEMUFile</span></code> type (see <code class="docutils literal notranslate"><span class="pre">migration/qemu-file.h</span></code>).  In most cases this
+is connected to a subtype of <code class="docutils literal notranslate"><span class="pre">QIOChannel</span></code> (see <code class="docutils literal notranslate"><span class="pre">io/</span></code>).</p>
+</section>
+<section id="saving-the-state-of-one-device">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Saving the state of one device</a><a class="headerlink" href="#saving-the-state-of-one-device" title="Permalink to this headline"></a></h2>
+<p>For most devices, the state is saved in a single call to the migration
+infrastructure; these are <em>non-iterative</em> devices.  The data for these
+devices is sent at the end of precopy migration, when the CPUs are paused.
+There are also <em>iterative</em> devices, which contain a very large amount of
+data (e.g. RAM or large tables).  See the iterative device section below.</p>
+<section id="general-advice-for-device-developers">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">General advice for device developers</a><a class="headerlink" href="#general-advice-for-device-developers" title="Permalink to this headline"></a></h3>
+<ul class="simple">
+<li><p>The migration state saved should reflect the device being modelled rather
+than the way your implementation works.  That way if you change the implementation
+later the migration stream will stay compatible.  That model may include
+internal state that’s not directly visible in a register.</p></li>
+<li><p>When saving a migration stream the device code may walk and check
+the state of the device.  These checks might fail in various ways (e.g.
+discovering internal state is corrupt or that the guest has done something bad).
+Consider carefully before asserting/aborting at this point, since the
+normal response from users is that <em>migration broke their VM</em> since it had
+apparently been running fine until then.  In these error cases, the device
+should log a message indicating the cause of error, and should consider
+putting the device into an error state, allowing the rest of the VM to
+continue execution.</p></li>
+<li><p>The migration might happen at an inconvenient point,
+e.g. right in the middle of the guest reprogramming the device, during
+guest reboot or shutdown or while the device is waiting for external IO.
+It’s strongly preferred that migrations do not fail in this situation,
+since in the cloud environment migrations might happen automatically to
+VMs that the administrator doesn’t directly control.</p></li>
+<li><p>If you do need to fail a migration, ensure that sufficient information
+is logged to identify what went wrong.</p></li>
+<li><p>The destination should treat an incoming migration stream as hostile
+(which we do to varying degrees in the existing code).  Check that offsets
+into buffers and the like can’t cause overruns.  Fail the incoming migration
+in the case of a corrupted stream like this.</p></li>
+<li><p>Take care with internal device state or behaviour that might become
+migration version dependent.  For example, the order of PCI capabilities
+is required to stay constant across migration.  Another example would
+be that a special case handled by subsections (see below) might become
+much more common if a default behaviour is changed.</p></li>
+<li><p>The state of the source should not be changed or destroyed by the
+outgoing migration.  Migrations timing out or being failed by
+higher levels of management, or failures of the destination host are
+not unusual, and in that case the VM is restarted on the source.
+Note that the management layer can validly revert the migration
+even though the QEMU level of migration has succeeded as long as it
+does it before starting execution on the destination.</p></li>
+<li><p>Buses and devices should be able to explicitly specify addresses when
+instantiated, and management tools should use those.  For example,
+when hot adding USB devices it’s important to specify the ports
+and addresses, since implicit ordering based on the command line order
+may be different on the destination.  This can result in the
+device state being loaded into the wrong device.</p></li>
+</ul>
+</section>
+<section id="vmstate">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">VMState</a><a class="headerlink" href="#vmstate" title="Permalink to this headline"></a></h3>
+<p>Most device data can be described using the <code class="docutils literal notranslate"><span class="pre">VMSTATE</span></code> macros (mostly defined
+in <code class="docutils literal notranslate"><span class="pre">include/migration/vmstate.h</span></code>).</p>
+<p>An example (from hw/input/pckbd.c)</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">VMStateDescription</span><span class="w"> </span><span class="n">vmstate_kbd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;pckbd&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">version_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">minimum_version_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">fields</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">VMStateField</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">VMSTATE_UINT8</span><span class="p">(</span><span class="n">write_cmd</span><span class="p">,</span><span class="w"> </span><span class="n">KBDState</span><span class="p">),</span>
+<span class="w">        </span><span class="n">VMSTATE_UINT8</span><span class="p">(</span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="n">KBDState</span><span class="p">),</span>
+<span class="w">        </span><span class="n">VMSTATE_UINT8</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span><span class="w"> </span><span class="n">KBDState</span><span class="p">),</span>
+<span class="w">        </span><span class="n">VMSTATE_UINT8</span><span class="p">(</span><span class="n">pending</span><span class="p">,</span><span class="w"> </span><span class="n">KBDState</span><span class="p">),</span>
+<span class="w">        </span><span class="n">VMSTATE_END_OF_LIST</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>We are declaring the state with name “pckbd”.  The <code class="docutils literal notranslate"><span class="pre">version_id</span></code> is
+3, and there are 4 uint8_t fields in the KBDState structure.  We
+registered this <code class="docutils literal notranslate"><span class="pre">VMSTATEDescription</span></code> with one of the following
+functions.  The first one will generate a device <code class="docutils literal notranslate"><span class="pre">instance_id</span></code>
+different for each registration.  Use the second one if you already
+have an id that is different for each instance of the device:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">vmstate_register_any</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">vmstate_kbd</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">);</span>
+<span class="n">vmstate_register</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">instance_id</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">vmstate_kbd</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>For devices that are <code class="docutils literal notranslate"><span class="pre">qdev</span></code> based, we can register the device in the class
+init function:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">dc</span><span class="o">-&gt;</span><span class="n">vmsd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">vmstate_kbd_isa</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The VMState macros take care of ensuring that the device data section
+is formatted portably (normally big endian) and make some compile time checks
+against the types of the fields in the structures.</p>
+<p>VMState macros can include other VMStateDescriptions to store substructures
+(see <code class="docutils literal notranslate"><span class="pre">VMSTATE_STRUCT_</span></code>), arrays (<code class="docutils literal notranslate"><span class="pre">VMSTATE_ARRAY_</span></code>) and variable length
+arrays (<code class="docutils literal notranslate"><span class="pre">VMSTATE_VARRAY_</span></code>).  Various other macros exist for special
+cases.</p>
+<p>Note that the format on the wire is still very raw; i.e. a VMSTATE_UINT32
+ends up with a 4 byte bigendian representation on the wire; in the future
+it might be possible to use a more structured format.</p>
+</section>
+<section id="legacy-way">
+<h3><a class="toc-backref" href="#id7" role="doc-backlink">Legacy way</a><a class="headerlink" href="#legacy-way" title="Permalink to this headline"></a></h3>
+<p>This way is going to disappear as soon as all current users are ported to VMSTATE;
+although converting existing code can be tricky, and thus ‘soon’ is relative.</p>
+<p>Each device has to register two functions, one to save the state and
+another to load the state back.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">register_savevm_live</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">idstr</span><span class="p">,</span>
+<span class="w">                         </span><span class="kt">int</span><span class="w"> </span><span class="n">instance_id</span><span class="p">,</span>
+<span class="w">                         </span><span class="kt">int</span><span class="w"> </span><span class="n">version_id</span><span class="p">,</span>
+<span class="w">                         </span><span class="n">SaveVMHandlers</span><span class="w"> </span><span class="o">*</span><span class="n">ops</span><span class="p">,</span>
+<span class="w">                         </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">opaque</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Two functions in the <code class="docutils literal notranslate"><span class="pre">ops</span></code> structure are the <code class="docutils literal notranslate"><span class="pre">save_state</span></code>
+and <code class="docutils literal notranslate"><span class="pre">load_state</span></code> functions.  Notice that <code class="docutils literal notranslate"><span class="pre">load_state</span></code> receives a version_id
+parameter to know what state format is receiving.  <code class="docutils literal notranslate"><span class="pre">save_state</span></code> doesn’t
+have a version_id parameter because it always uses the latest version.</p>
+<p>Note that because the VMState macros still save the data in a raw
+format, in many cases it’s possible to replace legacy code
+with a carefully constructed VMState description that matches the
+byte layout of the existing code.</p>
+</section>
+<section id="changing-migration-data-structures">
+<h3><a class="toc-backref" href="#id8" role="doc-backlink">Changing migration data structures</a><a class="headerlink" href="#changing-migration-data-structures" title="Permalink to this headline"></a></h3>
+<p>When we migrate a device, we save/load the state as a series
+of fields.  Sometimes, due to bugs or new functionality, we need to
+change the state to store more/different information.  Changing the migration
+state saved for a device can break migration compatibility unless
+care is taken to use the appropriate techniques.  In general QEMU tries
+to maintain forward migration compatibility (i.e. migrating from
+QEMU n-&gt;n+1) and there are users who benefit from backward compatibility
+as well.</p>
+</section>
+<section id="subsections">
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Subsections</a><a class="headerlink" href="#subsections" title="Permalink to this headline"></a></h3>
+<p>The most common structure change is adding new data, e.g. when adding
+a newer form of device, or adding that state that you previously
+forgot to migrate.  This is best solved using a subsection.</p>
+<p>A subsection is “like” a device vmstate, but with a particularity, it
+has a Boolean function that tells if that values are needed to be sent
+or not.  If this functions returns false, the subsection is not sent.
+Subsections have a unique name, that is looked for on the receiving
+side.</p>
+<p>On the receiving side, if we found a subsection for a device that we
+don’t understand, we just fail the migration.  If we understand all
+the subsections, then we load the state with success.  There’s no check
+that a subsection is loaded, so a newer QEMU that knows about a subsection
+can (with care) load a stream from an older QEMU that didn’t send
+the subsection.</p>
+<p>If the new data is only needed in a rare case, then the subsection
+can be made conditional on that case and the migration will still
+succeed to older QEMUs in most cases.  This is OK for data that’s
+critical, but in some use cases it’s preferred that the migration
+should succeed even with the data missing.  To support this the
+subsection can be connected to a device property and from there
+to a versioned machine type.</p>
+<p>The ‘pre_load’ and ‘post_load’ functions on subsections are only
+called if the subsection is loaded.</p>
+<p>One important note is that the outer post_load() function is called “after”
+loading all subsections, because a newer subsection could change the same
+value that it uses.  A flag, and the combination of outer pre_load and
+post_load can be used to detect whether a subsection was loaded, and to
+fall back on default behaviour when the subsection isn’t present.</p>
+<p>Example:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">ide_drive_pio_state_needed</span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">opaque</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">IDEState</span><span class="w"> </span><span class="o">*</span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">opaque</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">((</span><span class="n">s</span><span class="o">-&gt;</span><span class="n">status</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">DRQ_STAT</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">        </span><span class="o">||</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="o">-&gt;</span><span class="n">bus</span><span class="o">-&gt;</span><span class="n">error_status</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">BM_STATUS_PIO_RETRY</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">const</span><span class="w"> </span><span class="n">VMStateDescription</span><span class="w"> </span><span class="n">vmstate_ide_drive_pio_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ide_drive/pio_state&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">version_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">minimum_version_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">pre_save</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ide_drive_pio_pre_save</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">post_load</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ide_drive_pio_post_load</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">needed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ide_drive_pio_state_needed</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">fields</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">VMStateField</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">VMSTATE_INT32</span><span class="p">(</span><span class="n">req_nb_sectors</span><span class="p">,</span><span class="w"> </span><span class="n">IDEState</span><span class="p">),</span>
+<span class="w">        </span><span class="n">VMSTATE_VARRAY_INT32</span><span class="p">(</span><span class="n">io_buffer</span><span class="p">,</span><span class="w"> </span><span class="n">IDEState</span><span class="p">,</span><span class="w"> </span><span class="n">io_buffer_total_len</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">                             </span><span class="n">vmstate_info_uint8</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="p">),</span>
+<span class="w">        </span><span class="n">VMSTATE_INT32</span><span class="p">(</span><span class="n">cur_io_buffer_offset</span><span class="p">,</span><span class="w"> </span><span class="n">IDEState</span><span class="p">),</span>
+<span class="w">        </span><span class="n">VMSTATE_INT32</span><span class="p">(</span><span class="n">cur_io_buffer_len</span><span class="p">,</span><span class="w"> </span><span class="n">IDEState</span><span class="p">),</span>
+<span class="w">        </span><span class="n">VMSTATE_UINT8</span><span class="p">(</span><span class="n">end_transfer_fn_idx</span><span class="p">,</span><span class="w"> </span><span class="n">IDEState</span><span class="p">),</span>
+<span class="w">        </span><span class="n">VMSTATE_INT32</span><span class="p">(</span><span class="n">elementary_transfer_size</span><span class="p">,</span><span class="w"> </span><span class="n">IDEState</span><span class="p">),</span>
+<span class="w">        </span><span class="n">VMSTATE_INT32</span><span class="p">(</span><span class="n">packet_transfer_size</span><span class="p">,</span><span class="w"> </span><span class="n">IDEState</span><span class="p">),</span>
+<span class="w">        </span><span class="n">VMSTATE_END_OF_LIST</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="k">const</span><span class="w"> </span><span class="n">VMStateDescription</span><span class="w"> </span><span class="n">vmstate_ide_drive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ide_drive&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">version_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">minimum_version_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">post_load</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ide_drive_post_load</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">fields</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">VMStateField</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="p">....</span><span class="w"> </span><span class="n">several</span><span class="w"> </span><span class="n">fields</span><span class="w"> </span><span class="p">....</span>
+<span class="w">        </span><span class="n">VMSTATE_END_OF_LIST</span><span class="p">()</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">.</span><span class="n">subsections</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">VMStateDescription</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">vmstate_ide_drive_pio_state</span><span class="p">,</span>
+<span class="w">        </span><span class="nb">NULL</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>Here we have a subsection for the pio state.  We only need to
+save/send this state when we are in the middle of a pio operation
+(that is what <code class="docutils literal notranslate"><span class="pre">ide_drive_pio_state_needed()</span></code> checks).  If DRQ_STAT is
+not enabled, the values on that fields are garbage and don’t need to
+be sent.</p>
+</section>
+<section id="connecting-subsections-to-properties">
+<h3><a class="toc-backref" href="#id10" role="doc-backlink">Connecting subsections to properties</a><a class="headerlink" href="#connecting-subsections-to-properties" title="Permalink to this headline"></a></h3>
+<p>Using a condition function that checks a ‘property’ to determine whether
+to send a subsection allows backward migration compatibility when
+new subsections are added, especially when combined with versioned
+machine types.</p>
+<p>For example:</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li><p>Add a new property using <code class="docutils literal notranslate"><span class="pre">DEFINE_PROP_BOOL</span></code> - e.g. support-foo and
+default it to true.</p></li>
+<li><p>Add an entry to the <code class="docutils literal notranslate"><span class="pre">hw_compat_</span></code> for the previous version that sets
+the property to false.</p></li>
+<li><p>Add a static bool  support_foo function that tests the property.</p></li>
+<li><p>Add a subsection with a .needed set to the support_foo function</p></li>
+<li><p>(potentially) Add an outer pre_load that sets up a default value
+for ‘foo’ to be used if the subsection isn’t loaded.</p></li>
+</ol>
+</div></blockquote>
+<p>Now that subsection will not be generated when using an older
+machine type and the migration stream will be accepted by older
+QEMU versions.</p>
+</section>
+<section id="not-sending-existing-elements">
+<h3><a class="toc-backref" href="#id11" role="doc-backlink">Not sending existing elements</a><a class="headerlink" href="#not-sending-existing-elements" title="Permalink to this headline"></a></h3>
+<p>Sometimes members of the VMState are no longer needed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>removing them will break migration compatibility</p></li>
+<li><p>making them version dependent and bumping the version will break backward migration
+compatibility.</p></li>
+</ul>
+</div></blockquote>
+<p>Adding a dummy field into the migration stream is normally the best way to preserve
+compatibility.</p>
+<p>If the field really does need to be removed then:</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li><p>Add a new property/compatibility/function in the same way for subsections above.</p></li>
+<li><p>replace the VMSTATE macro with the _TEST version of the macro, e.g.:</p></li>
+</ol>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">VMSTATE_UINT32(foo,</span> <span class="pre">barstruct)</span></code></p>
+<p>becomes</p>
+<p><code class="docutils literal notranslate"><span class="pre">VMSTATE_UINT32_TEST(foo,</span> <span class="pre">barstruct,</span> <span class="pre">pre_version_baz)</span></code></p>
+<p>Sometime in the future when we no longer care about the ancient versions these can be killed off.
+Note that for backward compatibility it’s important to fill in the structure with
+data that the destination will understand.</p>
+</div></blockquote>
+</div></blockquote>
+<p>Any difference in the predicates on the source and destination will end up
+with different fields being enabled and data being loaded into the wrong
+fields; for this reason conditional fields like this are very fragile.</p>
+</section>
+<section id="versions">
+<h3><a class="toc-backref" href="#id12" role="doc-backlink">Versions</a><a class="headerlink" href="#versions" title="Permalink to this headline"></a></h3>
+<p>Version numbers are intended for major incompatible changes to the
+migration of a device, and using them breaks backward-migration
+compatibility; in general most changes can be made by adding Subsections
+(see above) or _TEST macros (see above) which won’t break compatibility.</p>
+<p>Each version is associated with a series of fields saved.  The <code class="docutils literal notranslate"><span class="pre">save_state</span></code> always saves
+the state as the newer version.  But <code class="docutils literal notranslate"><span class="pre">load_state</span></code> sometimes is able to
+load state from an older version.</p>
+<p>You can see that there are two version fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">version_id</span></code>: the maximum version_id supported by VMState for that device.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">minimum_version_id</span></code>: the minimum version_id that VMState is able to understand
+for that device.</p></li>
+</ul>
+<p>VMState is able to read versions from minimum_version_id to version_id.</p>
+<p>There are <em>_V</em> forms of many <code class="docutils literal notranslate"><span class="pre">VMSTATE_</span></code> macros to load fields for version dependent fields,
+e.g.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">VMSTATE_UINT16_V</span><span class="p">(</span><span class="n">ip_id</span><span class="p">,</span><span class="w"> </span><span class="n">Slirp</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span>
+</pre></div>
+</div>
+<p>only loads that field for versions 2 and newer.</p>
+<p>Saving state will always create a section with the ‘version_id’ value
+and thus can’t be loaded by any older QEMU.</p>
+</section>
+<section id="massaging-functions">
+<h3><a class="toc-backref" href="#id13" role="doc-backlink">Massaging functions</a><a class="headerlink" href="#massaging-functions" title="Permalink to this headline"></a></h3>
+<p>Sometimes, it is not enough to be able to save the state directly
+from one structure, we need to fill the correct values there.  One
+example is when we are using kvm.  Before saving the cpu state, we
+need to ask kvm to copy to QEMU the state that it is using.  And the
+opposite when we are loading the state, we need a way to tell kvm to
+load the state for the cpu that we have just loaded from the QEMUFile.</p>
+<p>The functions to do that are inside a vmstate definition, and are called:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">(*pre_load)(void</span> <span class="pre">*opaque);</span></code></p>
+<p>This function is called before we load the state of one device.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">(*post_load)(void</span> <span class="pre">*opaque,</span> <span class="pre">int</span> <span class="pre">version_id);</span></code></p>
+<p>This function is called after we load the state of one device.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">(*pre_save)(void</span> <span class="pre">*opaque);</span></code></p>
+<p>This function is called before we save the state of one device.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">(*post_save)(void</span> <span class="pre">*opaque);</span></code></p>
+<p>This function is called after we save the state of one device
+(even upon failure, unless the call to pre_save returned an error).</p>
+</li>
+</ul>
+<p>Example: You can look at hpet.c, that uses the first three functions
+to massage the state that is transferred.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">VMSTATE_WITH_TMP</span></code> macro may be useful when the migration
+data doesn’t match the stored device data well; it allows an
+intermediate temporary structure to be populated with migration
+data and then transferred to the main structure.</p>
+<p>If you use memory or portio_list API functions that update memory layout outside
+initialization (i.e., in response to a guest action), this is a strong
+indication that you need to call these functions in a <code class="docutils literal notranslate"><span class="pre">post_load</span></code> callback.
+Examples of such API functions are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>memory_region_add_subregion()</p></li>
+<li><p>memory_region_del_subregion()</p></li>
+<li><p>memory_region_set_readonly()</p></li>
+<li><p>memory_region_set_nonvolatile()</p></li>
+<li><p>memory_region_set_enabled()</p></li>
+<li><p>memory_region_set_address()</p></li>
+<li><p>memory_region_set_alias_offset()</p></li>
+<li><p>portio_list_set_address()</p></li>
+<li><p>portio_list_set_enabled()</p></li>
+</ul>
+</div></blockquote>
+<p>Since the order of device save/restore is not defined, you must
+avoid accessing or changing any other device’s state in one of these
+callbacks. (For instance, don’t do anything that calls <code class="docutils literal notranslate"><span class="pre">update_irq()</span></code>
+in a <code class="docutils literal notranslate"><span class="pre">post_load</span></code> hook.) Otherwise, restore will not be deterministic,
+and this will break execution record/replay.</p>
+</section>
+<section id="iterative-device-migration">
+<h3><a class="toc-backref" href="#id14" role="doc-backlink">Iterative device migration</a><a class="headerlink" href="#iterative-device-migration" title="Permalink to this headline"></a></h3>
+<p>Some devices, such as RAM or certain platform devices,
+have large amounts of data that would mean that the CPUs would be
+paused for too long if they were sent in one section.  For these
+devices an <em>iterative</em> approach is taken.</p>
+<p>The iterative devices generally don’t use VMState macros
+(although it may be possible in some cases) and instead use
+qemu_put_*/qemu_get_* macros to read/write data to the stream.  Specialist
+versions exist for high bandwidth IO.</p>
+<p>An iterative device must provide:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A <code class="docutils literal notranslate"><span class="pre">save_setup</span></code> function that initialises the data structures and
+transmits a first section containing information on the device.  In the
+case of RAM this transmits a list of RAMBlocks and sizes.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">load_setup</span></code> function that initialises the data structures on the
+destination.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">state_pending_exact</span></code> function that indicates how much more
+data we must save.  The core migration code will use this to
+determine when to pause the CPUs and complete the migration.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">state_pending_estimate</span></code> function that indicates how much more
+data we must save.  When the estimated amount is smaller than the
+threshold, we call <code class="docutils literal notranslate"><span class="pre">state_pending_exact</span></code>.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">save_live_iterate</span></code> function should send a chunk of data until
+the point that stream bandwidth limits tell it to stop.  Each call
+generates one section.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">save_live_complete_precopy</span></code> function that must transmit the
+last section for the device containing any remaining data.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">load_state</span></code> function used to load sections generated by
+any of the save functions that generate sections.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cleanup</span></code> functions for both save and load that are called
+at the end of migration.</p></li>
+</ul>
+</div></blockquote>
+<p>Note that the contents of the sections for iterative migration tend
+to be open-coded by the devices; care should be taken in parsing
+the results and structuring the stream to make them easy to validate.</p>
+</section>
+<section id="device-ordering">
+<h3><a class="toc-backref" href="#id15" role="doc-backlink">Device ordering</a><a class="headerlink" href="#device-ordering" title="Permalink to this headline"></a></h3>
+<p>There are cases in which the ordering of device loading matters; for
+example in some systems where a device may assert an interrupt during loading,
+if the interrupt controller is loaded later then it might lose the state.</p>
+<p>Some ordering is implicitly provided by the order in which the machine
+definition creates devices, however this is somewhat fragile.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">MigrationPriority</span></code> enum provides a means of explicitly enforcing
+ordering.  Numerically higher priorities are loaded earlier.
+The priority is set by setting the <code class="docutils literal notranslate"><span class="pre">priority</span></code> field of the top level
+<code class="docutils literal notranslate"><span class="pre">VMStateDescription</span></code> for the device.</p>
+</section>
+</section>
+<section id="stream-structure">
+<h2><a class="toc-backref" href="#id16" role="doc-backlink">Stream structure</a><a class="headerlink" href="#stream-structure" title="Permalink to this headline"></a></h2>
+<p>The stream tries to be word and endian agnostic, allowing migration between hosts
+of different characteristics running the same VM.</p>
+<blockquote>
+<div><ul>
+<li><p>Header</p>
+<ul>
+<li><p>Magic</p></li>
+<li><p>Version</p></li>
+<li><p>VM configuration section</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Machine type</p></li>
+<li><p>Target page bits</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</li>
+<li><p>List of sections
+Each section contains a device, or one iteration of a device save.</p>
+<ul class="simple">
+<li><p>section type</p></li>
+<li><p>section id</p></li>
+<li><p>ID string (First section of each device)</p></li>
+<li><p>instance id (First section of each device)</p></li>
+<li><p>version id (First section of each device)</p></li>
+<li><p>&lt;device data&gt;</p></li>
+<li><p>Footer mark</p></li>
+</ul>
+</li>
+<li><p>EOF mark</p></li>
+<li><p>VM Description structure
+Consisting of a JSON description of the contents for analysis only</p></li>
+</ul>
+</div></blockquote>
+<p>The <code class="docutils literal notranslate"><span class="pre">device</span> <span class="pre">data</span></code> in each section consists of the data produced
+by the code described above.  For non-iterative devices they have a single
+section; iterative devices have an initial and last section and a set
+of parts in between.
+Note that there is very little checking by the common code of the integrity
+of the <code class="docutils literal notranslate"><span class="pre">device</span> <span class="pre">data</span></code> contents, that’s up to the devices themselves.
+The <code class="docutils literal notranslate"><span class="pre">footer</span> <span class="pre">mark</span></code> provides a little bit of protection for the case where
+the receiving side reads more or less data than expected.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ID</span> <span class="pre">string</span></code> is normally unique, having been formed from a bus name
+and device address, PCI devices and storage devices hung off PCI controllers
+fit this pattern well.  Some devices are fixed single instances (e.g. “pc-ram”).
+Others (especially either older devices or system devices which for
+some reason don’t have a bus concept) make use of the <code class="docutils literal notranslate"><span class="pre">instance</span> <span class="pre">id</span></code>
+for otherwise identically named devices.</p>
+<section id="return-path">
+<h3><a class="toc-backref" href="#id17" role="doc-backlink">Return path</a><a class="headerlink" href="#return-path" title="Permalink to this headline"></a></h3>
+<p>Only a unidirectional stream is required for normal migration, however a
+<code class="docutils literal notranslate"><span class="pre">return</span> <span class="pre">path</span></code> can be created when bidirectional communication is desired.
+This is primarily used by postcopy, but is also used to return a success
+flag to the source at the end of migration.</p>
+<p><code class="docutils literal notranslate"><span class="pre">qemu_file_get_return_path(QEMUFile*</span> <span class="pre">fwdpath)</span></code> gives the QEMUFile* for the return
+path.</p>
+<blockquote>
+<div><p>Source side</p>
+<blockquote>
+<div><p>Forward path - written by migration thread
+Return path  - opened by main thread, read by return-path thread</p>
+</div></blockquote>
+<p>Destination side</p>
+<blockquote>
+<div><p>Forward path - read by main thread
+Return path  - opened by main thread, written by main thread AND postcopy
+thread (protected by rp_mutex)</p>
+</div></blockquote>
+</div></blockquote>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Migration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="features.html" class="btn btn-neutral float-right" title="Migration features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

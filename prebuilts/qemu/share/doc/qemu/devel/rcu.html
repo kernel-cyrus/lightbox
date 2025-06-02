@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Using RCU (Read-Copy-Update) for synchronization &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="block-coroutine-wrapper" href="block-coroutine-wrapper.html" />
+    <link rel="prev" title="Atomic operations in QEMU" href="atomics.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing/index.html">Testing QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Using RCU (Read-Copy-Update) for synchronization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rcu-api">RCU API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#convenience-macros">Convenience macros</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#differences-with-linux">Differences with Linux</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rcu-patterns">RCU Patterns</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="migration/index.html">Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="s390-cpu-topology.html">QAPI interface for S390 CPU topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uefi-vars.html">UEFI variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vfio-iommufd.html">IOMMUFD BACKEND usage with VFIO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crypto.html">Cryptography in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multiple-iothreads.html">Using Multiple <code class="docutils literal notranslate"><span class="pre">IOThread</span></code>s</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Developer Information</a> &raquo;</li>
+          <li><a href="index-internals.html">Internal Subsystem Information</a> &raquo;</li>
+      <li>Using RCU (Read-Copy-Update) for synchronization</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/rcu.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="using-rcu-read-copy-update-for-synchronization">
+<h1>Using RCU (Read-Copy-Update) for synchronization<a class="headerlink" href="#using-rcu-read-copy-update-for-synchronization" title="Permalink to this headline"></a></h1>
+<p>Read-copy update (RCU) is a synchronization mechanism that is used to
+protect read-mostly data structures.  RCU is very efficient and scalable
+on the read side (it is wait-free), and thus can make the read paths
+extremely fast.</p>
+<p>RCU supports concurrency between a single writer and multiple readers,
+thus it is not used alone.  Typically, the write-side will use a lock to
+serialize multiple updates, but other approaches are possible (e.g.,
+restricting updates to a single task).  In QEMU, when a lock is used,
+this will often be the “iothread mutex”, also known as the “big QEMU
+lock” (BQL).  Also, restricting updates to a single task is done in
+QEMU using the “bottom half” API.</p>
+<p>RCU is fundamentally a “wait-to-finish” mechanism.  The read side marks
+sections of code with “critical sections”, and the update side will wait
+for the execution of all <em>currently running</em> critical sections before
+proceeding, or before asynchronously executing a callback.</p>
+<p>The key point here is that only the currently running critical sections
+are waited for; critical sections that are started <strong>after</strong> the beginning
+of the wait do not extend the wait, despite running concurrently with
+the updater.  This is the reason why RCU is more scalable than,
+for example, reader-writer locks.  It is so much more scalable that
+the system will have a single instance of the RCU mechanism; a single
+mechanism can be used for an arbitrary number of “things”, without
+having to worry about things such as contention or deadlocks.</p>
+<p>How is this possible?  The basic idea is to split updates in two phases,
+“removal” and “reclamation”.  During removal, we ensure that subsequent
+readers will not be able to get a reference to the old data.  After
+removal has completed, a critical section will not be able to access
+the old data.  Therefore, critical sections that begin after removal
+do not matter; as soon as all previous critical sections have finished,
+there cannot be any readers who hold references to the data structure,
+and these can now be safely reclaimed (e.g., freed or unref’ed).</p>
+<p>Here is a picture:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">thread</span> <span class="mi">1</span>                  <span class="n">thread</span> <span class="mi">2</span>                  <span class="n">thread</span> <span class="mi">3</span>
+<span class="o">-------------------</span>    <span class="o">------------------------</span>    <span class="o">-------------------</span>
+<span class="n">enter</span> <span class="n">RCU</span> <span class="n">crit</span><span class="o">.</span><span class="n">sec</span><span class="o">.</span>
+       <span class="o">|</span>                <span class="n">finish</span> <span class="n">removal</span> <span class="n">phase</span>
+       <span class="o">|</span>                <span class="n">begin</span> <span class="n">wait</span>
+       <span class="o">|</span>                      <span class="o">|</span>                    <span class="n">enter</span> <span class="n">RCU</span> <span class="n">crit</span><span class="o">.</span><span class="n">sec</span><span class="o">.</span>
+<span class="n">exit</span> <span class="n">RCU</span> <span class="n">crit</span><span class="o">.</span><span class="n">sec</span>             <span class="o">|</span>                           <span class="o">|</span>
+                        <span class="n">complete</span> <span class="n">wait</span>                     <span class="o">|</span>
+                        <span class="n">begin</span> <span class="n">reclamation</span> <span class="n">phase</span>           <span class="o">|</span>
+                                                   <span class="n">exit</span> <span class="n">RCU</span> <span class="n">crit</span><span class="o">.</span><span class="n">sec</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Note how thread 3 is still executing its critical section when thread 2
+starts reclaiming data.  This is possible, because the old version of the
+data structure was not accessible at the time thread 3 began executing
+that critical section.</p>
+<section id="rcu-api">
+<h2>RCU API<a class="headerlink" href="#rcu-api" title="Permalink to this headline"></a></h2>
+<p>The core RCU API is small:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">rcu_read_lock(void);</span></code></dt><dd><p>Used by a reader to inform the reclaimer that the reader is
+entering an RCU read-side critical section.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">rcu_read_unlock(void);</span></code></dt><dd><p>Used by a reader to inform the reclaimer that the reader is
+exiting an RCU read-side critical section.  Note that RCU
+read-side critical sections may be nested and/or overlapping.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">synchronize_rcu(void);</span></code></dt><dd><p>Blocks until all pre-existing RCU read-side critical sections
+on all threads have completed.  This marks the end of the removal
+phase and the beginning of reclamation phase.</p>
+<p>Note that it would be valid for another update to come while
+<code class="docutils literal notranslate"><span class="pre">synchronize_rcu</span></code> is running.  Because of this, it is better that
+the updater releases any locks it may hold before calling
+<code class="docutils literal notranslate"><span class="pre">synchronize_rcu</span></code>.  If this is not possible (for example, because
+the updater is protected by the BQL), you can use <code class="docutils literal notranslate"><span class="pre">call_rcu</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">call_rcu1(struct</span> <span class="pre">rcu_head</span> <span class="pre">*</span> <span class="pre">head,</span> <span class="pre">void</span> <span class="pre">(*func)(struct</span> <span class="pre">rcu_head</span> <span class="pre">*head));</span></code></dt><dd><p>This function invokes <code class="docutils literal notranslate"><span class="pre">func(head)</span></code> after all pre-existing RCU
+read-side critical sections on all threads have completed.  This
+marks the end of the removal phase, with func taking care
+asynchronously of the reclamation phase.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">foo</span></code> struct needs to have an <code class="docutils literal notranslate"><span class="pre">rcu_head</span></code> structure added,
+perhaps as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">struct</span> <span class="n">foo</span> <span class="p">{</span>
+    <span class="n">struct</span> <span class="n">rcu_head</span> <span class="n">rcu</span><span class="p">;</span>
+    <span class="nb">int</span> <span class="n">a</span><span class="p">;</span>
+    <span class="n">char</span> <span class="n">b</span><span class="p">;</span>
+    <span class="n">long</span> <span class="n">c</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>so that the reclaimer function can fetch the <code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">foo</span></code> address
+and free it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">call_rcu1</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo</span><span class="o">.</span><span class="n">rcu</span><span class="p">,</span> <span class="n">foo_reclaim</span><span class="p">);</span>
+
+<span class="n">void</span> <span class="n">foo_reclaim</span><span class="p">(</span><span class="n">struct</span> <span class="n">rcu_head</span> <span class="o">*</span><span class="n">rp</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">struct</span> <span class="n">foo</span> <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">container_of</span><span class="p">(</span><span class="n">rp</span><span class="p">,</span> <span class="n">struct</span> <span class="n">foo</span><span class="p">,</span> <span class="n">rcu</span><span class="p">);</span>
+    <span class="n">g_free</span><span class="p">(</span><span class="n">fp</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">call_rcu1</span></code> is typically used via either the <code class="docutils literal notranslate"><span class="pre">call_rcu</span></code> or
+<code class="docutils literal notranslate"><span class="pre">g_free_rcu</span></code> macros, which handle the common case where the
+<code class="docutils literal notranslate"><span class="pre">rcu_head</span></code> member is the first of the struct.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">call_rcu(T</span> <span class="pre">*p,</span> <span class="pre">void</span> <span class="pre">(*func)(T</span> <span class="pre">*p),</span> <span class="pre">field-name);</span></code></dt><dd><p>If the <code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">rcu_head</span></code> is the first field in the struct, you can
+use this macro instead of <code class="docutils literal notranslate"><span class="pre">call_rcu1</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">g_free_rcu(T</span> <span class="pre">*p,</span> <span class="pre">field-name);</span></code></dt><dd><p>This is a special-case version of <code class="docutils literal notranslate"><span class="pre">call_rcu</span></code> where the callback
+function is <code class="docutils literal notranslate"><span class="pre">g_free</span></code>.
+In the example given in <code class="docutils literal notranslate"><span class="pre">call_rcu1</span></code>, one could have written simply:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">g_free_rcu</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo</span><span class="p">,</span> <span class="n">rcu</span><span class="p">);</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">typeof(*p)</span> <span class="pre">qatomic_rcu_read(p);</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">qatomic_rcu_read()</span></code> is similar to <code class="docutils literal notranslate"><span class="pre">qatomic_load_acquire()</span></code>, but
+it makes some assumptions on the code that calls it.  This allows a
+more optimized implementation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">qatomic_rcu_read</span></code> assumes that whenever a single RCU critical
+section reads multiple shared data, these reads are either
+data-dependent or need no ordering.  This is almost always the
+case when using RCU, because read-side critical sections typically
+navigate one or more pointers (the pointers that are changed on
+every update) until reaching a data structure of interest,
+and then read from there.</p>
+<p>RCU read-side critical sections must use <code class="docutils literal notranslate"><span class="pre">qatomic_rcu_read()</span></code> to
+read data, unless concurrent writes are prevented by another
+synchronization mechanism.</p>
+<p>Furthermore, RCU read-side critical sections should traverse the
+data structure in a single direction, opposite to the direction
+in which the updater initializes it.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">qatomic_rcu_set(p,</span> <span class="pre">typeof(*p)</span> <span class="pre">v);</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">qatomic_rcu_set()</span></code> is similar to <code class="docutils literal notranslate"><span class="pre">qatomic_store_release()</span></code>,
+though it also makes assumptions on the code that calls it in
+order to allow a more optimized implementation.</p>
+<p>In particular, <code class="docutils literal notranslate"><span class="pre">qatomic_rcu_set()</span></code> suffices for synchronization
+with readers, if the updater never mutates a field within a
+data item that is already accessible to readers.  This is the
+case when initializing a new copy of the RCU-protected data
+structure; just ensure that initialization of <code class="docutils literal notranslate"><span class="pre">*p</span></code> is carried out
+before <code class="docutils literal notranslate"><span class="pre">qatomic_rcu_set()</span></code> makes the data item visible to readers.
+If this rule is observed, writes will happen in the opposite
+order as reads in the RCU read-side critical sections (or if
+there is just one update), and there will be no need for other
+synchronization mechanism to coordinate the accesses.</p>
+</dd>
+</dl>
+<p>The following APIs must be used before RCU is used in a thread:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">rcu_register_thread(void);</span></code></dt><dd><p>Mark a thread as taking part in the RCU mechanism.  Such a thread
+will have to report quiescent points regularly, either manually
+or through the <code class="docutils literal notranslate"><span class="pre">QemuCond</span></code>/<code class="docutils literal notranslate"><span class="pre">QemuSemaphore</span></code>/<code class="docutils literal notranslate"><span class="pre">QemuEvent</span></code> APIs.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">rcu_unregister_thread(void);</span></code></dt><dd><p>Mark a thread as not taking part anymore in the RCU mechanism.
+It is not a problem if such a thread reports quiescent points,
+either manually or by using the
+<code class="docutils literal notranslate"><span class="pre">QemuCond</span></code>/<code class="docutils literal notranslate"><span class="pre">QemuSemaphore</span></code>/<code class="docutils literal notranslate"><span class="pre">QemuEvent</span></code> APIs.</p>
+</dd>
+</dl>
+<p>Note that these APIs are relatively heavyweight, and should <strong>not</strong> be
+nested.</p>
+</section>
+<section id="convenience-macros">
+<h2>Convenience macros<a class="headerlink" href="#convenience-macros" title="Permalink to this headline"></a></h2>
+<p>Two macros are provided that automatically release the read lock at the
+end of the scope.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">RCU_READ_LOCK_GUARD()</span></code></dt><dd><p>Takes the lock and will release it at the end of the block it’s
+used in.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">WITH_RCU_READ_LOCK_GUARD()</span>&#160; <span class="pre">{</span> <span class="pre">code</span> <span class="pre">}</span></code></dt><dd><p>Is used at the head of a block to protect the code within the block.</p>
+</dd>
+</dl>
+<p>Note that a <code class="docutils literal notranslate"><span class="pre">goto</span></code> out of the guarded block will also drop the lock.</p>
+</section>
+<section id="differences-with-linux">
+<h2>Differences with Linux<a class="headerlink" href="#differences-with-linux" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Waiting on a mutex is possible, though discouraged, within an RCU critical
+section.  This is because spinlocks are rarely (if ever) used in userspace
+programming; not allowing this would prevent upgrading an RCU read-side
+critical section to become an updater.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">qatomic_rcu_read</span></code> and <code class="docutils literal notranslate"><span class="pre">qatomic_rcu_set</span></code> replace <code class="docutils literal notranslate"><span class="pre">rcu_dereference</span></code> and
+<code class="docutils literal notranslate"><span class="pre">rcu_assign_pointer</span></code>.  They take a <strong>pointer</strong> to the variable being accessed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">call_rcu</span></code> is a macro that has an extra argument (the name of the first
+field in the struct, which must be a struct <code class="docutils literal notranslate"><span class="pre">rcu_head</span></code>), and expects the
+type of the callback’s argument to be the type of the first argument.
+<code class="docutils literal notranslate"><span class="pre">call_rcu1</span></code> is the same as Linux’s <code class="docutils literal notranslate"><span class="pre">call_rcu</span></code>.</p></li>
+</ul>
+</section>
+<section id="rcu-patterns">
+<h2>RCU Patterns<a class="headerlink" href="#rcu-patterns" title="Permalink to this headline"></a></h2>
+<p>Many patterns using read-writer locks translate directly to RCU, with
+the advantages of higher scalability and deadlock immunity.</p>
+<p>In general, RCU can be used whenever it is possible to create a new
+“version” of a data structure every time the updater runs.  This may
+sound like a very strict restriction, however:</p>
+<ul class="simple">
+<li><p>the updater does not mean “everything that writes to a data structure”,
+but rather “everything that involves a reclamation step”.  See the
+array example below</p></li>
+<li><p>in some cases, creating a new version of a data structure may actually
+be very cheap.  For example, modifying the “next” pointer of a singly
+linked list is effectively creating a new version of the list.</p></li>
+</ul>
+<p>Here are some frequently-used RCU idioms that are worth noting.</p>
+<section id="rcu-list-processing">
+<h3>RCU list processing<a class="headerlink" href="#rcu-list-processing" title="Permalink to this headline"></a></h3>
+<p>TBD (not yet used in QEMU)</p>
+</section>
+<section id="rcu-reference-counting">
+<h3>RCU reference counting<a class="headerlink" href="#rcu-reference-counting" title="Permalink to this headline"></a></h3>
+<p>Because grace periods are not allowed to complete while there is an RCU
+read-side critical section in progress, the RCU read-side primitives
+may be used as a restricted reference-counting mechanism.  For example,
+consider the following code fragment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rcu_read_lock</span><span class="p">();</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">qatomic_rcu_read</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo</span><span class="p">);</span>
+<span class="o">/*</span> <span class="n">do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">p</span><span class="o">.</span> <span class="o">*/</span>
+<span class="n">rcu_read_unlock</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The RCU read-side critical section ensures that the value of <code class="docutils literal notranslate"><span class="pre">p</span></code> remains
+valid until after the <code class="docutils literal notranslate"><span class="pre">rcu_read_unlock()</span></code>.  In some sense, it is acquiring
+a reference to <code class="docutils literal notranslate"><span class="pre">p</span></code> that is later released when the critical section ends.
+The write side looks simply like this (with appropriate locking):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_mutex</span><span class="p">);</span>
+<span class="n">old</span> <span class="o">=</span> <span class="n">foo</span><span class="p">;</span>
+<span class="n">qatomic_rcu_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo</span><span class="p">,</span> <span class="n">new</span><span class="p">);</span>
+<span class="n">qemu_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_mutex</span><span class="p">);</span>
+<span class="n">synchronize_rcu</span><span class="p">();</span>
+<span class="n">free</span><span class="p">(</span><span class="n">old</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If the processing cannot be done purely within the critical section, it
+is possible to combine this idiom with a “real” reference count:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rcu_read_lock</span><span class="p">();</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">qatomic_rcu_read</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo</span><span class="p">);</span>
+<span class="n">foo_ref</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+<span class="n">rcu_read_unlock</span><span class="p">();</span>
+<span class="o">/*</span> <span class="n">do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">p</span><span class="o">.</span> <span class="o">*/</span>
+<span class="n">foo_unref</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The write side can be like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_mutex</span><span class="p">);</span>
+<span class="n">old</span> <span class="o">=</span> <span class="n">foo</span><span class="p">;</span>
+<span class="n">qatomic_rcu_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo</span><span class="p">,</span> <span class="n">new</span><span class="p">);</span>
+<span class="n">qemu_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_mutex</span><span class="p">);</span>
+<span class="n">synchronize_rcu</span><span class="p">();</span>
+<span class="n">foo_unref</span><span class="p">(</span><span class="n">old</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>or with <code class="docutils literal notranslate"><span class="pre">call_rcu</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_mutex</span><span class="p">);</span>
+<span class="n">old</span> <span class="o">=</span> <span class="n">foo</span><span class="p">;</span>
+<span class="n">qatomic_rcu_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo</span><span class="p">,</span> <span class="n">new</span><span class="p">);</span>
+<span class="n">qemu_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_mutex</span><span class="p">);</span>
+<span class="n">call_rcu</span><span class="p">(</span><span class="n">foo_unref</span><span class="p">,</span> <span class="n">old</span><span class="p">,</span> <span class="n">rcu</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>In both cases, the write side only performs removal.  Reclamation
+happens when the last reference to a <code class="docutils literal notranslate"><span class="pre">foo</span></code> object is dropped.
+Using <code class="docutils literal notranslate"><span class="pre">synchronize_rcu()</span></code> is undesirably expensive, because the
+last reference may be dropped on the read side.  Hence you can
+use <code class="docutils literal notranslate"><span class="pre">call_rcu()</span></code> instead:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">foo_unref</span><span class="p">(</span><span class="n">struct</span> <span class="n">foo</span> <span class="o">*</span><span class="n">p</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">qatomic_fetch_dec</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">refcount</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">call_rcu</span><span class="p">(</span><span class="n">foo_destroy</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">rcu</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that the same idioms would be possible with reader/writer
+locks:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">read_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_rwlock</span><span class="p">);</span>         <span class="n">write_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_rwlock</span><span class="p">);</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">foo</span><span class="p">;</span>                        <span class="n">p</span> <span class="o">=</span> <span class="n">foo</span><span class="p">;</span>
+<span class="o">/*</span> <span class="n">do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">p</span><span class="o">.</span> <span class="o">*/</span>      <span class="n">foo</span> <span class="o">=</span> <span class="n">new</span><span class="p">;</span>
+<span class="n">read_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_rwlock</span><span class="p">);</span>       <span class="n">free</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+                                <span class="n">write_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_rwlock</span><span class="p">);</span>
+                                <span class="n">free</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+
+<span class="o">------------------------------------------------------------------</span>
+
+<span class="n">read_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_rwlock</span><span class="p">);</span>         <span class="n">write_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_rwlock</span><span class="p">);</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">foo</span><span class="p">;</span>                        <span class="n">old</span> <span class="o">=</span> <span class="n">foo</span><span class="p">;</span>
+<span class="n">foo_ref</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>                     <span class="n">foo</span> <span class="o">=</span> <span class="n">new</span><span class="p">;</span>
+<span class="n">read_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_rwlock</span><span class="p">);</span>       <span class="n">foo_unref</span><span class="p">(</span><span class="n">old</span><span class="p">);</span>
+<span class="o">/*</span> <span class="n">do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">p</span><span class="o">.</span> <span class="o">*/</span>      <span class="n">write_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_rwlock</span><span class="p">);</span>
+<span class="n">read_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_rwlock</span><span class="p">);</span>
+<span class="n">foo_unref</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+<span class="n">read_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">foo_rwlock</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">foo_unref</span></code> could use a mechanism such as bottom halves to move deallocation
+out of the write-side critical section.</p>
+</section>
+<section id="rcu-resizable-arrays">
+<h3>RCU resizable arrays<a class="headerlink" href="#rcu-resizable-arrays" title="Permalink to this headline"></a></h3>
+<p>Resizable arrays can be used with RCU.  The expensive RCU synchronization
+(or <code class="docutils literal notranslate"><span class="pre">call_rcu</span></code>) only needs to take place when the array is resized.
+The two items to take care of are:</p>
+<ul class="simple">
+<li><p>ensuring that the old version of the array is available between removal
+and reclamation;</p></li>
+<li><p>avoiding mismatches in the read side between the array data and the
+array size.</p></li>
+</ul>
+<p>The first problem is avoided simply by not using <code class="docutils literal notranslate"><span class="pre">realloc</span></code>.  Instead,
+each resize will allocate a new array and copy the old data into it.
+The second problem would arise if the size and the data pointers were
+two members of a larger struct:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">struct</span> <span class="n">mystuff</span> <span class="p">{</span>
+    <span class="o">...</span>
+    <span class="nb">int</span> <span class="n">data_size</span><span class="p">;</span>
+    <span class="nb">int</span> <span class="n">data_alloc</span><span class="p">;</span>
+    <span class="n">T</span>   <span class="o">*</span><span class="n">data</span><span class="p">;</span>
+    <span class="o">...</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>Instead, we store the size of the array with the array itself:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>struct arr {
+    int size;
+    int alloc;
+    T   data[];
+};
+struct arr *global_array;
+
+read side:
+    rcu_read_lock();
+    struct arr *array = qatomic_rcu_read(&amp;global_array);
+    x = i &lt; array-&gt;size ? array-&gt;data[i] : -1;
+    rcu_read_unlock();
+    return x;
+
+write side (running under a lock):
+    if (global_array-&gt;size == global_array-&gt;alloc) {
+        /* Creating a new version.  */
+        new_array = g_malloc(sizeof(struct arr) +
+                             global_array-&gt;alloc * 2 * sizeof(T));
+        new_array-&gt;size = global_array-&gt;size;
+        new_array-&gt;alloc = global_array-&gt;alloc * 2;
+        memcpy(new_array-&gt;data, global_array-&gt;data,
+               global_array-&gt;alloc * sizeof(T));
+
+        /* Removal phase.  */
+        old_array = global_array;
+        qatomic_rcu_set(&amp;global_array, new_array);
+        synchronize_rcu();
+
+        /* Reclamation phase.  */
+        free(old_array);
+    }
+</pre></div>
+</div>
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>The <a class="reference external" href="https://docs.kernel.org/RCU/">Linux kernel RCU documentation</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="atomics.html" class="btn btn-neutral float-left" title="Atomic operations in QEMU" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="block-coroutine-wrapper.html" class="btn btn-neutral float-right" title="block-coroutine-wrapper" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

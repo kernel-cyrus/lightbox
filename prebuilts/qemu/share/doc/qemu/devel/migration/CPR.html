@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CheckPoint and Restart (CPR) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="QPL Compression" href="qpl-compression.html" />
+    <link rel="prev" title="Mapped-ram" href="mapped-ram.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-build.html">QEMU Build System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testing/index.html">Testing QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rcu.html">Using RCU (Read-Copy-Update) for synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Migration</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="main.html">Migration framework</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="features.html">Migration features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="compatibility.html">Backwards compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="best-practices.html">Best practices</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../s390-cpu-topology.html">QAPI interface for S390 CPU topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uefi-vars.html">UEFI variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../vfio-iommufd.html">IOMMUFD BACKEND usage with VFIO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../crypto.html">Cryptography in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multiple-iothreads.html">Using Multiple <code class="docutils literal notranslate"><span class="pre">IOThread</span></code>s</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index-tcg.html">TCG Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Developer Information</a> &raquo;</li>
+          <li><a href="../index-internals.html">Internal Subsystem Information</a> &raquo;</li>
+          <li><a href="index.html">Migration</a> &raquo;</li>
+          <li><a href="features.html">Migration features</a> &raquo;</li>
+      <li>CheckPoint and Restart (CPR)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/migration/CPR.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="checkpoint-and-restart-cpr">
+<h1>CheckPoint and Restart (CPR)<a class="headerlink" href="#checkpoint-and-restart-cpr" title="Permalink to this headline"></a></h1>
+<p>CPR is the umbrella name for a set of migration modes in which the
+VM is migrated to a new QEMU instance on the same host.  It is
+intended for use when the goal is to update host software components
+that run the VM, such as QEMU or even the host kernel.  At this time,
+the cpr-reboot and cpr-transfer modes are available.</p>
+<p>Because QEMU is restarted on the same host, with access to the same
+local devices, CPR is allowed in certain cases where normal migration
+would be blocked.  However, the user must not modify the contents of
+guest block devices between quitting old QEMU and starting new QEMU.</p>
+<p>CPR unconditionally stops VM execution before memory is saved, and
+thus does not depend on any form of dirty page tracking.</p>
+<section id="cpr-reboot-mode">
+<h2>cpr-reboot mode<a class="headerlink" href="#cpr-reboot-mode" title="Permalink to this headline"></a></h2>
+<p>In this mode, QEMU stops the VM, and writes VM state to the migration
+URI, which will typically be a file.  After quitting QEMU, the user
+resumes by running QEMU with the <code class="docutils literal notranslate"><span class="pre">-incoming</span></code> option.  Because the
+old and new QEMU instances are not active concurrently, the URI cannot
+be a type that streams data from one instance to the other.</p>
+<p>Guest RAM can be saved in place if backed by shared memory, or can be
+copied to a file.  The former is more efficient and is therefore
+preferred.</p>
+<p>After state and memory are saved, the user may update userland host
+software before restarting QEMU and resuming the VM.  Further, if
+the RAM is backed by persistent shared memory, such as a DAX device,
+then the user may reboot to a new host kernel before restarting QEMU.</p>
+<p>This mode supports VFIO devices provided the user first puts the
+guest in the suspended runstate, such as by issuing the
+<code class="docutils literal notranslate"><span class="pre">guest-suspend-ram</span></code> command to the QEMU guest agent.  The agent
+must be pre-installed in the guest, and the guest must support
+suspend to RAM.  Beware that suspension can take a few seconds, so
+the user should poll to see the suspended state before proceeding
+with the CPR operation.</p>
+<section id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h3>
+<p>It is recommended that guest RAM be backed with some type of shared
+memory, such as <code class="docutils literal notranslate"><span class="pre">memory-backend-file,share=on</span></code>, and that the
+<code class="docutils literal notranslate"><span class="pre">x-ignore-shared</span></code> capability be set.  This combination allows memory
+to be saved in place.  Otherwise, after QEMU stops the VM, all guest
+RAM is copied to the migration URI.</p>
+<dl class="simple">
+<dt>Outgoing:</dt><dd><ul class="simple">
+<li><p>Set the migration mode parameter to <code class="docutils literal notranslate"><span class="pre">cpr-reboot</span></code>.</p></li>
+<li><p>Set the <code class="docutils literal notranslate"><span class="pre">x-ignore-shared</span></code> capability if desired.</p></li>
+<li><p>Issue the <code class="docutils literal notranslate"><span class="pre">migrate</span></code> command.  It is recommended the URI be a
+<code class="docutils literal notranslate"><span class="pre">file</span></code> type, but one can use other types such as <code class="docutils literal notranslate"><span class="pre">exec</span></code>,
+provided the command captures all the data from the outgoing side,
+and provides all the data to the incoming side.</p></li>
+<li><p>Quit when QEMU reaches the postmigrate state.</p></li>
+</ul>
+</dd>
+<dt>Incoming:</dt><dd><ul class="simple">
+<li><p>Start QEMU with the <code class="docutils literal notranslate"><span class="pre">-incoming</span> <span class="pre">defer</span></code> option.</p></li>
+<li><p>Set the migration mode parameter to <code class="docutils literal notranslate"><span class="pre">cpr-reboot</span></code>.</p></li>
+<li><p>Set the <code class="docutils literal notranslate"><span class="pre">x-ignore-shared</span></code> capability if desired.</p></li>
+<li><p>Issue the <code class="docutils literal notranslate"><span class="pre">migrate-incoming</span></code> command.</p></li>
+<li><p>If the VM was running when the outgoing <code class="docutils literal notranslate"><span class="pre">migrate</span></code> command was
+issued, then QEMU automatically resumes VM execution.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="example-1">
+<h3>Example 1<a class="headerlink" href="#example-1" title="Permalink to this headline"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># qemu-kvm -monitor stdio</span>
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">ram0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="n">G</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">dev</span><span class="o">/</span><span class="n">dax0</span><span class="mf">.0</span><span class="p">,</span><span class="n">align</span><span class="o">=</span><span class="mi">2</span><span class="n">M</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span> <span class="o">-</span><span class="n">m</span> <span class="mi">4</span><span class="n">G</span>
+<span class="o">...</span>
+
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">status</span>
+<span class="n">VM</span> <span class="n">status</span><span class="p">:</span> <span class="n">running</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">migrate_set_parameter</span> <span class="n">mode</span> <span class="n">cpr</span><span class="o">-</span><span class="n">reboot</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">migrate_set_capability</span> <span class="n">x</span><span class="o">-</span><span class="n">ignore</span><span class="o">-</span><span class="n">shared</span> <span class="n">on</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">migrate</span> <span class="o">-</span><span class="n">d</span> <span class="n">file</span><span class="p">:</span><span class="n">vm</span><span class="o">.</span><span class="n">state</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">status</span>
+<span class="n">VM</span> <span class="n">status</span><span class="p">:</span> <span class="n">paused</span> <span class="p">(</span><span class="n">postmigrate</span><span class="p">)</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">quit</span>
+
+<span class="c1">### optionally update kernel and reboot</span>
+<span class="c1"># systemctl kexec</span>
+<span class="n">kexec_core</span><span class="p">:</span> <span class="n">Starting</span> <span class="n">new</span> <span class="n">kernel</span>
+<span class="o">...</span>
+
+<span class="c1"># qemu-kvm ... -incoming defer</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">status</span>
+<span class="n">VM</span> <span class="n">status</span><span class="p">:</span> <span class="n">paused</span> <span class="p">(</span><span class="n">inmigrate</span><span class="p">)</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">migrate_set_parameter</span> <span class="n">mode</span> <span class="n">cpr</span><span class="o">-</span><span class="n">reboot</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">migrate_set_capability</span> <span class="n">x</span><span class="o">-</span><span class="n">ignore</span><span class="o">-</span><span class="n">shared</span> <span class="n">on</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">migrate_incoming</span> <span class="n">file</span><span class="p">:</span><span class="n">vm</span><span class="o">.</span><span class="n">state</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">status</span>
+<span class="n">VM</span> <span class="n">status</span><span class="p">:</span> <span class="n">running</span>
+</pre></div>
+</div>
+</section>
+<section id="example-2-vfio">
+<h3>Example 2: VFIO<a class="headerlink" href="#example-2-vfio" title="Permalink to this headline"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># qemu-kvm -monitor stdio</span>
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">ram0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="n">G</span><span class="p">,</span><span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">dev</span><span class="o">/</span><span class="n">dax0</span><span class="mf">.0</span><span class="p">,</span><span class="n">align</span><span class="o">=</span><span class="mi">2</span><span class="n">M</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span> <span class="o">-</span><span class="n">m</span> <span class="mi">4</span><span class="n">G</span>
+<span class="o">-</span><span class="n">device</span> <span class="n">vfio</span><span class="o">-</span><span class="n">pci</span><span class="p">,</span> <span class="o">...</span>
+<span class="o">-</span><span class="n">chardev</span> <span class="n">socket</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">qga0</span><span class="p">,</span><span class="n">path</span><span class="o">=</span><span class="n">qga</span><span class="o">.</span><span class="n">sock</span><span class="p">,</span><span class="n">server</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">wait</span><span class="o">=</span><span class="n">off</span>
+<span class="o">-</span><span class="n">device</span> <span class="n">virtserialport</span><span class="p">,</span><span class="n">chardev</span><span class="o">=</span><span class="n">qga0</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">org</span><span class="o">.</span><span class="n">qemu</span><span class="o">.</span><span class="n">guest_agent</span><span class="mf">.0</span>
+<span class="o">...</span>
+
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">status</span>
+<span class="n">VM</span> <span class="n">status</span><span class="p">:</span> <span class="n">running</span>
+
+<span class="c1"># echo &#39;{&quot;execute&quot;:&quot;guest-suspend-ram&quot;}&#39; | ncat --send-only -U qga.sock</span>
+
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">status</span>
+<span class="n">VM</span> <span class="n">status</span><span class="p">:</span> <span class="n">paused</span> <span class="p">(</span><span class="n">suspended</span><span class="p">)</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">migrate_set_parameter</span> <span class="n">mode</span> <span class="n">cpr</span><span class="o">-</span><span class="n">reboot</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">migrate_set_capability</span> <span class="n">x</span><span class="o">-</span><span class="n">ignore</span><span class="o">-</span><span class="n">shared</span> <span class="n">on</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">migrate</span> <span class="o">-</span><span class="n">d</span> <span class="n">file</span><span class="p">:</span><span class="n">vm</span><span class="o">.</span><span class="n">state</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">status</span>
+<span class="n">VM</span> <span class="n">status</span><span class="p">:</span> <span class="n">paused</span> <span class="p">(</span><span class="n">postmigrate</span><span class="p">)</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">quit</span>
+
+<span class="c1">### optionally update kernel and reboot</span>
+<span class="c1"># systemctl kexec</span>
+<span class="n">kexec_core</span><span class="p">:</span> <span class="n">Starting</span> <span class="n">new</span> <span class="n">kernel</span>
+<span class="o">...</span>
+
+<span class="c1"># qemu-kvm ... -incoming defer</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">status</span>
+<span class="n">VM</span> <span class="n">status</span><span class="p">:</span> <span class="n">paused</span> <span class="p">(</span><span class="n">inmigrate</span><span class="p">)</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">migrate_set_parameter</span> <span class="n">mode</span> <span class="n">cpr</span><span class="o">-</span><span class="n">reboot</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">migrate_set_capability</span> <span class="n">x</span><span class="o">-</span><span class="n">ignore</span><span class="o">-</span><span class="n">shared</span> <span class="n">on</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">migrate_incoming</span> <span class="n">file</span><span class="p">:</span><span class="n">vm</span><span class="o">.</span><span class="n">state</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">status</span>
+<span class="n">VM</span> <span class="n">status</span><span class="p">:</span> <span class="n">paused</span> <span class="p">(</span><span class="n">suspended</span><span class="p">)</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">system_wakeup</span>
+<span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">status</span>
+<span class="n">VM</span> <span class="n">status</span><span class="p">:</span> <span class="n">running</span>
+</pre></div>
+</div>
+</section>
+<section id="caveats">
+<h3>Caveats<a class="headerlink" href="#caveats" title="Permalink to this headline"></a></h3>
+<p>cpr-reboot mode may not be used with postcopy, background-snapshot,
+or COLO.</p>
+</section>
+</section>
+<section id="cpr-transfer-mode">
+<h2>cpr-transfer mode<a class="headerlink" href="#cpr-transfer-mode" title="Permalink to this headline"></a></h2>
+<p>This mode allows the user to transfer a guest to a new QEMU instance
+on the same host with minimal guest pause time, by preserving guest
+RAM in place, albeit with new virtual addresses in new QEMU.  Devices
+and their pinned memory pages will also be preserved in a future QEMU
+release.</p>
+<p>The user starts new QEMU on the same host as old QEMU, with command-
+line arguments to create the same machine, plus the <code class="docutils literal notranslate"><span class="pre">-incoming</span></code>
+option for the main migration channel, like normal live migration.
+In addition, the user adds a second -incoming option with channel
+type <code class="docutils literal notranslate"><span class="pre">cpr</span></code>.  This CPR channel must support file descriptor transfer
+with SCM_RIGHTS, i.e. it must be a UNIX domain socket.</p>
+<p>To initiate CPR, the user issues a migrate command to old QEMU,
+adding a second migration channel of type <code class="docutils literal notranslate"><span class="pre">cpr</span></code> in the channels
+argument.  Old QEMU stops the VM, saves state to the migration
+channels, and enters the postmigrate state.  Execution resumes in
+new QEMU.</p>
+<p>New QEMU reads the CPR channel before opening a monitor, hence
+the CPR channel cannot be specified in the list of channels for a
+migrate-incoming command.  It may only be specified on the command
+line.</p>
+<section id="id1">
+<h3>Usage<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h3>
+<p>Memory backend objects must have the <code class="docutils literal notranslate"><span class="pre">share=on</span></code> attribute.</p>
+<p>The VM must be started with the <code class="docutils literal notranslate"><span class="pre">-machine</span> <span class="pre">aux-ram-share=on</span></code>
+option.  This causes implicit RAM blocks (those not described by
+a memory-backend object) to be allocated by mmap’ing a memfd.
+Examples include VGA and ROM.</p>
+<dl class="simple">
+<dt>Outgoing:</dt><dd><ul class="simple">
+<li><p>Set the migration mode parameter to <code class="docutils literal notranslate"><span class="pre">cpr-transfer</span></code>.</p></li>
+<li><p>Issue the <code class="docutils literal notranslate"><span class="pre">migrate</span></code> command, containing a main channel and
+a cpr channel.</p></li>
+</ul>
+</dd>
+<dt>Incoming:</dt><dd><ul class="simple">
+<li><p>Start new QEMU with two <code class="docutils literal notranslate"><span class="pre">-incoming</span></code> options.</p></li>
+<li><p>If the VM was running when the outgoing <code class="docutils literal notranslate"><span class="pre">migrate</span></code> command was
+issued, then QEMU automatically resumes VM execution.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Caveats<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h3>
+<p>cpr-transfer mode may not be used with postcopy, background-snapshot,
+or COLO.</p>
+<p>memory-backend-epc is not supported.</p>
+<p>The main incoming migration channel address cannot be a file type.</p>
+<p>If the main incoming channel address is an inet socket, then the port
+cannot be 0 (meaning dynamically choose a port).</p>
+<p>When using <code class="docutils literal notranslate"><span class="pre">-incoming</span> <span class="pre">defer</span></code>, you must issue the migrate command to
+old QEMU before issuing any monitor commands to new QEMU, because new
+QEMU blocks waiting to read from the cpr channel before starting its
+monitor, and old QEMU does not write to the channel until the migrate
+command is issued.  However, new QEMU does not open and read the
+main migration channel until you issue the migrate incoming command.</p>
+</section>
+<section id="example-1-incoming-channel">
+<h3>Example 1: incoming channel<a class="headerlink" href="#example-1-incoming-channel" title="Permalink to this headline"></a></h3>
+<p>In these examples, we simply restart the same version of QEMU, but
+in a real scenario one would start new QEMU on the incoming side.
+Note that new QEMU does not print the monitor prompt until old QEMU
+has issued the migrate command.  The outgoing side uses QMP because
+HMP cannot specify a CPR channel.  Some QMP responses are omitted for
+brevity.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Outgoing</span><span class="p">:</span>                             <span class="n">Incoming</span><span class="p">:</span>
+
+<span class="c1"># qemu-kvm -qmp stdio</span>
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">ram0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="n">G</span><span class="p">,</span>
+<span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">dev</span><span class="o">/</span><span class="n">shm</span><span class="o">/</span><span class="n">ram0</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span> <span class="o">-</span><span class="n">m</span> <span class="mi">4</span><span class="n">G</span>
+<span class="o">-</span><span class="n">machine</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">=</span><span class="n">ram0</span>
+<span class="o">-</span><span class="n">machine</span> <span class="n">aux</span><span class="o">-</span><span class="n">ram</span><span class="o">-</span><span class="n">share</span><span class="o">=</span><span class="n">on</span>
+<span class="o">...</span>
+                                      <span class="c1"># qemu-kvm -monitor stdio</span>
+                                      <span class="o">-</span><span class="n">incoming</span> <span class="n">tcp</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">44444</span>
+                                      <span class="o">-</span><span class="n">incoming</span> <span class="s1">&#39;{&quot;channel-type&quot;: &quot;cpr&quot;,</span>
+                                        <span class="s2">&quot;addr&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;transport&quot;</span><span class="p">:</span> <span class="s2">&quot;socket&quot;</span><span class="p">,</span>
+                                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;unix&quot;</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;cpr.sock&quot;</span><span class="p">}}</span><span class="s1">&#39;</span>
+                                      <span class="o">...</span>
+<span class="p">{</span><span class="s2">&quot;execute&quot;</span><span class="p">:</span><span class="s2">&quot;qmp_capabilities&quot;</span><span class="p">}</span>
+
+<span class="p">{</span><span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;query-status&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;running&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;running&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">}}</span>
+
+<span class="p">{</span><span class="s2">&quot;execute&quot;</span><span class="p">:</span><span class="s2">&quot;migrate-set-parameters&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;arguments&quot;</span><span class="p">:{</span><span class="s2">&quot;mode&quot;</span><span class="p">:</span><span class="s2">&quot;cpr-transfer&quot;</span><span class="p">}}</span>
+
+<span class="p">{</span><span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;migrate&quot;</span><span class="p">,</span> <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;channels&quot;</span><span class="p">:</span> <span class="p">[</span>
+  <span class="p">{</span><span class="s2">&quot;channel-type&quot;</span><span class="p">:</span> <span class="s2">&quot;main&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;addr&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;transport&quot;</span><span class="p">:</span> <span class="s2">&quot;socket&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;inet&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="s2">&quot;44444&quot;</span> <span class="p">}},</span>
+  <span class="p">{</span><span class="s2">&quot;channel-type&quot;</span><span class="p">:</span> <span class="s2">&quot;cpr&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;addr&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;transport&quot;</span><span class="p">:</span> <span class="s2">&quot;socket&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;unix&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;cpr.sock&quot;</span> <span class="p">}}]}}</span>
+
+                                      <span class="n">QEMU</span> <span class="mf">10.0.50</span> <span class="n">monitor</span>
+                                      <span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">status</span>
+                                      <span class="n">VM</span> <span class="n">status</span><span class="p">:</span> <span class="n">running</span>
+
+<span class="p">{</span><span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;query-status&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;postmigrate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;running&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">}}</span>
+</pre></div>
+</div>
+</section>
+<section id="example-2-incoming-defer">
+<h3>Example 2: incoming defer<a class="headerlink" href="#example-2-incoming-defer" title="Permalink to this headline"></a></h3>
+<p>This example uses <code class="docutils literal notranslate"><span class="pre">-incoming</span> <span class="pre">defer</span></code> to hot plug a device before
+accepting the main migration channel.  Again note you must issue the
+migrate command to old QEMU before you can issue any monitor
+commands to new QEMU.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Outgoing</span><span class="p">:</span>                             <span class="n">Incoming</span><span class="p">:</span>
+
+<span class="c1"># qemu-kvm -monitor stdio</span>
+<span class="o">-</span><span class="nb">object</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">file</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="n">ram0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="n">G</span><span class="p">,</span>
+<span class="n">mem</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">dev</span><span class="o">/</span><span class="n">shm</span><span class="o">/</span><span class="n">ram0</span><span class="p">,</span><span class="n">share</span><span class="o">=</span><span class="n">on</span> <span class="o">-</span><span class="n">m</span> <span class="mi">4</span><span class="n">G</span>
+<span class="o">-</span><span class="n">machine</span> <span class="n">memory</span><span class="o">-</span><span class="n">backend</span><span class="o">=</span><span class="n">ram0</span>
+<span class="o">-</span><span class="n">machine</span> <span class="n">aux</span><span class="o">-</span><span class="n">ram</span><span class="o">-</span><span class="n">share</span><span class="o">=</span><span class="n">on</span>
+<span class="o">...</span>
+                                      <span class="c1"># qemu-kvm -monitor stdio</span>
+                                      <span class="o">-</span><span class="n">incoming</span> <span class="n">defer</span>
+                                      <span class="o">-</span><span class="n">incoming</span> <span class="s1">&#39;{&quot;channel-type&quot;: &quot;cpr&quot;,</span>
+                                        <span class="s2">&quot;addr&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;transport&quot;</span><span class="p">:</span> <span class="s2">&quot;socket&quot;</span><span class="p">,</span>
+                                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;unix&quot;</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;cpr.sock&quot;</span><span class="p">}}</span><span class="s1">&#39;</span>
+                                      <span class="o">...</span>
+<span class="p">{</span><span class="s2">&quot;execute&quot;</span><span class="p">:</span><span class="s2">&quot;qmp_capabilities&quot;</span><span class="p">}</span>
+
+<span class="p">{</span><span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;device_add&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;driver&quot;</span><span class="p">:</span> <span class="s2">&quot;pcie-root-port&quot;</span><span class="p">}}</span>
+
+<span class="p">{</span><span class="s2">&quot;execute&quot;</span><span class="p">:</span><span class="s2">&quot;migrate-set-parameters&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;arguments&quot;</span><span class="p">:{</span><span class="s2">&quot;mode&quot;</span><span class="p">:</span><span class="s2">&quot;cpr-transfer&quot;</span><span class="p">}}</span>
+
+<span class="p">{</span><span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;migrate&quot;</span><span class="p">,</span> <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;channels&quot;</span><span class="p">:</span> <span class="p">[</span>
+  <span class="p">{</span><span class="s2">&quot;channel-type&quot;</span><span class="p">:</span> <span class="s2">&quot;main&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;addr&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;transport&quot;</span><span class="p">:</span> <span class="s2">&quot;socket&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;inet&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="s2">&quot;44444&quot;</span> <span class="p">}},</span>
+  <span class="p">{</span><span class="s2">&quot;channel-type&quot;</span><span class="p">:</span> <span class="s2">&quot;cpr&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;addr&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;transport&quot;</span><span class="p">:</span> <span class="s2">&quot;socket&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;unix&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;cpr.sock&quot;</span> <span class="p">}}]}}</span>
+
+                                      <span class="n">QEMU</span> <span class="mf">10.0.50</span> <span class="n">monitor</span>
+                                      <span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">status</span>
+                                      <span class="n">VM</span> <span class="n">status</span><span class="p">:</span> <span class="n">paused</span> <span class="p">(</span><span class="n">inmigrate</span><span class="p">)</span>
+                                      <span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">device_add</span> <span class="n">pcie</span><span class="o">-</span><span class="n">root</span><span class="o">-</span><span class="n">port</span>
+                                      <span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">migrate_incoming</span> <span class="n">tcp</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">44444</span>
+                                      <span class="p">(</span><span class="n">qemu</span><span class="p">)</span> <span class="n">info</span> <span class="n">status</span>
+                                      <span class="n">VM</span> <span class="n">status</span><span class="p">:</span> <span class="n">running</span>
+
+<span class="p">{</span><span class="s2">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;query-status&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="s2">&quot;return&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;postmigrate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;running&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">}}</span>
+</pre></div>
+</div>
+</section>
+<section id="futures">
+<h3>Futures<a class="headerlink" href="#futures" title="Permalink to this headline"></a></h3>
+<p>cpr-transfer mode is based on a capability to transfer open file
+descriptors from old to new QEMU.  In the future, descriptors for
+vfio, iommufd, vhost, and char devices could be transferred,
+preserving those devices and their kernel state without interruption,
+even if they do not explicitly support live migration.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mapped-ram.html" class="btn btn-neutral float-left" title="Mapped-ram" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qpl-compression.html" class="btn btn-neutral float-right" title="QPL Compression" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapped-ram &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="CheckPoint and Restart (CPR)" href="CPR.html" />
+    <link rel="prev" title="Virtio device migration" href="virtio.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-build.html">QEMU Build System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testing/index.html">Testing QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rcu.html">Using RCU (Read-Copy-Update) for synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Migration</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="main.html">Migration framework</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="features.html">Migration features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="compatibility.html">Backwards compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="best-practices.html">Best practices</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../s390-cpu-topology.html">QAPI interface for S390 CPU topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uefi-vars.html">UEFI variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../vfio-iommufd.html">IOMMUFD BACKEND usage with VFIO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../crypto.html">Cryptography in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multiple-iothreads.html">Using Multiple <code class="docutils literal notranslate"><span class="pre">IOThread</span></code>s</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index-tcg.html">TCG Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Developer Information</a> &raquo;</li>
+          <li><a href="../index-internals.html">Internal Subsystem Information</a> &raquo;</li>
+          <li><a href="index.html">Migration</a> &raquo;</li>
+          <li><a href="features.html">Migration features</a> &raquo;</li>
+      <li>Mapped-ram</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/migration/mapped-ram.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mapped-ram">
+<h1>Mapped-ram<a class="headerlink" href="#mapped-ram" title="Permalink to this headline"></a></h1>
+<p>Mapped-ram is a new stream format for the RAM section designed to
+supplement the existing <code class="docutils literal notranslate"><span class="pre">file:</span></code> migration and make it compatible
+with <code class="docutils literal notranslate"><span class="pre">multifd</span></code>. This enables parallel migration of a guest’s RAM to
+a file.</p>
+<p>The core of the feature is to ensure that RAM pages are mapped
+directly to offsets in the resulting migration file. This enables the
+<code class="docutils literal notranslate"><span class="pre">multifd</span></code> threads to write exclusively to those offsets even if the
+guest is constantly dirtying pages (i.e. live migration). Another
+benefit is that the resulting file will have a bounded size, since
+pages which are dirtied multiple times will always go to a fixed
+location in the file, rather than constantly being added to a
+sequential stream. Having the pages at fixed offsets also allows the
+usage of O_DIRECT for save/restore of the migration stream as the
+pages are ensured to be written respecting O_DIRECT alignment
+restrictions.</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
+<p>On both source and destination, enable the <code class="docutils literal notranslate"><span class="pre">multifd</span></code> and
+<code class="docutils literal notranslate"><span class="pre">mapped-ram</span></code> capabilities:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">migrate_set_capability</span> <span class="pre">multifd</span> <span class="pre">on</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">migrate_set_capability</span> <span class="pre">mapped-ram</span> <span class="pre">on</span></code></p>
+</div></blockquote>
+<p>Use a <code class="docutils literal notranslate"><span class="pre">file:</span></code> URL for migration:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">migrate</span> <span class="pre">file:/path/to/migration/file</span></code></p>
+</div></blockquote>
+<p>Mapped-ram migration is best done non-live, i.e. by stopping the VM on
+the source side before migrating.</p>
+<p>For best performance enable the <code class="docutils literal notranslate"><span class="pre">direct-io</span></code> parameter as well:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">migrate_set_parameter</span> <span class="pre">direct-io</span> <span class="pre">on</span></code></p>
+</div></blockquote>
+</section>
+<section id="use-cases">
+<h2>Use-cases<a class="headerlink" href="#use-cases" title="Permalink to this headline"></a></h2>
+<p>The mapped-ram feature was designed for use cases where the migration
+stream will be directed to a file in the filesystem and not
+immediately restored on the destination VM<a class="footnote-reference brackets" href="#alternatives" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. These could be
+thought of as snapshots. We can further categorize them into live and
+non-live.</p>
+<ul class="simple">
+<li><p>Non-live snapshot</p></li>
+</ul>
+<p>If the use case requires a VM to be stopped before taking a snapshot,
+that’s the ideal scenario for mapped-ram migration. Not having to
+track dirty pages, the migration will write the RAM pages to the disk
+as fast as it can.</p>
+<p>Note: if a snapshot is taken of a running VM, but the VM will be
+stopped after the snapshot by the admin, then consider stopping it
+right before the snapshot to take benefit of the performance gains
+mentioned above.</p>
+<ul class="simple">
+<li><p>Live snapshot</p></li>
+</ul>
+<p>If the use case requires that the VM keeps running during and after
+the snapshot operation, then mapped-ram migration can still be used,
+but will be less performant. Other strategies such as
+background-snapshot should be evaluated as well. One benefit of
+mapped-ram in this scenario is portability since background-snapshot
+depends on async dirty tracking (KVM_GET_DIRTY_LOG) which is not
+supported outside of Linux.</p>
+<aside class="footnote brackets" id="alternatives" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>While this same effect could be obtained with the usage of
+snapshots or the <code class="docutils literal notranslate"><span class="pre">file:</span></code> migration alone, mapped-ram provides
+a performance increase for VMs with larger RAM sizes (10s to
+100s of GiBs), specially if the VM has been stopped beforehand.</p>
+</aside>
+</section>
+<section id="ram-section-format">
+<h2>RAM section format<a class="headerlink" href="#ram-section-format" title="Permalink to this headline"></a></h2>
+<p>Instead of having a sequential stream of pages that follow the
+RAMBlock headers, the dirty pages for a RAMBlock follow its header
+instead. This ensures that each RAM page has a fixed offset in the
+resulting migration file.</p>
+<p>A bitmap is introduced to track which pages have been written in the
+migration file. Pages are written at a fixed location for every
+ramblock. Zero pages are ignored as they’d be zero in the destination
+migration as well.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Without</span> <span class="n">mapped</span><span class="o">-</span><span class="n">ram</span><span class="p">:</span>                  <span class="n">With</span> <span class="n">mapped</span><span class="o">-</span><span class="n">ram</span><span class="p">:</span>
+
+<span class="o">---------------------</span>               <span class="o">--------------------------------</span>
+<span class="o">|</span> <span class="n">ramblock</span> <span class="mi">1</span> <span class="n">header</span> <span class="o">|</span>               <span class="o">|</span> <span class="n">ramblock</span> <span class="mi">1</span> <span class="n">header</span>            <span class="o">|</span>
+<span class="o">---------------------</span>               <span class="o">--------------------------------</span>
+<span class="o">|</span> <span class="n">ramblock</span> <span class="mi">2</span> <span class="n">header</span> <span class="o">|</span>               <span class="o">|</span> <span class="n">ramblock</span> <span class="mi">1</span> <span class="n">mapped</span><span class="o">-</span><span class="n">ram</span> <span class="n">header</span> <span class="o">|</span>
+<span class="o">---------------------</span>               <span class="o">--------------------------------</span>
+<span class="o">|</span> <span class="o">...</span>               <span class="o">|</span>               <span class="o">|</span> <span class="n">padding</span> <span class="n">to</span> <span class="nb">next</span> <span class="mi">1</span><span class="n">MB</span> <span class="n">boundary</span> <span class="o">|</span>
+<span class="o">---------------------</span>               <span class="o">|</span> <span class="o">...</span>                          <span class="o">|</span>
+<span class="o">|</span> <span class="n">ramblock</span> <span class="n">n</span> <span class="n">header</span> <span class="o">|</span>               <span class="o">--------------------------------</span>
+<span class="o">---------------------</span>               <span class="o">|</span> <span class="n">ramblock</span> <span class="mi">1</span> <span class="n">pages</span>             <span class="o">|</span>
+<span class="o">|</span> <span class="n">RAM_SAVE_FLAG_EOS</span> <span class="o">|</span>               <span class="o">|</span> <span class="o">...</span>                          <span class="o">|</span>
+<span class="o">---------------------</span>               <span class="o">--------------------------------</span>
+<span class="o">|</span> <span class="n">stream</span> <span class="n">of</span> <span class="n">pages</span>   <span class="o">|</span>               <span class="o">|</span> <span class="n">ramblock</span> <span class="mi">2</span> <span class="n">header</span>            <span class="o">|</span>
+<span class="o">|</span> <span class="p">(</span><span class="nb">iter</span> <span class="mi">1</span><span class="p">)</span>          <span class="o">|</span>               <span class="o">--------------------------------</span>
+<span class="o">|</span> <span class="o">...</span>               <span class="o">|</span>               <span class="o">|</span> <span class="n">ramblock</span> <span class="mi">2</span> <span class="n">mapped</span><span class="o">-</span><span class="n">ram</span> <span class="n">header</span> <span class="o">|</span>
+<span class="o">---------------------</span>               <span class="o">--------------------------------</span>
+<span class="o">|</span> <span class="n">RAM_SAVE_FLAG_EOS</span> <span class="o">|</span>               <span class="o">|</span> <span class="n">padding</span> <span class="n">to</span> <span class="nb">next</span> <span class="mi">1</span><span class="n">MB</span> <span class="n">boundary</span> <span class="o">|</span>
+<span class="o">---------------------</span>               <span class="o">|</span> <span class="o">...</span>                          <span class="o">|</span>
+<span class="o">|</span> <span class="n">stream</span> <span class="n">of</span> <span class="n">pages</span>   <span class="o">|</span>               <span class="o">--------------------------------</span>
+<span class="o">|</span> <span class="p">(</span><span class="nb">iter</span> <span class="mi">2</span><span class="p">)</span>          <span class="o">|</span>               <span class="o">|</span> <span class="n">ramblock</span> <span class="mi">2</span> <span class="n">pages</span>             <span class="o">|</span>
+<span class="o">|</span> <span class="o">...</span>               <span class="o">|</span>               <span class="o">|</span> <span class="o">...</span>                          <span class="o">|</span>
+<span class="o">---------------------</span>               <span class="o">--------------------------------</span>
+<span class="o">|</span> <span class="o">...</span>               <span class="o">|</span>               <span class="o">|</span> <span class="o">...</span>                          <span class="o">|</span>
+<span class="o">---------------------</span>               <span class="o">--------------------------------</span>
+                                    <span class="o">|</span> <span class="n">RAM_SAVE_FLAG_EOS</span>            <span class="o">|</span>
+                                    <span class="o">--------------------------------</span>
+                                    <span class="o">|</span> <span class="o">...</span>                          <span class="o">|</span>
+                                    <span class="o">--------------------------------</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>where:</dt><dd><ul class="simple">
+<li><p>ramblock header: the generic information for a ramblock, such as
+idstr, used_len, etc.</p></li>
+<li><p>ramblock mapped-ram header: the information added by this feature:
+bitmap of pages written, bitmap size and offset of pages in the
+migration file.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="restrictions">
+<h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline"></a></h2>
+<p>Since pages are written to their relative offsets and out of order
+(due to the memory dirtying patterns), streaming channels such as
+sockets are not supported. A seekable channel such as a file is
+required. This can be verified in the QIOChannel by the presence of
+the QIO_CHANNEL_FEATURE_SEEKABLE.</p>
+<p>The improvements brought by this feature apply only to guest physical
+RAM. Other types of memory such as VRAM are migrated as part of device
+states.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="virtio.html" class="btn btn-neutral float-left" title="Virtio device migration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="CPR.html" class="btn btn-neutral float-right" title="CheckPoint and Restart (CPR)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

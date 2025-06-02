@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AmigaNG boards (amigaone, pegasos2, sam460ex) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Embedded family boards" href="embedded.html" />
+    <link rel="prev" title="PowerPC System emulator" href="../target-ppc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../target-arm.html">Arm System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-loongarch.html">LoongArch System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../target-ppc.html#board-specific-documentation">Board-specific documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vm-templating.html">QEMU VM templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sriov.html">Compsable SR-IOV device</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">System Emulation</a> &raquo;</li>
+          <li><a href="../targets.html">QEMU System Emulator Targets</a> &raquo;</li>
+          <li><a href="../target-ppc.html">PowerPC System emulator</a> &raquo;</li>
+      <li>AmigaNG boards (<code class="docutils literal notranslate"><span class="pre">amigaone</span></code>, <code class="docutils literal notranslate"><span class="pre">pegasos2</span></code>, <code class="docutils literal notranslate"><span class="pre">sam460ex</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/system/ppc/amigang.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="amigang-boards-amigaone-pegasos2-sam460ex">
+<h1>AmigaNG boards (<code class="docutils literal notranslate"><span class="pre">amigaone</span></code>, <code class="docutils literal notranslate"><span class="pre">pegasos2</span></code>, <code class="docutils literal notranslate"><span class="pre">sam460ex</span></code>)<a class="headerlink" href="#amigang-boards-amigaone-pegasos2-sam460ex" title="Permalink to this headline"></a></h1>
+<p>These PowerPC machines emulate boards that are primarily used for
+running Amiga like OSes (AmigaOS 4, MorphOS and AROS) but these can
+also run Linux which is what this section documents.</p>
+<section id="eyetech-amigaone-mai-logic-teron-amigaone">
+<h2>Eyetech AmigaOne/Mai Logic Teron (<code class="docutils literal notranslate"><span class="pre">amigaone</span></code>)<a class="headerlink" href="#eyetech-amigaone-mai-logic-teron-amigaone" title="Permalink to this headline"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">amigaone</span></code> machine emulates an AmigaOne XE mainboard by Eyetech
+which is a rebranded Mai Logic Teron board with modified U-Boot
+firmware to support AmigaOS 4.</p>
+<section id="emulated-devices">
+<h3>Emulated devices<a class="headerlink" href="#emulated-devices" title="Permalink to this headline"></a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><p>PowerPC 7457 CPU (can also use <code class="docutils literal notranslate"><span class="pre">-cpu</span> <span class="pre">g3,</span> <span class="pre">750cxe,</span> <span class="pre">750fx</span></code> or <code class="docutils literal notranslate"><span class="pre">750gx</span></code>)</p></li>
+<li><p>Articia S north bridge</p></li>
+<li><p>VIA VT82C686B south bridge</p></li>
+<li><p>PCI VGA compatible card (guests may need other card instead)</p></li>
+<li><p>PS/2 keyboard and mouse</p></li>
+<li><p>4 KiB NVRAM (use <code class="docutils literal notranslate"><span class="pre">-drive</span> <span class="pre">if=mtd,format=raw,file=nvram.bin</span></code> to keep contents persistent)</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="firmware">
+<h3>Firmware<a class="headerlink" href="#firmware" title="Permalink to this headline"></a></h3>
+<p>A firmware binary is necessary for the boot process. It is a modified
+U-Boot under GPL but its source is lost so it cannot be included in
+QEMU. A binary is available at
+<a class="reference external" href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=28">https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=28</a>.
+The ROM image is in the last 512kB which can be extracted with the
+following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>tail<span class="w"> </span>-c<span class="w"> </span><span class="m">524288</span><span class="w"> </span>updater.image<span class="w"> </span>&gt;<span class="w"> </span>u-boot-amigaone.bin
+</pre></div>
+</div>
+<p>The BIOS emulator in the firmware is unable to run QEMU‘s standard
+vgabios so <code class="docutils literal notranslate"><span class="pre">VGABIOS-lgpl-latest.bin</span></code> is needed instead which can be
+downloaded from <a class="reference external" href="http://www.nongnu.org/vgabios">http://www.nongnu.org/vgabios</a>.</p>
+</section>
+<section id="running-linux">
+<h3>Running Linux<a class="headerlink" href="#running-linux" title="Permalink to this headline"></a></h3>
+<p>There are some Linux images under the following link that work on the
+<code class="docutils literal notranslate"><span class="pre">amigaone</span></code> machine:
+<a class="reference external" href="https://sourceforge.net/projects/amigaone-linux/files/debian-installer/">https://sourceforge.net/projects/amigaone-linux/files/debian-installer/</a>.
+To boot the system run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>qemu-system-ppc<span class="w"> </span>-machine<span class="w"> </span>amigaone<span class="w"> </span>-bios<span class="w"> </span>u-boot-amigaone.bin<span class="w"> </span><span class="se">\</span>
+<span class="w">                  </span>-cdrom<span class="w"> </span><span class="s2">&quot;A1 Linux Net Installer.iso&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                  </span>-device<span class="w"> </span>ati-vga,model<span class="o">=</span>rv100,romfile<span class="o">=</span>VGABIOS-lgpl-latest.bin
+</pre></div>
+</div>
+<p>If a firmware menu appears, select <code class="docutils literal notranslate"><span class="pre">Boot</span> <span class="pre">sequence</span></code> → <code class="docutils literal notranslate"><span class="pre">Amiga</span> <span class="pre">Multiboot</span> <span class="pre">Options</span></code>
+and set <code class="docutils literal notranslate"><span class="pre">Boot</span> <span class="pre">device</span> <span class="pre">1</span></code> to <code class="docutils literal notranslate"><span class="pre">Onboard</span> <span class="pre">VIA</span> <span class="pre">IDE</span> <span class="pre">CDROM</span></code>. Then hit escape until
+the main screen appears again, hit escape once more and from the exit menu that
+appears select either <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">settings</span> <span class="pre">and</span> <span class="pre">exit</span></code> or <code class="docutils literal notranslate"><span class="pre">Use</span> <span class="pre">settings</span> <span class="pre">for</span> <span class="pre">this</span>
+<span class="pre">session</span> <span class="pre">only</span></code>. It may take a long time loading the kernel into memory but
+eventually it boots and the installer becomes visible. The <code class="docutils literal notranslate"><span class="pre">ati-vga</span></code> RV100
+emulation is not complete yet so only frame buffer works, DRM and 3D is not
+available.</p>
+</section>
+</section>
+<section id="genesi-bplan-pegasos-ii-pegasos2">
+<h2>Genesi/bPlan Pegasos II (<code class="docutils literal notranslate"><span class="pre">pegasos2</span></code>)<a class="headerlink" href="#genesi-bplan-pegasos-ii-pegasos2" title="Permalink to this headline"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">pegasos2</span></code> machine emulates the Pegasos II sold by Genesi and
+designed by bPlan. Its schematics are available at
+<a class="reference external" href="https://www.powerdeveloper.org/platforms/pegasos/schematics">https://www.powerdeveloper.org/platforms/pegasos/schematics</a>.</p>
+<section id="id1">
+<h3>Emulated devices<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><p>PowerPC 7457 CPU (can also use <code class="docutils literal notranslate"><span class="pre">-cpu</span> <span class="pre">g3</span></code> or <code class="docutils literal notranslate"><span class="pre">750cxe</span></code>)</p></li>
+<li><p>Marvell MV64361 Discovery II north bridge</p></li>
+<li><p>VIA VT8231 south bridge</p></li>
+<li><p>PCI VGA compatible card (guests may need other card instead)</p></li>
+<li><p>PS/2 keyboard and mouse</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="id2">
+<h3>Firmware<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h3>
+<p>The Pegasos II board has an Open Firmware compliant ROM based on
+SmartFirmware with some changes that are not open-sourced therefore
+the ROM binary cannot be included in QEMU. An updater was available
+from bPlan, it can be found in the <a class="reference external" href="http://web.archive.org/web/20071021223056/http://www.bplan-gmbh.de/up050404/up050404">Internet Archive</a>.
+The ROM image can be extracted from it with the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>tail<span class="w"> </span>-c<span class="w"> </span>+85581<span class="w"> </span>up050404<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-c<span class="w"> </span><span class="m">524288</span><span class="w"> </span>&gt;<span class="w"> </span>pegasos2.rom
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h3>Running Linux<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h3>
+<p>The PowerPC version of Debian 8.11 supported Pegasos II. The BIOS
+emulator in the firmware binary is unable to run QEMU‘s standard
+vgabios so it needs to be disabled. To boot the system run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>qemu-system-ppc<span class="w"> </span>-machine<span class="w"> </span>pegasos2<span class="w"> </span>-bios<span class="w"> </span>pegasos2.rom<span class="w"> </span><span class="se">\</span>
+<span class="w">                  </span>-cdrom<span class="w"> </span>debian-8.11.0-powerpc-netinst.iso<span class="w"> </span><span class="se">\</span>
+<span class="w">                  </span>-device<span class="w"> </span>VGA,romfile<span class="o">=</span><span class="s2">&quot;&quot;</span><span class="w"> </span>-serial<span class="w"> </span>stdio
+</pre></div>
+</div>
+<p>At the firmware <code class="docutils literal notranslate"><span class="pre">ok</span></code> prompt enter <code class="docutils literal notranslate"><span class="pre">boot</span> <span class="pre">cd</span> <span class="pre">install/pegasos</span></code>.</p>
+<p>Alternatively, it is possible to boot the kernel directly without
+firmware ROM using the QEMU built-in minimal Virtual Open Firmware
+(VOF) emulation which is also supported on <code class="docutils literal notranslate"><span class="pre">pegasos2</span></code>. For this,
+extract the kernel <code class="docutils literal notranslate"><span class="pre">install/powerpc/vmlinuz-chrp.initrd</span></code> from the CD
+image, then run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>qemu-system-ppc<span class="w"> </span>-machine<span class="w"> </span>pegasos2<span class="w"> </span>-serial<span class="w"> </span>stdio<span class="w"> </span><span class="se">\</span>
+<span class="w">                  </span>-kernel<span class="w"> </span>vmlinuz-chrp.initrd<span class="w"> </span>-append<span class="w"> </span><span class="s2">&quot;---&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                  </span>-cdrom<span class="w"> </span>debian-8.11.0-powerpc-netinst.iso
+</pre></div>
+</div>
+</section>
+</section>
+<section id="acube-sam460ex-sam460ex">
+<h2>aCube Sam460ex (<code class="docutils literal notranslate"><span class="pre">sam460ex</span></code>)<a class="headerlink" href="#acube-sam460ex-sam460ex" title="Permalink to this headline"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">sam460ex</span></code> machine emulates the Sam460ex board by aCube which is
+based on the AMCC PowerPC 460EX SoC (that despite its name has a
+PPC440 CPU core).</p>
+<section id="id4">
+<h3>Firmware<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h3>
+<p>The board has a firmware based on an older U-Boot version with
+modifications to support booting AmigaOS 4. The firmware ROM is
+included with QEMU.</p>
+</section>
+<section id="id5">
+<h3>Emulated devices<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><p>PowerPC 460EX SoC</p></li>
+<li><p>M41T80 serial RTC chip</p></li>
+<li><p>Silicon Motion SM501 display parts (identical to SM502 on real board)</p></li>
+<li><p>Silicon Image SiI3112 2 port SATA controller</p></li>
+<li><p>USB keyboard and mouse</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="id6">
+<h3>Running Linux<a class="headerlink" href="#id6" title="Permalink to this headline"></a></h3>
+<p>The only Linux distro that supported Sam460ex out of box was CruxPPC
+2.x. It can be booted by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>qemu-system-ppc<span class="w"> </span>-machine<span class="w"> </span>sam460ex<span class="w"> </span>-serial<span class="w"> </span>stdio<span class="w"> </span><span class="se">\</span>
+<span class="w">                  </span>-drive<span class="w"> </span><span class="k">if</span><span class="o">=</span>none,id<span class="o">=</span>cd,format<span class="o">=</span>raw,file<span class="o">=</span>crux-ppc-2.7a.iso<span class="w"> </span><span class="se">\</span>
+<span class="w">                  </span>-device<span class="w"> </span>ide-cd,drive<span class="o">=</span>cd,bus<span class="o">=</span>ide.1
+</pre></div>
+</div>
+<p>There are some other kernels and instructions for booting other
+distros on aCube’s product page at
+<a class="reference external" href="https://www.acube-systems.biz/index.php?page=hardware&amp;pid=5">https://www.acube-systems.biz/index.php?page=hardware&amp;pid=5</a>
+but those are untested.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../target-ppc.html" class="btn btn-neutral float-left" title="PowerPC System emulator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="embedded.html" class="btn btn-neutral float-right" title="Embedded family boards" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

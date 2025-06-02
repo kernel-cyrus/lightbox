@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Functional testing with Python &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ACPI/SMBIOS testing using biosbits" href="acpi-bits.html" />
+    <link rel="prev" title="Qtest Driver Framework" href="qgraph.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-build.html">QEMU Build System</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Testing QEMU</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="main.html">Testing in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qtest.html">QTest Device Emulation Testing Framework</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Functional testing with Python</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#running-tests">Running tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#logging">Logging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#introduction-to-writing-tests">Introduction to writing tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qemumachine">QEMUMachine</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#attribute-reference">Attribute reference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#asset-handling">Asset handling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#skipping-tests">Skipping tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="acpi-bits.html">ACPI/SMBIOS testing using biosbits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html">Continuous Integration (CI)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#custom-ci-cd-variables">Custom CI/CD variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#jobs-on-custom-runners">Jobs on Custom Runners</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fuzzing.html">Fuzzing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="blkdebug.html">Block I/O error injection using <code class="docutils literal notranslate"><span class="pre">blkdebug</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="blkverify.html">Block driver correctness testing with <code class="docutils literal notranslate"><span class="pre">blkverify</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-tcg.html">TCG Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Developer Information</a> &raquo;</li>
+          <li><a href="index.html">Testing QEMU</a> &raquo;</li>
+      <li>Functional testing with Python</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/testing/functional.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="functional-testing-with-python">
+<span id="checkfunctional-ref"></span><h1>Functional testing with Python<a class="headerlink" href="#functional-testing-with-python" title="Permalink to this headline"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">tests/functional</span></code> directory hosts functional tests written in
+Python. They are usually higher level tests, and may interact with
+external resources and with various guest operating systems.</p>
+<p>The tests should be written in the style of the Python <a class="reference external" href="https://docs.python.org/3/library/unittest.html">unittest</a> framework,
+using stdio for the TAP protocol. The folder <code class="docutils literal notranslate"><span class="pre">tests/functional/qemu_test</span></code>
+provides classes (e.g. the <code class="docutils literal notranslate"><span class="pre">QemuBaseTest</span></code>, <code class="docutils literal notranslate"><span class="pre">QemuUserTest</span></code> and the
+<code class="docutils literal notranslate"><span class="pre">QemuSystemTest</span></code> classes) and utility functions that help to get your test
+into the right shape, e.g. by replacing the ‘stdout’ python object to redirect
+the normal output of your test to stderr instead.</p>
+<p>Note that if you don’t use one of the QemuBaseTest based classes for your
+test, or if you spawn subprocesses from your test, you have to make sure
+that there is no TAP-incompatible output written to stdio, e.g. either by
+prefixing every line with a “# ” to mark the output as a TAP comment, or
+e.g. by capturing the stdout output of subprocesses (redirecting it to
+stderr is OK).</p>
+<p>Tests based on <code class="docutils literal notranslate"><span class="pre">qemu_test.QemuSystemTest</span></code> can easily:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Customize the command line arguments given to the convenience
+<code class="docutils literal notranslate"><span class="pre">self.vm</span></code> attribute (a QEMUMachine instance)</p></li>
+<li><p>Interact with the QEMU monitor, send QMP commands and check
+their results</p></li>
+<li><p>Interact with the guest OS, using the convenience console device
+(which may be useful to assert the effectiveness and correctness of
+command line arguments or QMP commands)</p></li>
+<li><p>Download (and cache) remote data files, such as firmware and kernel
+images</p></li>
+</ul>
+</div></blockquote>
+<section id="running-tests">
+<h2>Running tests<a class="headerlink" href="#running-tests" title="Permalink to this headline"></a></h2>
+<p>You can run the functional tests simply by executing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">check</span><span class="o">-</span><span class="n">functional</span>
+</pre></div>
+</div>
+<p>It is also possible to run tests for a certain target only, for example
+the following line will only run the tests for the x86_64 target:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">check</span><span class="o">-</span><span class="n">functional</span><span class="o">-</span><span class="n">x86_64</span>
+</pre></div>
+</div>
+<p>To run a single test file without the meson test runner, you can also
+execute the file directly by specifying two environment variables first,
+the PYTHONPATH that has to include the python folder and the tests/functional
+folder of the source tree, and QEMU_TEST_QEMU_BINARY that has to point
+to the QEMU binary that should be used for the test. The current working
+directory should be your build folder. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export PYTHONPATH=../python:../tests/functional
+$ export QEMU_TEST_QEMU_BINARY=$PWD/qemu-system-x86_64
+$ pyvenv/bin/python3 ../tests/functional/test_file.py
+</pre></div>
+</div>
+<p>The test framework will automatically purge any scratch files created during
+the tests. If needing to debug a failed test, it is possible to keep these
+files around on disk by setting <code class="docutils literal notranslate"><span class="pre">`QEMU_TEST_KEEP_SCRATCH=1`</span></code> as an env
+variable.  Any preserved files will be deleted the next time the test is run
+without this variable set.</p>
+</section>
+<section id="logging">
+<h2>Logging<a class="headerlink" href="#logging" title="Permalink to this headline"></a></h2>
+<p>The framework collects log files for each test in the build directory
+in the following subfolder:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">builddir</span><span class="o">&gt;/</span><span class="n">tests</span><span class="o">/</span><span class="n">functional</span><span class="o">/&lt;</span><span class="n">arch</span><span class="o">&gt;/&lt;</span><span class="n">fileid</span><span class="o">&gt;.&lt;</span><span class="n">classid</span><span class="o">&gt;.&lt;</span><span class="n">testname</span><span class="o">&gt;/</span>
+</pre></div>
+</div>
+<p>There are usually three log files:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">base.log</span></code> contains the generic logging information that is written
+by the calls to the logging functions in the test code (e.g. by calling
+the <code class="docutils literal notranslate"><span class="pre">self.log.info()</span></code> or <code class="docutils literal notranslate"><span class="pre">self.log.debug()</span></code> functions).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">console.log</span></code> contains the output of the serial console of the guest.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">default.log</span></code> contains the output of QEMU. This file could be named
+differently if the test chooses to use a different identifier for
+the guest VM (e.g. when the test spins up multiple VMs).</p></li>
+</ul>
+</section>
+<section id="introduction-to-writing-tests">
+<h2>Introduction to writing tests<a class="headerlink" href="#introduction-to-writing-tests" title="Permalink to this headline"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">tests/functional/qemu_test</span></code> directory provides the <code class="docutils literal notranslate"><span class="pre">qemu_test</span></code>
+Python module, containing the <code class="docutils literal notranslate"><span class="pre">qemu_test.QemuSystemTest</span></code> class.
+Here is a simple usage example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qemu_test</span><span class="w"> </span><span class="kn">import</span> <span class="n">QemuSystemTest</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Version</span><span class="p">(</span><span class="n">QemuSystemTest</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_qmp_human_info_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="s1">&#39;human-monitor-command&#39;</span><span class="p">,</span>
+                          <span class="n">command_line</span><span class="o">=</span><span class="s1">&#39;info version&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRegex</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;^(\d+\.\d+\.\d)&#39;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">QemuSystemTest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>By providing the “hash bang” line at the beginning of the script, marking
+the file as executable and by calling into QemuSystemTest.main(), the test
+can also be run stand-alone, without a test runner. OTOH when run via a test
+runner, the QemuSystemTest.main() function takes care of running the test
+functions in the right fassion (e.g. with TAP output that is required by the
+meson test runner).</p>
+<section id="the-qemu-test-qemusystemtest-base-test-class">
+<h3>The <code class="docutils literal notranslate"><span class="pre">qemu_test.QemuSystemTest</span></code> base test class<a class="headerlink" href="#the-qemu-test-qemusystemtest-base-test-class" title="Permalink to this headline"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">qemu_test.QemuSystemTest</span></code> class has a number of characteristics
+that are worth being mentioned.</p>
+<p>First of all, it attempts to give each test a ready to use QEMUMachine
+instance, available at <code class="docutils literal notranslate"><span class="pre">self.vm</span></code>.  Because many tests will tweak the
+QEMU command line, launching the QEMUMachine (by using <code class="docutils literal notranslate"><span class="pre">self.vm.launch()</span></code>)
+is left to the test writer.</p>
+<p>The base test class has also support for tests with more than one
+QEMUMachine. The way to get machines is through the <code class="docutils literal notranslate"><span class="pre">self.get_vm()</span></code>
+method which will return a QEMUMachine instance. The <code class="docutils literal notranslate"><span class="pre">self.get_vm()</span></code>
+method accepts arguments that will be passed to the QEMUMachine creation
+and also an optional <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute so you can identify a specific
+machine and get it more than once through the tests methods. A simple
+and hypothetical example follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qemu_test</span><span class="w"> </span><span class="kn">import</span> <span class="n">QemuSystemTest</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MultipleMachines</span><span class="p">(</span><span class="n">QemuSystemTest</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_multiple_machines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">first_machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_vm</span><span class="p">()</span>
+        <span class="n">second_machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_vm</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_vm</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;third_machine&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+
+        <span class="n">first_machine</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+        <span class="n">second_machine</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+
+        <span class="n">first_res</span> <span class="o">=</span> <span class="n">first_machine</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
+            <span class="s1">&#39;human-monitor-command&#39;</span><span class="p">,</span>
+            <span class="n">command_line</span><span class="o">=</span><span class="s1">&#39;info version&#39;</span><span class="p">)</span>
+
+        <span class="n">second_res</span> <span class="o">=</span> <span class="n">second_machine</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
+            <span class="s1">&#39;human-monitor-command&#39;</span><span class="p">,</span>
+            <span class="n">command_line</span><span class="o">=</span><span class="s1">&#39;info version&#39;</span><span class="p">)</span>
+
+        <span class="n">third_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_vm</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;third_machine&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
+            <span class="s1">&#39;human-monitor-command&#39;</span><span class="p">,</span>
+            <span class="n">command_line</span><span class="o">=</span><span class="s1">&#39;info version&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">first_res</span><span class="p">,</span> <span class="n">second_res</span><span class="p">,</span> <span class="n">third_res</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>At test “tear down”, <code class="docutils literal notranslate"><span class="pre">qemu_test.QemuSystemTest</span></code> handles all the QEMUMachines
+shutdown.</p>
+</section>
+</section>
+<section id="qemumachine">
+<h2>QEMUMachine<a class="headerlink" href="#qemumachine" title="Permalink to this headline"></a></h2>
+<p>The QEMUMachine API is already widely used in the Python iotests,
+device-crash-test and other Python scripts.  It’s a wrapper around the
+execution of a QEMU binary, giving its users:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>the ability to set command line arguments to be given to the QEMU
+binary</p></li>
+<li><p>a ready to use QMP connection and interface, which can be used to
+send commands and inspect its results, as well as asynchronous
+events</p></li>
+<li><p>convenience methods to set commonly used command line arguments in
+a more succinct and intuitive way</p></li>
+</ul>
+</div></blockquote>
+<section id="qemu-binary-selection">
+<h3>QEMU binary selection<a class="headerlink" href="#qemu-binary-selection" title="Permalink to this headline"></a></h3>
+<p>The QEMU binary used for the <code class="docutils literal notranslate"><span class="pre">self.vm</span></code> QEMUMachine instance will
+primarily depend on the value of the <code class="docutils literal notranslate"><span class="pre">qemu_bin</span></code> instance attribute.
+If it is not explicitly set by the test code, its default value will
+be the result the QEMU_TEST_QEMU_BINARY environment variable.</p>
+</section>
+<section id="debugging-hung-qemu">
+<h3>Debugging hung QEMU<a class="headerlink" href="#debugging-hung-qemu" title="Permalink to this headline"></a></h3>
+<p>When test cases go wrong it may be helpful to debug a stalled QEMU
+process. While the QEMUMachine class owns the primary QMP monitor
+socket, it is possible to request a second QMP monitor be created
+by setting the <code class="docutils literal notranslate"><span class="pre">QEMU_TEST_QMP_BACKDOOR</span></code> env variable to refer
+to a UNIX socket name. The <code class="docutils literal notranslate"><span class="pre">qmp-shell</span></code> command can then be
+attached to the stalled QEMU to examine its live state.</p>
+</section>
+</section>
+<section id="attribute-reference">
+<h2>Attribute reference<a class="headerlink" href="#attribute-reference" title="Permalink to this headline"></a></h2>
+<section id="qemubasetest">
+<h3>QemuBaseTest<a class="headerlink" href="#qemubasetest" title="Permalink to this headline"></a></h3>
+<p>The following attributes are available on any <code class="docutils literal notranslate"><span class="pre">qemu_test.QemuBaseTest</span></code>
+instance.</p>
+<section id="arch">
+<h4>arch<a class="headerlink" href="#arch" title="Permalink to this headline"></a></h4>
+<p>The target architecture of the QEMU binary.</p>
+<p>Tests are also free to use this attribute value, for their own needs.
+A test may, for instance, use this value when selecting the architecture
+of a kernel or disk image to boot a VM with.</p>
+</section>
+<section id="qemu-bin">
+<h4>qemu_bin<a class="headerlink" href="#qemu-bin" title="Permalink to this headline"></a></h4>
+<p>The preserved value of the <code class="docutils literal notranslate"><span class="pre">QEMU_TEST_QEMU_BINARY</span></code> environment
+variable.</p>
+</section>
+</section>
+<section id="qemuusertest">
+<h3>QemuUserTest<a class="headerlink" href="#qemuusertest" title="Permalink to this headline"></a></h3>
+<p>The QemuUserTest class can be used for running an executable via the
+usermode emulation binaries.</p>
+</section>
+<section id="qemusystemtest">
+<h3>QemuSystemTest<a class="headerlink" href="#qemusystemtest" title="Permalink to this headline"></a></h3>
+<p>The QemuSystemTest class can be used for running tests via one of the
+qemu-system-* binaries.</p>
+<section id="vm">
+<h4>vm<a class="headerlink" href="#vm" title="Permalink to this headline"></a></h4>
+<p>A QEMUMachine instance, initially configured according to the given
+<code class="docutils literal notranslate"><span class="pre">qemu_bin</span></code> parameter.</p>
+</section>
+<section id="cpu">
+<h4>cpu<a class="headerlink" href="#cpu" title="Permalink to this headline"></a></h4>
+<p>The cpu model that will be set to all QEMUMachine instances created
+by the test.</p>
+</section>
+<section id="machine">
+<h4>machine<a class="headerlink" href="#machine" title="Permalink to this headline"></a></h4>
+<p>The machine type that will be set to all QEMUMachine instances created
+by the test. By using the set_machine() function of the QemuSystemTest
+class to set this attribute, you can automatically check whether the
+machine is available to skip the test in case it is not built into the
+QEMU binary.</p>
+</section>
+</section>
+</section>
+<section id="asset-handling">
+<h2>Asset handling<a class="headerlink" href="#asset-handling" title="Permalink to this headline"></a></h2>
+<p>Many functional tests download assets (e.g. Linux kernels, initrds,
+firmware images, etc.) from the internet to be able to run tests with
+them. This imposes additional challenges to the test framework.</p>
+<p>First there is the problem that some people might not have an
+unconstrained internet connection, so such tests should not be run by
+default when running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check</span></code>. To accomplish this situation,
+the tests that download files should only be added to the “thorough”
+speed mode in the meson.build file, while the “quick” speed mode is
+fine for functional tests that can be run without downloading files.
+<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check</span></code> then only runs the quick functional tests along with
+the other quick tests from the other test suites. If you choose to
+run only <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-functional</span></code>, the “thorough” tests will be
+executed, too. And to run all functional tests along with the others,
+you can use something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>make -j$(nproc) check SPEED=thorough
+</pre></div>
+</div>
+<p>The second problem with downloading files from the internet are time
+constraints. The time for downloading files should not be taken into
+account when the test is running and the timeout of the test is ticking
+(since downloading can be very slow, depending on the network bandwidth).
+This problem is solved by downloading the assets ahead of time, before
+the tests are run. This pre-caching is done with the qemu_test.Asset
+class. To use it in your test, declare an asset in your test class with
+its URL and SHA256 checksum like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qemu_test</span><span class="w"> </span><span class="kn">import</span> <span class="n">Asset</span>
+
+<span class="n">ASSET_somename</span> <span class="o">=</span> <span class="n">Asset</span><span class="p">(</span>
+    <span class="p">(</span><span class="s1">&#39;https://www.qemu.org/assets/images/qemu_head_200.png&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;34b74cad46ea28a2966c1d04e102510daf1fd73e6582b6b74523940d5da029dd&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In your test function, you can then get the file name of the cached
+asset like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ASSET_somename</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The pre-caching will be done automatically when running
+<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-functional</span></code> (but not when running e.g.
+<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-functional-&lt;target&gt;</span></code>). In case you just want to download
+the assets without running the tests, you can do so by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">precache</span><span class="o">-</span><span class="n">functional</span>
+</pre></div>
+</div>
+<p>The cache is populated in the <code class="docutils literal notranslate"><span class="pre">~/.cache/qemu/download</span></code> directory by
+default, but the location can be changed by setting the
+<code class="docutils literal notranslate"><span class="pre">QEMU_TEST_CACHE_DIR</span></code> environment variable.</p>
+</section>
+<section id="skipping-tests">
+<h2>Skipping tests<a class="headerlink" href="#skipping-tests" title="Permalink to this headline"></a></h2>
+<p>Since the test framework is based on the common Python unittest framework,
+you can use the usual Python decorators which allow for easily skipping
+tests running under certain conditions, for example, on the lack of a binary
+on the test system or when the running environment is a CI system. For further
+information about those decorators, please refer to:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://docs.python.org/3/library/unittest.html#skipping-tests-and-expected-failures">https://docs.python.org/3/library/unittest.html#skipping-tests-and-expected-failures</a></p>
+</div></blockquote>
+<p>While the conditions for skipping tests are often specifics of each one, there
+are recurring scenarios identified by the QEMU developers and the use of
+environment variables became a kind of standard way to enable/disable tests.</p>
+<p>Here is a list of the most used variables:</p>
+<section id="qemu-test-allow-large-storage">
+<h3>QEMU_TEST_ALLOW_LARGE_STORAGE<a class="headerlink" href="#qemu-test-allow-large-storage" title="Permalink to this headline"></a></h3>
+<p>Tests which are going to fetch or produce assets considered <em>large</em> are not
+going to run unless that <code class="docutils literal notranslate"><span class="pre">QEMU_TEST_ALLOW_LARGE_STORAGE=1</span></code> is exported on
+the environment.</p>
+<p>The definition of <em>large</em> is a bit arbitrary here, but it usually means an
+asset which occupies at least 1GB of size on disk when uncompressed.</p>
+</section>
+<section id="qemu-test-allow-untrusted-code">
+<h3>QEMU_TEST_ALLOW_UNTRUSTED_CODE<a class="headerlink" href="#qemu-test-allow-untrusted-code" title="Permalink to this headline"></a></h3>
+<p>There are tests which will boot a kernel image or firmware that can be
+considered not safe to run on the developer’s workstation, thus they are
+skipped by default. The definition of <em>not safe</em> is also arbitrary but
+usually it means a blob which either its source or build process aren’t
+public available.</p>
+<p>You should export <code class="docutils literal notranslate"><span class="pre">QEMU_TEST_ALLOW_UNTRUSTED_CODE=1</span></code> on the environment in
+order to allow tests which make use of those kind of assets.</p>
+</section>
+<section id="qemu-test-flaky-tests">
+<h3>QEMU_TEST_FLAKY_TESTS<a class="headerlink" href="#qemu-test-flaky-tests" title="Permalink to this headline"></a></h3>
+<p>Some tests are not working reliably and thus are disabled by default.
+This includes tests that don’t run reliably on GitLab’s CI which
+usually expose real issues that are rarely seen on developer machines
+due to the constraints of the CI environment. If you encounter a
+similar situation then raise a bug and then mark the test as shown on
+the code snippet below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># See https://gitlab.com/qemu-project/qemu/-/issues/nnnn</span>
+<span class="nd">@skipUnless</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;QEMU_TEST_FLAKY_TESTS&#39;</span><span class="p">),</span> <span class="s1">&#39;Test is unstable on GitLab&#39;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Tests should not live in this state forever and should either be fixed
+or eventually removed.</p>
+</section>
+<section id="qemu-test-allow-slow">
+<h3>QEMU_TEST_ALLOW_SLOW<a class="headerlink" href="#qemu-test-allow-slow" title="Permalink to this headline"></a></h3>
+<p>Tests that have a very long runtime and might run into timeout issues
+e.g. if the QEMU binary has been compiled with debugging options enabled.
+To avoid these timeout issues by default and to save some precious CPU
+cycles during normal testing, such tests are disabled by default unless
+the QEMU_TEST_ALLOW_SLOW environment variable has been set.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qgraph.html" class="btn btn-neutral float-left" title="Qtest Driver Framework" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="acpi-bits.html" class="btn btn-neutral float-right" title="ACPI/SMBIOS testing using biosbits" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

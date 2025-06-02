@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Locked Counters (aka QemuLockCnt) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The memory API" href="memory.html" />
+    <link rel="prev" title="Load and Store APIs" href="loads-stores.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing/index.html">Testing QEMU</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="bitops.html">Bitwise operations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="loads-stores.html">Load and Store APIs</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Locked Counters (aka <code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code>)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qemulockcnt-concepts"><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code> concepts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qemulockcnt-api"><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code> API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qemulockcnt-usage"><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code> usage</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="memory.html">The memory API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html">QEMU modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pci.html">PCI subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qom-api.html">QEMU Object Model (QOM) API Reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdev-api.html">QEMU Device (qdev) API Reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ui.html">QEMU UI subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zoned-storage.html">zoned-storage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Developer Information</a> &raquo;</li>
+          <li><a href="index-api.html">Internal QEMU APIs</a> &raquo;</li>
+      <li>Locked Counters (aka <code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/lockcnt.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="locked-counters-aka-qemulockcnt">
+<h1>Locked Counters (aka <code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code>)<a class="headerlink" href="#locked-counters-aka-qemulockcnt" title="Permalink to this headline"></a></h1>
+<p>QEMU often uses reference counts to track data structures that are being
+accessed and should not be freed.  For example, a loop that invoke
+callbacks like this is not safe:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">QLIST_FOREACH_SAFE</span><span class="p">(</span><span class="n">ioh</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">io_handlers</span><span class="p">,</span> <span class="nb">next</span><span class="p">,</span> <span class="n">pioh</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">revents</span> <span class="o">&amp;</span> <span class="n">G_IO_OUT</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">ioh</span><span class="o">-&gt;</span><span class="n">fd_write</span><span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">opaque</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">QLIST_FOREACH_SAFE</span></code> protects against deletion of the current node (<code class="docutils literal notranslate"><span class="pre">ioh</span></code>)
+by stashing away its <code class="docutils literal notranslate"><span class="pre">next</span></code> pointer.  However, <code class="docutils literal notranslate"><span class="pre">ioh-&gt;fd_write</span></code> could
+actually delete the next node from the list.  The simplest way to
+avoid this is to mark the node as deleted, and remove it from the
+list in the above loop:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">QLIST_FOREACH_SAFE</span><span class="p">(</span><span class="n">ioh</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">io_handlers</span><span class="p">,</span> <span class="nb">next</span><span class="p">,</span> <span class="n">pioh</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">deleted</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">QLIST_REMOVE</span><span class="p">(</span><span class="n">ioh</span><span class="p">,</span> <span class="nb">next</span><span class="p">);</span>
+        <span class="n">g_free</span><span class="p">(</span><span class="n">ioh</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">revents</span> <span class="o">&amp;</span> <span class="n">G_IO_OUT</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">ioh</span><span class="o">-&gt;</span><span class="n">fd_write</span><span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">opaque</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If however this loop must also be reentrant, i.e. it is possible that
+<code class="docutils literal notranslate"><span class="pre">ioh-&gt;fd_write</span></code> invokes the loop again, some kind of counting is needed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">walking_handlers</span><span class="o">++</span><span class="p">;</span>
+<span class="n">QLIST_FOREACH_SAFE</span><span class="p">(</span><span class="n">ioh</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">io_handlers</span><span class="p">,</span> <span class="nb">next</span><span class="p">,</span> <span class="n">pioh</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">deleted</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">walking_handlers</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">QLIST_REMOVE</span><span class="p">(</span><span class="n">ioh</span><span class="p">,</span> <span class="nb">next</span><span class="p">);</span>
+            <span class="n">g_free</span><span class="p">(</span><span class="n">ioh</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">revents</span> <span class="o">&amp;</span> <span class="n">G_IO_OUT</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">ioh</span><span class="o">-&gt;</span><span class="n">fd_write</span><span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">opaque</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">walking_handlers</span><span class="o">--</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>One may think of using the RCU primitives, <code class="docutils literal notranslate"><span class="pre">rcu_read_lock()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">rcu_read_unlock()</span></code>; effectively, the RCU nesting count would take
+the place of the walking_handlers global variable.  Indeed,
+reference counting and RCU have similar purposes, but their usage in
+general is complementary:</p>
+<ul class="simple">
+<li><p>reference counting is fine-grained and limited to a single data
+structure; RCU delays reclamation of <em>all</em> RCU-protected data
+structures;</p></li>
+<li><p>reference counting works even in the presence of code that keeps
+a reference for a long time; RCU critical sections in principle
+should be kept short;</p></li>
+<li><p>reference counting is often applied to code that is not thread-safe
+but is reentrant; in fact, usage of reference counting in QEMU predates
+the introduction of threads by many years.  RCU is generally used to
+protect readers from other threads freeing memory after concurrent
+modifications to a data structure.</p></li>
+<li><p>reclaiming data can be done by a separate thread in the case of RCU;
+this can improve performance, but also delay reclamation undesirably.
+With reference counting, reclamation is deterministic.</p></li>
+</ul>
+<p>This file documents <code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code>, an abstraction for using reference
+counting in code that has to be both thread-safe and reentrant.</p>
+<section id="qemulockcnt-concepts">
+<h2><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code> concepts<a class="headerlink" href="#qemulockcnt-concepts" title="Permalink to this headline"></a></h2>
+<p>A <code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code> comprises both a counter and a mutex; it has primitives
+to increment and decrement the counter, and to take and release the
+mutex.  The counter notes how many visits to the data structures are
+taking place (the visits could be from different threads, or there could
+be multiple reentrant visits from the same thread).  The basic rules
+governing the counter/mutex pair then are the following:</p>
+<ul class="simple">
+<li><p>Data protected by the QemuLockCnt must not be freed unless the
+counter is zero and the mutex is taken.</p></li>
+<li><p>A new visit cannot be started while the counter is zero and the
+mutex is taken.</p></li>
+</ul>
+<p>Most of the time, the mutex protects all writes to the data structure,
+not just frees, though there could be cases where this is not necessary.</p>
+<p>Reads, instead, can be done without taking the mutex, as long as the
+readers and writers use the same macros that are used for RCU, for
+example <code class="docutils literal notranslate"><span class="pre">qatomic_rcu_read</span></code>, <code class="docutils literal notranslate"><span class="pre">qatomic_rcu_set</span></code>, <code class="docutils literal notranslate"><span class="pre">QLIST_FOREACH_RCU</span></code>,
+etc.  This is because the reads are done outside a lock and a set
+or <code class="docutils literal notranslate"><span class="pre">QLIST_INSERT_HEAD</span></code>
+can happen concurrently with the read.  The RCU API ensures that the
+processor and the compiler see all required memory barriers.</p>
+<p>This could be implemented simply by protecting the counter with the
+mutex, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">qemu_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">walking_handlers_mutex</span><span class="p">);</span>
+<span class="n">walking_handlers</span><span class="o">++</span><span class="p">;</span>
+<span class="n">qemu_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">walking_handlers_mutex</span><span class="p">);</span>
+
+<span class="o">...</span>
+
+<span class="o">//</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">qemu_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">walking_handlers_mutex</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">--</span><span class="n">walking_handlers</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">QLIST_FOREACH_SAFE</span><span class="p">(</span><span class="n">ioh</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">io_handlers</span><span class="p">,</span> <span class="nb">next</span><span class="p">,</span> <span class="n">pioh</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">deleted</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">QLIST_REMOVE</span><span class="p">(</span><span class="n">ioh</span><span class="p">,</span> <span class="nb">next</span><span class="p">);</span>
+            <span class="n">g_free</span><span class="p">(</span><span class="n">ioh</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">qemu_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">walking_handlers_mutex</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Here, no frees can happen in the code represented by the ellipsis.
+If another thread is executing critical section (2), that part of
+the code cannot be entered, because the thread will not be able
+to increment the <code class="docutils literal notranslate"><span class="pre">walking_handlers</span></code> variable.  And of course
+during the visit any other thread will see a nonzero value for
+<code class="docutils literal notranslate"><span class="pre">walking_handlers</span></code>, as in the single-threaded code.</p>
+<p>Note that it is possible for multiple concurrent accesses to delay
+the cleanup arbitrarily; in other words, for the <code class="docutils literal notranslate"><span class="pre">walking_handlers</span></code>
+counter to never become zero.  For this reason, this technique is
+more easily applicable if concurrent access to the structure is rare.</p>
+<p>However, critical sections are easy to forget since you have to do
+them for each modification of the counter.  <code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code> ensures that
+all modifications of the counter take the lock appropriately, and it
+can also be more efficient in two ways:</p>
+<ul class="simple">
+<li><p>it avoids taking the lock for many operations (for example
+incrementing the counter while it is non-zero);</p></li>
+<li><p>on some platforms, one can implement <code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code> to hold the lock
+and the mutex in a single word, making the fast path no more expensive
+than simply managing a counter using atomic operations (see
+<a class="reference internal" href="atomics.html"><span class="doc">Atomic operations in QEMU</span></a>).  This can be very helpful if concurrent access to
+the data structure is expected to be rare.</p></li>
+</ul>
+<p>Using the same mutex for frees and writes can still incur some small
+inefficiencies; for example, a visit can never start if the counter is
+zero and the mutex is taken – even if the mutex is taken by a write,
+which in principle need not block a visit of the data structure.
+However, these are usually not a problem if any of the following
+assumptions are valid:</p>
+<ul class="simple">
+<li><p>concurrent access is possible but rare</p></li>
+<li><p>writes are rare</p></li>
+<li><p>writes are frequent, but this kind of write (e.g. appending to a
+list) has a very small critical section.</p></li>
+</ul>
+<p>For example, QEMU uses <code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code> to manage an <code class="docutils literal notranslate"><span class="pre">AioContext</span></code>’s list of
+bottom halves and file descriptor handlers.  Modifications to the list
+of file descriptor handlers are rare.  Creation of a new bottom half is
+frequent and can happen on a fast path; however: 1) it is almost never
+concurrent with a visit to the list of bottom halves; 2) it only has
+three instructions in the critical path, two assignments and a <code class="docutils literal notranslate"><span class="pre">smp_wmb()</span></code>.</p>
+</section>
+<section id="qemulockcnt-api">
+<h2><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code> API<a class="headerlink" href="#qemulockcnt-api" title="Permalink to this headline"></a></h2>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_lockcnt_init">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_lockcnt_init</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">QemuLockCnt</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">lockcnt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_lockcnt_init" title="Permalink to this definition"></a><br /></dt>
+<dd><p>initialize a QemuLockcnt</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span> <span class="pre">*lockcnt</span></code></dt><dd><p>the lockcnt to initialize</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Initialize lockcnt’s counter to zero and prepare its mutex
+for usage.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_lockcnt_destroy">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_lockcnt_destroy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">QemuLockCnt</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">lockcnt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_lockcnt_destroy" title="Permalink to this definition"></a><br /></dt>
+<dd><p>destroy a QemuLockcnt</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span> <span class="pre">*lockcnt</span></code></dt><dd><p>the lockcnt to destruct</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Destroy lockcnt’s mutex.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_lockcnt_inc">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_lockcnt_inc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">QemuLockCnt</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">lockcnt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_lockcnt_inc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>increment a QemuLockCnt’s counter</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span> <span class="pre">*lockcnt</span></code></dt><dd><p>the lockcnt to operate on</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>If the lockcnt’s count is zero, wait for critical sections
+to finish and increment lockcnt’s count to 1.  If the count
+is not zero, just increment it.</p>
+<p>Because this function can wait on the mutex, it must not be
+called while the lockcnt’s mutex is held by the current thread.
+For the same reason, qemu_lockcnt_inc can also contribute to
+AB-BA deadlocks.  This is a sample deadlock scenario:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">thread</span> <span class="mi">1</span>                      <span class="n">thread</span> <span class="mi">2</span>
+<span class="o">-------------------------------------------------------</span>
+<span class="n">qemu_lockcnt_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lc1</span><span class="p">);</span>
+                              <span class="n">qemu_lockcnt_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lc2</span><span class="p">);</span>
+<span class="n">qemu_lockcnt_inc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lc2</span><span class="p">);</span>
+                              <span class="n">qemu_lockcnt_inc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lc1</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_lockcnt_dec">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_lockcnt_dec</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">QemuLockCnt</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">lockcnt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_lockcnt_dec" title="Permalink to this definition"></a><br /></dt>
+<dd><p>decrement a QemuLockCnt’s counter</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span> <span class="pre">*lockcnt</span></code></dt><dd><p>the lockcnt to operate on</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_lockcnt_dec_and_lock">
+<span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_lockcnt_dec_and_lock</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">QemuLockCnt</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">lockcnt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_lockcnt_dec_and_lock" title="Permalink to this definition"></a><br /></dt>
+<dd><p>decrement a QemuLockCnt’s counter and possibly lock it.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span> <span class="pre">*lockcnt</span></code></dt><dd><p>the lockcnt to operate on</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Decrement lockcnt’s count.  If the new count is zero, lock
+the mutex and return true.  Otherwise, return false.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_lockcnt_dec_if_lock">
+<span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_lockcnt_dec_if_lock</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">QemuLockCnt</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">lockcnt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_lockcnt_dec_if_lock" title="Permalink to this definition"></a><br /></dt>
+<dd><p>possibly decrement a QemuLockCnt’s counter and lock it.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span> <span class="pre">*lockcnt</span></code></dt><dd><p>the lockcnt to operate on</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>If the count is 1, decrement the count to zero, lock
+the mutex and return true.  Otherwise, return false.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_lockcnt_lock">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_lockcnt_lock</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">QemuLockCnt</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">lockcnt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_lockcnt_lock" title="Permalink to this definition"></a><br /></dt>
+<dd><p>lock a QemuLockCnt’s mutex.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span> <span class="pre">*lockcnt</span></code></dt><dd><p>the lockcnt to operate on</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Remember that concurrent visits are not blocked unless the count is
+also zero.  You can use qemu_lockcnt_count to check for this inside a
+critical section.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_lockcnt_unlock">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_lockcnt_unlock</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">QemuLockCnt</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">lockcnt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_lockcnt_unlock" title="Permalink to this definition"></a><br /></dt>
+<dd><p>release a QemuLockCnt’s mutex.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span> <span class="pre">*lockcnt</span></code></dt><dd><p>the lockcnt to operate on.</p>
+</dd>
+</dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_lockcnt_inc_and_unlock">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_lockcnt_inc_and_unlock</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">QemuLockCnt</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">lockcnt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_lockcnt_inc_and_unlock" title="Permalink to this definition"></a><br /></dt>
+<dd><p>combined unlock/increment on a QemuLockCnt.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span> <span class="pre">*lockcnt</span></code></dt><dd><p>the lockcnt to operate on.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>This is the same as</p>
+<blockquote>
+<div><p>qemu_lockcnt_unlock(lockcnt);
+qemu_lockcnt_inc(lockcnt);</p>
+</div></blockquote>
+<p>but more efficient.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.qemu_lockcnt_count">
+<span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qemu_lockcnt_count</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">QemuLockCnt</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">lockcnt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.qemu_lockcnt_count" title="Permalink to this definition"></a><br /></dt>
+<dd><p>query a LockCnt’s count.</p>
+</dd></dl>
+
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span> <span class="pre">*lockcnt</span></code></dt><dd><p>the lockcnt to query.</p>
+</dd>
+</dl>
+<p><strong>Description</strong></p>
+<p>Note that the count can change at any time.  Still, while the
+lockcnt is locked, one can usefully check whether the count
+is non-zero.</p>
+</section>
+<section id="qemulockcnt-usage">
+<h2><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code> usage<a class="headerlink" href="#qemulockcnt-usage" title="Permalink to this headline"></a></h2>
+<p>This section explains the typical usage patterns for <code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code> functions.</p>
+<p>Setting a variable to a non-NULL value can be done between
+<code class="docutils literal notranslate"><span class="pre">qemu_lockcnt_lock</span></code> and <code class="docutils literal notranslate"><span class="pre">qemu_lockcnt_unlock</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>qemu_lockcnt_lock(&amp;xyz_lockcnt);
+if (!xyz) {
+    new_xyz = g_new(XYZ, 1);
+    ...
+    qatomic_rcu_set(&amp;xyz, new_xyz);
+}
+qemu_lockcnt_unlock(&amp;xyz_lockcnt);
+</pre></div>
+</div>
+<p>Accessing the value can be done between <code class="docutils literal notranslate"><span class="pre">qemu_lockcnt_inc</span></code> and
+<code class="docutils literal notranslate"><span class="pre">qemu_lockcnt_dec</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu_lockcnt_inc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">xyz_lockcnt</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">xyz</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">XYZ</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">qatomic_rcu_read</span><span class="p">(</span><span class="o">&amp;</span><span class="n">xyz</span><span class="p">);</span>
+    <span class="o">...</span>
+    <span class="o">/*</span> <span class="n">Accesses</span> <span class="n">can</span> <span class="n">now</span> <span class="n">be</span> <span class="n">done</span> <span class="n">through</span> <span class="s2">&quot;p&quot;</span><span class="o">.</span>  <span class="o">*/</span>
+<span class="p">}</span>
+<span class="n">qemu_lockcnt_dec</span><span class="p">(</span><span class="o">&amp;</span><span class="n">xyz_lockcnt</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Freeing the object can similarly use <code class="docutils literal notranslate"><span class="pre">qemu_lockcnt_lock</span></code> and
+<code class="docutils literal notranslate"><span class="pre">qemu_lockcnt_unlock</span></code>, but you also need to ensure that the count
+is zero (i.e. there is no concurrent visit).  Because <code class="docutils literal notranslate"><span class="pre">qemu_lockcnt_inc</span></code>
+takes the <code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code>’s lock, the count cannot become non-zero while
+the object is being freed.  Freeing an object looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>qemu_lockcnt_lock(&amp;xyz_lockcnt);
+if (!qemu_lockcnt_count(&amp;xyz_lockcnt)) {
+    g_free(xyz);
+    xyz = NULL;
+}
+qemu_lockcnt_unlock(&amp;xyz_lockcnt);
+</pre></div>
+</div>
+<p>If an object has to be freed right after a visit, you can combine
+the decrement, the locking and the check on count as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu_lockcnt_inc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">xyz_lockcnt</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">xyz</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">XYZ</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">qatomic_rcu_read</span><span class="p">(</span><span class="o">&amp;</span><span class="n">xyz</span><span class="p">);</span>
+    <span class="o">...</span>
+    <span class="o">/*</span> <span class="n">Accesses</span> <span class="n">can</span> <span class="n">now</span> <span class="n">be</span> <span class="n">done</span> <span class="n">through</span> <span class="s2">&quot;p&quot;</span><span class="o">.</span>  <span class="o">*/</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">qemu_lockcnt_dec_and_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">xyz_lockcnt</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">g_free</span><span class="p">(</span><span class="n">xyz</span><span class="p">);</span>
+    <span class="n">xyz</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+    <span class="n">qemu_lockcnt_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">xyz_lockcnt</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">QemuLockCnt</span></code> can also be used to access a list as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu_lockcnt_inc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">io_handlers_lockcnt</span><span class="p">);</span>
+<span class="n">QLIST_FOREACH_RCU</span><span class="p">(</span><span class="n">ioh</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">io_handlers</span><span class="p">,</span> <span class="n">pioh</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">revents</span> <span class="o">&amp;</span> <span class="n">G_IO_OUT</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">ioh</span><span class="o">-&gt;</span><span class="n">fd_write</span><span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">opaque</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">qemu_lockcnt_dec_and_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">io_handlers_lockcnt</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">QLIST_FOREACH_SAFE</span><span class="p">(</span><span class="n">ioh</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">io_handlers</span><span class="p">,</span> <span class="nb">next</span><span class="p">,</span> <span class="n">pioh</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">deleted</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">QLIST_REMOVE</span><span class="p">(</span><span class="n">ioh</span><span class="p">,</span> <span class="nb">next</span><span class="p">);</span>
+            <span class="n">g_free</span><span class="p">(</span><span class="n">ioh</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">qemu_lockcnt_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">io_handlers_lockcnt</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Again, the RCU primitives are used because new items can be added to the
+list during the walk.  <code class="docutils literal notranslate"><span class="pre">QLIST_FOREACH_RCU</span></code> ensures that the processor and
+the compiler see the appropriate memory barriers.</p>
+<p>An alternative pattern uses <code class="docutils literal notranslate"><span class="pre">qemu_lockcnt_dec_if_lock</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu_lockcnt_inc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">io_handlers_lockcnt</span><span class="p">);</span>
+<span class="n">QLIST_FOREACH_SAFE_RCU</span><span class="p">(</span><span class="n">ioh</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">io_handlers</span><span class="p">,</span> <span class="nb">next</span><span class="p">,</span> <span class="n">pioh</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">deleted</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">qemu_lockcnt_dec_if_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">io_handlers_lockcnt</span><span class="p">))</span> <span class="p">{</span>
+            <span class="n">QLIST_REMOVE</span><span class="p">(</span><span class="n">ioh</span><span class="p">,</span> <span class="nb">next</span><span class="p">);</span>
+            <span class="n">g_free</span><span class="p">(</span><span class="n">ioh</span><span class="p">);</span>
+            <span class="n">qemu_lockcnt_inc_and_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">io_handlers_lockcnt</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">revents</span> <span class="o">&amp;</span> <span class="n">G_IO_OUT</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">ioh</span><span class="o">-&gt;</span><span class="n">fd_write</span><span class="p">(</span><span class="n">ioh</span><span class="o">-&gt;</span><span class="n">opaque</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">qemu_lockcnt_dec</span><span class="p">(</span><span class="o">&amp;</span><span class="n">io_handlers_lockcnt</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Here you can use <code class="docutils literal notranslate"><span class="pre">qemu_lockcnt_dec</span></code> instead of <code class="docutils literal notranslate"><span class="pre">qemu_lockcnt_dec_and_lock</span></code>,
+because there is no special task to do if the count goes from 1 to 0.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="loads-stores.html" class="btn btn-neutral float-left" title="Load and Store APIs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="memory.html" class="btn btn-neutral float-right" title="The memory API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

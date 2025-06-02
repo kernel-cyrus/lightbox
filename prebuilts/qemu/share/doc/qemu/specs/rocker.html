@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rocker Network Switch Register Programming Guide &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RISC-V IOMMU support for RISC-V machines" href="riscv-iommu.html" />
+    <link rel="prev" title="RAPL MSR support" href="rapl-msr.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Guest Hardware Specifications</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pci-ids.html">PCI IDs for QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pci-serial.html">QEMU PCI serial devices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pci-testdev.html">QEMU PCI test device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-xive.html">POWER9 XIVE interrupt controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-xive.html">XIVE for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html">NUMA mechanics for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#how-the-pseries-linux-guest-calculates-numa-distances">How the pseries Linux guest calculates NUMA distances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#pseries-numa-mechanics">pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#legacy-5-1-and-older-pseries-numa-mechanics">Legacy (5.1 and older) pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hw_reduced_hotplug.html">QEMU and ACPI BIOS Generic Event Device interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tpm.html">QEMU TPM Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hest_ghes.html">APEI tables generating and CPER record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_cpu_hotplug.html">QEMU&lt;-&gt;ACPI BIOS CPU hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_mem_hotplug.html">QEMU&lt;-&gt;ACPI BIOS memory hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_pci_hotplug.html">QEMU&lt;-&gt;ACPI BIOS PCI hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_nvdimm.html">QEMU&lt;-&gt;ACPI BIOS NVDIMM interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_erst.html">ACPI ERST DEVICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sev-guest-firmware.html">QEMU/Guest Firmware Interface for AMD SEV and SEV-ES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fw_cfg.html">QEMU Firmware Configuration (fw_cfg) Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fsi.html">IBM’s Flexible Service Interface (FSI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vmw_pvscsi-spec.html">VMWare PVSCSI Device Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="edu.html">EDU device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ivshmem-spec.html">Device Specification for Inter-VM shared memory device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pvpanic.html">PVPANIC DEVICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spdm.html">QEMU Security Protocols and Data Models (SPDM) Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="standard-vga.html">QEMU Standard VGA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virt-ctlr.html">Virtual System Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vmcoreinfo.html">VMCoreInfo device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vmgenid.html">Virtual Machine Generation ID Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rapl-msr.html">RAPL MSR support</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Rocker Network Switch Register Programming Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notations-and-conventions">Notations and Conventions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pci-configuration-registers">PCI Configuration Registers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pci-configuration-space">PCI Configuration Space</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#memory-mapped-register-space">Memory-Mapped Register Space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#interrupts-dma-and-endianness">Interrupts, DMA, and Endianness</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pci-interrupts">PCI Interrupts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dma-operations">DMA Operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#endianness">Endianness</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#test-registers">Test Registers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ports">Ports</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#physical-and-logical-ports">Physical and Logical Ports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#physical-port-mode">Physical Port Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#port-settings">Port Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#port-enable">Port Enable</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#switch-control">Switch Control</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#control">Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#switch-id">Switch ID</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#events">Events</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#link-changed-event">Link Changed Event</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mac-vlan-seen-event">MAC VLAN Seen Event</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#cpu-packet-processing">CPU Packet Processing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tx-packet-processing">Tx Packet Processing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rx-packet-processing">Rx Packet Processing</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#of-dpa-mode">OF-DPA Mode</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#of-dpa-flow-table-interface">OF-DPA Flow Table Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#group-table-interface">Group Table Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="riscv-iommu.html">RISC-V IOMMU support for RISC-V machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="riscv-aia.html">RISC-V AIA support for RISC-V machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspeed-intc.html">ASPEED Interrupt Controller</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">System Emulation Guest Hardware Specifications</a> &raquo;</li>
+      <li>Rocker Network Switch Register Programming Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/specs/rocker.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rocker-network-switch-register-programming-guide">
+<h1>Rocker Network Switch Register Programming Guide<a class="headerlink" href="#rocker-network-switch-register-programming-guide" title="Permalink to this headline"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<section id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Permalink to this headline"></a></h3>
+<p>This document describes the hardware/software interface for the Rocker switch
+device.  The intended audience is authors of OS drivers and device emulation
+software.</p>
+</section>
+<section id="notations-and-conventions">
+<h3>Notations and Conventions<a class="headerlink" href="#notations-and-conventions" title="Permalink to this headline"></a></h3>
+<ul class="simple">
+<li><p>In register descriptions, [n:m] indicates a range from bit n to bit m,
+inclusive.</p></li>
+<li><p>Use of leading 0x indicates a hexadecimal number.</p></li>
+<li><p>Use of leading 0b indicates a binary number.</p></li>
+<li><p>The use of RSVD or Reserved indicates that a bit or field is reserved for
+future use.</p></li>
+<li><p>Field width is in bytes, unless otherwise noted.</p></li>
+<li><p>Register are (R) read-only, (R/W) read/write, (W) write-only, or (COR) clear
+on read</p></li>
+<li><p>TLV values in network-byte-order are designated with (N).</p></li>
+</ul>
+</section>
+</section>
+<section id="pci-configuration-registers">
+<h2>PCI Configuration Registers<a class="headerlink" href="#pci-configuration-registers" title="Permalink to this headline"></a></h2>
+<section id="pci-configuration-space">
+<h3>PCI Configuration Space<a class="headerlink" href="#pci-configuration-space" title="Permalink to this headline"></a></h3>
+<p>Each switch instance registers as a PCI device with PCI configuration space:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">offset</span>  <span class="n">width</span>   <span class="n">description</span>             <span class="n">value</span>
+<span class="o">---------------------------------------------</span>
+<span class="mh">0x0</span>     <span class="mi">2</span>       <span class="n">Vendor</span> <span class="n">ID</span>               <span class="mh">0x1b36</span>
+<span class="mh">0x2</span>     <span class="mi">2</span>       <span class="n">Device</span> <span class="n">ID</span>               <span class="mh">0x0006</span>
+<span class="mh">0x4</span>     <span class="mi">4</span>       <span class="n">Command</span><span class="o">/</span><span class="n">Status</span>
+<span class="mh">0x8</span>     <span class="mi">1</span>       <span class="n">Revision</span> <span class="n">ID</span>             <span class="mh">0x01</span>
+<span class="mh">0x9</span>     <span class="mi">3</span>       <span class="n">Class</span> <span class="n">code</span>              <span class="mh">0x2800</span>
+<span class="mh">0xC</span>     <span class="mi">1</span>       <span class="n">Cache</span> <span class="n">line</span> <span class="n">size</span>
+<span class="mh">0xD</span>     <span class="mi">1</span>       <span class="n">Latency</span> <span class="n">timer</span>
+<span class="mh">0xE</span>     <span class="mi">1</span>       <span class="n">Header</span> <span class="nb">type</span>
+<span class="mh">0xF</span>     <span class="mi">1</span>       <span class="n">Built</span><span class="o">-</span><span class="ow">in</span> <span class="bp">self</span> <span class="n">test</span>
+<span class="mh">0x10</span>    <span class="mi">4</span>       <span class="n">Base</span> <span class="n">address</span> <span class="n">low</span>
+<span class="mh">0x14</span>    <span class="mi">4</span>       <span class="n">Base</span> <span class="n">address</span> <span class="n">high</span>
+<span class="mh">0x18</span><span class="o">-</span><span class="mi">28</span>         <span class="n">Reserved</span>
+<span class="mh">0x2C</span>    <span class="mi">2</span>       <span class="n">Subsystem</span> <span class="n">vendor</span> <span class="n">ID</span>     <span class="o">*</span>
+<span class="mh">0x2E</span>    <span class="mi">2</span>       <span class="n">Subsystem</span> <span class="n">ID</span>            <span class="o">*</span>
+<span class="mh">0x30</span><span class="o">-</span><span class="mi">38</span>         <span class="n">Reserved</span>
+<span class="mh">0x3C</span>    <span class="mi">1</span>       <span class="n">Interrupt</span> <span class="n">line</span>
+<span class="mh">0x3D</span>    <span class="mi">1</span>       <span class="n">Interrupt</span> <span class="n">pin</span>           <span class="mh">0x00</span>
+<span class="mh">0x3E</span>    <span class="mi">1</span>       <span class="n">Min</span> <span class="n">grant</span>               <span class="mh">0x00</span>
+<span class="mh">0x3D</span>    <span class="mi">1</span>       <span class="n">Max</span> <span class="n">latency</span>             <span class="mh">0x00</span>
+<span class="mh">0x40</span>    <span class="mi">1</span>       <span class="n">TRDY</span> <span class="n">timeout</span>
+<span class="mh">0x41</span>    <span class="mi">1</span>       <span class="n">Retry</span> <span class="n">count</span>
+<span class="mh">0x42</span>    <span class="mi">2</span>       <span class="n">Reserved</span>
+
+<span class="o">*</span> <span class="n">Assigned</span> <span class="n">by</span> <span class="n">sub</span><span class="o">-</span><span class="n">system</span> <span class="n">implementation</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="memory-mapped-register-space">
+<h2>Memory-Mapped Register Space<a class="headerlink" href="#memory-mapped-register-space" title="Permalink to this headline"></a></h2>
+<p>There are two memory-mapped BARs.  BAR0 maps device register space and is
+0x2000 in size.  BAR1 maps MSI-X vector and PBA tables and is also 0x2000 in
+size, allowing for 256 MSI-X vectors.</p>
+<p>All registers are 4 or 8 bytes long.  It is assumed host software will access 4
+byte registers with one 4-byte access, and 8 byte registers with either two
+4-byte accesses or a single 8-byte access.  In the case of two 4-byte accesses,
+access must be lower and then upper 4-bytes, in that order.</p>
+<p>BAR0 device register space is organized as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">offset</span>          <span class="n">description</span>
+<span class="o">------------------------------------------------------</span>
+<span class="mh">0x0000</span><span class="o">-</span><span class="mh">0x000f</span>   <span class="n">Bogus</span> <span class="n">registers</span> <span class="n">to</span> <span class="n">catch</span> <span class="n">misbehaving</span>
+                <span class="n">drivers</span><span class="o">.</span>  <span class="n">Writes</span> <span class="n">do</span> <span class="n">nothing</span><span class="o">.</span>  <span class="n">Reads</span>
+                <span class="n">back</span> <span class="k">as</span> <span class="mh">0xDEADBABE</span><span class="o">.</span>
+<span class="mh">0x0010</span><span class="o">-</span><span class="mh">0x00ff</span>   <span class="n">Test</span> <span class="n">registers</span>
+<span class="mh">0x0300</span><span class="o">-</span><span class="mh">0x03ff</span>   <span class="n">General</span> <span class="n">purpose</span> <span class="n">registers</span>
+<span class="mh">0x1000</span><span class="o">-</span><span class="mh">0x1fff</span>   <span class="n">Descriptor</span> <span class="n">control</span>
+</pre></div>
+</div>
+<p>Holes in register space are reserved.  Writes to reserved registers do nothing.
+Reads to reserved registers read back as 0.</p>
+<p>No fancy stuff like write-combining is enabled on any of the registers.</p>
+<p>BAR1 MSI-X register space is organized as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">offset</span>          <span class="n">description</span>
+<span class="o">------------------------------------------------------</span>
+<span class="mh">0x0000</span><span class="o">-</span><span class="mh">0x0fff</span>   <span class="n">MSI</span><span class="o">-</span><span class="n">X</span> <span class="n">vector</span> <span class="n">table</span> <span class="p">(</span><span class="mi">256</span> <span class="n">vectors</span> <span class="n">total</span><span class="p">)</span>
+<span class="mh">0x1000</span><span class="o">-</span><span class="mh">0x1fff</span>   <span class="n">MSI</span><span class="o">-</span><span class="n">X</span> <span class="n">PBA</span> <span class="n">table</span>
+</pre></div>
+</div>
+</section>
+<section id="interrupts-dma-and-endianness">
+<h2>Interrupts, DMA, and Endianness<a class="headerlink" href="#interrupts-dma-and-endianness" title="Permalink to this headline"></a></h2>
+<section id="pci-interrupts">
+<h3>PCI Interrupts<a class="headerlink" href="#pci-interrupts" title="Permalink to this headline"></a></h3>
+<p>The device supports only MSI-X interrupts.  BAR1 memory-mapped region contains
+the MSI-X vector and PBA tables, with support for up to 256 MSI-X vectors.</p>
+<p>The vector assignment is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vector</span>          <span class="n">description</span>
+<span class="o">-----------------------------------------------------</span>
+<span class="mi">0</span>               <span class="n">Command</span> <span class="n">descriptor</span> <span class="n">ring</span> <span class="n">completion</span>
+<span class="mi">1</span>               <span class="n">Event</span> <span class="n">descriptor</span> <span class="n">ring</span> <span class="n">completion</span>
+<span class="mi">2</span>               <span class="n">Test</span> <span class="n">operation</span> <span class="n">completion</span>
+<span class="mi">3</span>               <span class="n">RSVD</span>
+<span class="mi">4</span><span class="o">-</span><span class="mi">255</span>           <span class="n">Tx</span> <span class="ow">and</span> <span class="n">Rx</span> <span class="n">descriptor</span> <span class="n">ring</span> <span class="n">completion</span>
+                  <span class="n">Tx</span> <span class="n">vector</span> <span class="ow">is</span> <span class="n">even</span>
+                  <span class="n">Rx</span> <span class="n">vector</span> <span class="ow">is</span> <span class="n">odd</span>
+</pre></div>
+</div>
+<p>A MSI-X vector table entry is 16 bytes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>           <span class="n">offset</span>  <span class="n">width</span>   <span class="n">description</span>
+<span class="o">-------------------------------------------------------------</span>
+<span class="n">lower_addr</span>      <span class="mh">0x0</span>     <span class="mi">4</span>       <span class="p">[</span><span class="mi">31</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="n">message</span> <span class="n">address</span><span class="p">[</span><span class="mi">31</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+                                <span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">0</span><span class="p">]</span> <span class="n">Rsvd</span> <span class="p">(</span><span class="mi">4</span> <span class="n">byte</span> <span class="n">alignment</span>
+                                            <span class="n">required</span><span class="p">)</span>
+<span class="n">upper_addr</span>      <span class="mh">0x4</span>     <span class="mi">4</span>       <span class="p">[</span><span class="mi">31</span><span class="p">:</span><span class="mi">19</span><span class="p">]</span> <span class="n">Rsvd</span>
+                                <span class="p">[</span><span class="mi">14</span><span class="p">:</span><span class="mi">0</span><span class="p">]</span> <span class="n">message</span> <span class="n">address</span><span class="p">[</span><span class="mi">46</span><span class="p">:</span><span class="mi">32</span><span class="p">]</span>
+<span class="n">data</span>            <span class="mh">0x8</span>     <span class="mi">4</span>       <span class="n">message</span> <span class="n">data</span><span class="p">[</span><span class="mi">31</span><span class="p">:</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">control</span>         <span class="mh">0xc</span>     <span class="mi">4</span>       <span class="p">[</span><span class="mi">31</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span> <span class="n">Rsvd</span>
+                                <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="n">mask</span> <span class="p">(</span><span class="mi">0</span> <span class="o">=</span> <span class="n">enable</span><span class="p">,</span>
+                                          <span class="mi">1</span> <span class="o">=</span> <span class="n">masked</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Software should install the Interrupt Service Routine (ISR) before any ports
+are enabled or any commands are issued on the command ring.</p>
+</section>
+<section id="dma-operations">
+<h3>DMA Operations<a class="headerlink" href="#dma-operations" title="Permalink to this headline"></a></h3>
+<p>DMA operations are used for packet DMA to/from the CPU, command and event
+processing.  Command processing includes statistical counters and table dumps,
+table insertion/deletion, and more.  Event processing provides an async
+notification method for device-originating events.  Each DMA operation has a
+set of control registers to manage a descriptor ring.  The descriptor rings are
+allocated from contiguous host DMA-able memory and registers specify the rings
+base address, size and current head and tail indices.  Software always writes
+the head, and hardware always writes the tail.</p>
+<p>The higher-order bit of DMA_DESC_COMP_ERR is used to mark hardware completion
+of a descriptor.  Software will clear this bit when posting a descriptor to the
+ring, and hardware will set this bit when the descriptor is complete.</p>
+<p>Descriptor ring sizes must be a power of 2 and range from 2 to 64K entries.
+Descriptor rings’ base address must be 8-byte aligned.  Descriptors must be
+packed within ring.  Each descriptor in each ring must also be aligned on an 8
+byte boundary.  Each descriptor ring will have these registers:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DMA_DESC_xxx_BASE_ADDR</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x1000</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mi">32</span><span class="p">),</span> <span class="mi">64</span><span class="o">-</span><span class="n">bit</span><span class="p">,</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">W</span><span class="p">)</span>
+<span class="n">DMA_DESC_xxx_SIZE</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x1008</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mi">32</span><span class="p">),</span> <span class="mi">32</span><span class="o">-</span><span class="n">bit</span><span class="p">,</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">W</span><span class="p">)</span>
+<span class="n">DMA_DESC_xxx_HEAD</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x100c</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mi">32</span><span class="p">),</span> <span class="mi">32</span><span class="o">-</span><span class="n">bit</span><span class="p">,</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">W</span><span class="p">)</span>
+<span class="n">DMA_DESC_xxx_TAIL</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x1010</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mi">32</span><span class="p">),</span> <span class="mi">32</span><span class="o">-</span><span class="n">bit</span><span class="p">,</span> <span class="p">(</span><span class="n">R</span><span class="p">)</span>
+<span class="n">DMA_DESC_xxx_CTRL</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x1014</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mi">32</span><span class="p">),</span> <span class="mi">32</span><span class="o">-</span><span class="n">bit</span><span class="p">,</span> <span class="p">(</span><span class="n">W</span><span class="p">)</span>
+<span class="n">DMA_DESC_xxx_CREDITS</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x1018</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mi">32</span><span class="p">),</span> <span class="mi">32</span><span class="o">-</span><span class="n">bit</span><span class="p">,</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">W</span><span class="p">)</span>
+<span class="n">DMA_DESC_xxx_RSVD1</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x101c</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mi">32</span><span class="p">),</span> <span class="mi">32</span><span class="o">-</span><span class="n">bit</span><span class="p">,</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">W</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where x is descriptor ring index:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">index</span>           <span class="n">ring</span>
+<span class="o">--------------------</span>
+<span class="mi">0</span>               <span class="n">CMD</span>
+<span class="mi">1</span>               <span class="n">EVENT</span>
+<span class="mi">2</span>               <span class="n">TX</span> <span class="p">(</span><span class="n">port</span> <span class="mi">0</span><span class="p">)</span>
+<span class="mi">3</span>               <span class="n">RX</span> <span class="p">(</span><span class="n">port</span> <span class="mi">0</span><span class="p">)</span>
+<span class="mi">4</span>               <span class="n">TX</span> <span class="p">(</span><span class="n">port</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mi">5</span>               <span class="n">RX</span> <span class="p">(</span><span class="n">port</span> <span class="mi">1</span><span class="p">)</span>
+<span class="o">.</span>
+<span class="o">.</span>
+<span class="o">.</span>
+<span class="mi">124</span>             <span class="n">TX</span> <span class="p">(</span><span class="n">port</span> <span class="mi">61</span><span class="p">)</span>
+<span class="mi">125</span>             <span class="n">RX</span> <span class="p">(</span><span class="n">port</span> <span class="mi">61</span><span class="p">)</span>
+<span class="mi">126</span>             <span class="n">Resv</span>
+<span class="mi">127</span>             <span class="n">Resv</span>
+</pre></div>
+</div>
+<p>Writing BASE_ADDR or SIZE will reset HEAD and TAIL to zero.  HEAD cannot be
+written past TAIL.  To do so would wrap the ring.  An empty ring is when HEAD
+== TAIL.  A full ring is when HEAD is one position behind TAIL.  Both HEAD and
+TAIL increment and modulo wrap at the ring size.</p>
+<p>CTRL register bits:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bit</span>     <span class="n">name</span>            <span class="n">description</span>
+<span class="o">------------------------------------------------------------------------</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">]</span>     <span class="n">CTRL_RESET</span>      <span class="n">Reset</span> <span class="n">the</span> <span class="n">descriptor</span> <span class="n">ring</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">31</span><span class="p">]</span>  <span class="n">Reserved</span>
+</pre></div>
+</div>
+<p>All descriptor types share some common fields:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">-------------------------------------------------------------------</span>
+<span class="n">DMA_DESC_BUF_ADDR</span>       <span class="mi">8</span>       <span class="n">Phys</span> <span class="n">addr</span> <span class="n">of</span> <span class="n">desc</span> <span class="n">payload</span><span class="p">,</span> <span class="mi">8</span><span class="o">-</span><span class="n">byte</span>
+                                <span class="n">aligned</span>
+<span class="n">DMA_DESC_COOKIE</span>         <span class="mi">8</span>       <span class="n">Desc</span> <span class="n">cookie</span> <span class="k">for</span> <span class="n">completion</span> <span class="n">matching</span><span class="p">,</span>
+                                <span class="n">upper</span><span class="o">-</span><span class="n">most</span> <span class="n">bit</span> <span class="ow">is</span> <span class="n">reserved</span>
+<span class="n">DMA_DESC_BUF_SIZE</span>       <span class="mi">2</span>       <span class="n">Desc</span> <span class="n">payload</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">bytes</span>
+<span class="n">DMA_DESC_TLV_SIZE</span>       <span class="mi">2</span>       <span class="n">Desc</span> <span class="n">payload</span> <span class="n">total</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">bytes</span>
+                                <span class="n">used</span> <span class="k">for</span> <span class="n">TLVs</span><span class="o">.</span>  <span class="n">Must</span> <span class="n">be</span> <span class="o">&lt;=</span>
+                                <span class="n">DMA_DESC_BUF_SIZE</span><span class="o">.</span>
+<span class="n">DMA_DESC_COMP_ERR</span>       <span class="mi">2</span>       <span class="n">Completion</span> <span class="n">status</span> <span class="n">of</span> <span class="n">associated</span>
+                                <span class="n">desc</span> <span class="n">payload</span><span class="o">.</span>  <span class="n">High</span> <span class="n">order</span> <span class="n">bit</span> <span class="ow">is</span>
+                                <span class="n">clear</span> <span class="n">on</span> <span class="n">new</span> <span class="n">descs</span><span class="p">,</span> <span class="n">toggled</span> <span class="n">by</span>
+                                <span class="n">hw</span> <span class="k">for</span> <span class="n">completed</span> <span class="n">items</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>To support forward- and backward-compatibility, descriptor and completion
+payloads are specified in TLV format.  Fields are packed with Type=field name,
+Length=field length, and Value=field value.  Software will ignore unknown fields
+filled in by the switch.  Likewise, the switch will ignore unknown fields
+filled in by software.</p>
+<p>Descriptor payload buffer is 8-byte aligned and TLVs are 8-byte aligned.  The
+value within a TLV is also 8-byte aligned.  The (packed, 8 byte) TLV header is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">-----------------------------</span>
+<span class="nb">type</span>    <span class="mi">4</span>       <span class="n">TLV</span> <span class="nb">type</span>
+<span class="nb">len</span>     <span class="mi">2</span>       <span class="n">TLV</span> <span class="n">value</span> <span class="n">length</span>
+<span class="n">pad</span>     <span class="mi">2</span>       <span class="n">Reserved</span>
+</pre></div>
+</div>
+<p>The alignment requirements for descriptors and TLVs are to avoid unaligned
+access exceptions in software.  Note that the payload for each TLV is also
+8 byte aligned.</p>
+<p>Figure 1 shows an example descriptor buffer with two TLVs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                &lt;------- 8 bytes -------&gt;
+
+8-byte  +––––+  +–––––––––––+–––––+–––––+                     +–+
+align           |   type    | len | pad |    TLV#1 hdr          |
+                +–––––––––––+–––––+–––––+    (len=22)           |
+                |                       |                       |
+                |  value                |    TVL#1 value        |
+                |                       |    (padded to 8-byte  |
+                |                 +–––––+     alignment)        |
+                |                 |/////|                       |
+ 8-byte +––––+  +–––––––––––+–––––––––––+                       |
+ align          |   type    | len | pad |    TLV#2 hdr    DESC_BUF_SIZE
+                +–––––+–––––+–––––+–––––+    (len=2)            |
+                |value|/////////////////|    TLV#2 value        |
+                +–––––+/////////////////|                       |
+                |///////////////////////|                       |
+                |///////////////////////|                       |
+                |///////////////////////|                       |
+                |////////unused/////////|                       |
+                |////////space//////////|                       |
+                |///////////////////////|                       |
+                |///////////////////////|                       |
+                |///////////////////////|                       |
+                +–––––––––––––––––––––––+                     +–+
+
+                              fig. 1
+</pre></div>
+</div>
+<p>TLVs can be nested within the NEST TLV type.</p>
+<section id="interrupt-credits">
+<h4>Interrupt credits<a class="headerlink" href="#interrupt-credits" title="Permalink to this headline"></a></h4>
+<p>MSI-X vectors used for descriptor ring completions use a credit mechanism for
+efficient device, PCIe bus, OS and driver operations.  Each descriptor ring has
+a credit count which represents the number of outstanding descriptors to be
+processed by the driver.  As the device marks descriptors complete, the credit
+count is incremented.  As the driver processes those outstanding descriptors,
+it returns credits back to the device.  This way, the device knows the driver’s
+progress and can make decisions about when to fire the next interrupt or not.
+When the credit count is zero, and the first descriptors are posted for the
+driver, a single interrupt is fired.  Once the interrupt is fired, the
+interrupt is disabled (auto-masked*).  In response to the interrupt, the driver
+will process descriptors and PIO write a returned credit value for that
+descriptor ring.  If the driver returns all credits (the driver caught up with
+the device and there is no outstanding work), then the interrupt is unmasked,
+but not fired.  If only partial credits are returned, the interrupt remains
+masked but the device generates an interrupt, signaling the driver that more
+outstanding work is available.</p>
+<p>(* this masking is unrelated to the MSI-X interrupt mask register)</p>
+</section>
+</section>
+<section id="endianness">
+<h3>Endianness<a class="headerlink" href="#endianness" title="Permalink to this headline"></a></h3>
+<p>Device registers are hard-coded to little-endian (LE).  The driver should
+convert to/from host endianness to LE for device register accesses.</p>
+<p>Descriptors are LE.  Descriptor buffer TLVs will have LE type and length
+fields, but the value field can either be LE or network-byte-order, depending
+on context.  TLV values containing network packet data will be in network-byte
+order.  A TLV value containing a field or mask used to compare against network
+packet data is network-byte order.  For example, flow match fields (and masks)
+are network-byte-order since they’re matched directly, byte-by-byte, against
+network packet data.  All non-network-packet TLV multi-byte values will be LE.</p>
+<p>TLV values in network-byte-order are designated with (N).</p>
+</section>
+</section>
+<section id="test-registers">
+<h2>Test Registers<a class="headerlink" href="#test-registers" title="Permalink to this headline"></a></h2>
+<p>Rocker has several test registers to support troubleshooting register access,
+interrupt generation, and DMA operations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TEST_REG</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x0010</span><span class="p">,</span> <span class="mi">32</span><span class="o">-</span><span class="n">bit</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">W</span><span class="p">)</span>
+<span class="n">TEST_REG64</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x0018</span><span class="p">,</span> <span class="mi">64</span><span class="o">-</span><span class="n">bit</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">W</span><span class="p">)</span>
+<span class="n">TEST_IRQ</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x0020</span><span class="p">,</span> <span class="mi">32</span><span class="o">-</span><span class="n">bit</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">W</span><span class="p">)</span>
+<span class="n">TEST_DMA_ADDR</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x0028</span><span class="p">,</span> <span class="mi">64</span><span class="o">-</span><span class="n">bit</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">W</span><span class="p">)</span>
+<span class="n">TEST_DMA_SIZE</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x0030</span><span class="p">,</span> <span class="mi">32</span><span class="o">-</span><span class="n">bit</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">W</span><span class="p">)</span>
+<span class="n">TEST_DMA_CTRL</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x0034</span><span class="p">,</span> <span class="mi">32</span><span class="o">-</span><span class="n">bit</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">W</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Reads to TEST_REG and TEST_REG64 will read a value equal to twice the last
+value written to the register.  The 32-bit and 64-bit versions are for testing
+32-bit and 64-bit host accesses.</p>
+<p>A vector can be written to TEST_IRQ and the device will generate an interrupt
+for that vector.</p>
+<p>To test basic DMA operations, allocate a DMA-able host buffer and put the
+buffer address into TEST_DMA_ADDR and size into TEST_DMA_SIZE.  Then, write to
+TEST_DMA_CTRL to manipulate the buffer contents.  TEST_DMA_CTRL operations are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operation</span>               <span class="n">value</span>   <span class="n">description</span>
+<span class="o">-----------------------------------------------------------</span>
+<span class="n">TEST_DMA_CTRL_CLEAR</span>     <span class="mi">1</span>       <span class="n">clear</span> <span class="n">buffer</span>
+<span class="n">TEST_DMA_CTRL_FILL</span>      <span class="mi">2</span>       <span class="n">fill</span> <span class="n">buffer</span> <span class="nb">bytes</span> <span class="k">with</span> <span class="mh">0x96</span>
+<span class="n">TEST_DMA_CTRL_INVERT</span>    <span class="mi">4</span>       <span class="n">invert</span> <span class="nb">bytes</span> <span class="ow">in</span> <span class="n">buffer</span>
+</pre></div>
+</div>
+<p>Various buffer address and sizes should be tested to verify no address boundary
+issue exists.  In particular, buffers that start on odd-8-byte boundary and/or
+span multiple PAGE sizes should be tested.</p>
+</section>
+<section id="ports">
+<h2>Ports<a class="headerlink" href="#ports" title="Permalink to this headline"></a></h2>
+<section id="physical-and-logical-ports">
+<h3>Physical and Logical Ports<a class="headerlink" href="#physical-and-logical-ports" title="Permalink to this headline"></a></h3>
+<p>The switch supports up to 62 physical (front-panel) ports.  Register
+PORT_PHYS_COUNT returns the actual number of physical ports available:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PORT_PHYS_COUNT</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x0304</span><span class="p">,</span> <span class="mi">32</span><span class="o">-</span><span class="n">bit</span><span class="p">,</span> <span class="p">(</span><span class="n">R</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In addition to front-panel ports, the switch supports logical ports for
+tunnels.</p>
+<p>Front-panel ports and logical tunnel ports are mapped into a single 32-bit port
+space.  A special CPU port is assigned port 0.  The front-panel ports are
+mapped to ports 1-62.  A special loopback port is assigned port 63.  Logical
+tunnel ports are assigned ports 0x0001000-0x0001ffff.
+To summarize the port assignments:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">port</span>                    <span class="n">mapping</span>
+<span class="o">-------------------------------------------------------</span>
+<span class="mi">0</span>                       <span class="n">CPU</span> <span class="n">port</span> <span class="p">(</span><span class="k">for</span> <span class="n">packets</span> <span class="n">to</span><span class="o">/</span><span class="kn">from</span><span class="w"> </span><span class="nn">host</span> <span class="n">CPU</span><span class="p">)</span>
+<span class="mi">1</span><span class="o">-</span><span class="mi">62</span>                    <span class="n">front</span><span class="o">-</span><span class="n">panel</span> <span class="n">physical</span> <span class="n">ports</span>
+<span class="mi">63</span>                      <span class="n">loopback</span> <span class="n">port</span>
+<span class="mi">64</span><span class="o">-</span><span class="mh">0x0000ffff</span>           <span class="n">RSVD</span>
+<span class="mh">0x00010000</span><span class="o">-</span><span class="mh">0x0001ffff</span>   <span class="n">logical</span> <span class="n">tunnel</span> <span class="n">ports</span>
+<span class="mh">0x00020000</span><span class="o">-</span><span class="mh">0xffffffff</span>   <span class="n">RSVD</span>
+</pre></div>
+</div>
+</section>
+<section id="physical-port-mode">
+<h3>Physical Port Mode<a class="headerlink" href="#physical-port-mode" title="Permalink to this headline"></a></h3>
+<p>Switch front-panel ports operate in a mode.  Currently, the only mode is
+OF-DPA.  OF-DPA[1] mode is based on OpenFlow Data Plane Abstraction (OF-DPA)
+Abstract Switch Specification, Version 1.0, from Broadcom Corporation.  To
+set/get the mode for front-panel ports, see port settings, below.</p>
+</section>
+<section id="port-settings">
+<h3>Port Settings<a class="headerlink" href="#port-settings" title="Permalink to this headline"></a></h3>
+<p>Link status for all front-panel ports is available via PORT_PHYS_LINK_STATUS:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PORT_PHYS_LINK_STATUS</span><span class="p">,</span> <span class="n">offset</span> <span class="mh">0x0310</span><span class="p">,</span> <span class="mi">64</span><span class="o">-</span><span class="n">bit</span><span class="p">,</span> <span class="p">(</span><span class="n">R</span><span class="p">)</span>
+
+<span class="n">Value</span> <span class="ow">is</span> <span class="n">port</span> <span class="n">bitmap</span><span class="o">.</span>  <span class="n">Bits</span> <span class="mi">0</span> <span class="ow">and</span> <span class="mi">63</span> <span class="n">always</span> <span class="n">read</span> <span class="mf">0.</span>  <span class="n">Bits</span> <span class="mi">1</span><span class="o">-</span><span class="mi">62</span>
+<span class="n">read</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">link</span> <span class="n">UP</span> <span class="ow">and</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">link</span> <span class="n">DOWN</span> <span class="k">for</span> <span class="n">respective</span> <span class="n">front</span><span class="o">-</span><span class="n">panel</span> <span class="n">ports</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Other properties for front-panel ports are available via DMA CMD descriptors:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Get</span> <span class="n">PORT_SETTINGS</span> <span class="n">descriptor</span><span class="p">:</span>
+
+        <span class="n">field</span>           <span class="n">width</span>   <span class="n">description</span>
+        <span class="o">----------------------------------------------</span>
+        <span class="n">PORT_SETTINGS</span>   <span class="mi">2</span>       <span class="n">CMD_GET</span>
+        <span class="n">PPORT</span>           <span class="mi">4</span>       <span class="n">Physical</span> <span class="n">port</span> <span class="c1">#</span>
+
+<span class="n">Get</span> <span class="n">PORT_SETTINGS</span> <span class="n">completion</span><span class="p">:</span>
+
+        <span class="n">field</span>           <span class="n">width</span>   <span class="n">description</span>
+        <span class="o">----------------------------------------------</span>
+        <span class="n">PPORT</span>           <span class="mi">4</span>       <span class="n">Physical</span> <span class="n">port</span> <span class="c1">#</span>
+        <span class="n">SPEED</span>           <span class="mi">4</span>       <span class="n">Current</span> <span class="n">port</span> <span class="n">interface</span> <span class="n">speed</span><span class="p">,</span> <span class="ow">in</span> <span class="n">Mbps</span>
+        <span class="n">DUPLEX</span>          <span class="mi">1</span>       <span class="mi">1</span> <span class="o">=</span> <span class="n">Full</span><span class="p">,</span> <span class="mi">0</span> <span class="o">=</span> <span class="n">Half</span>
+        <span class="n">AUTONEG</span>         <span class="mi">1</span>       <span class="mi">1</span> <span class="o">=</span> <span class="n">enabled</span><span class="p">,</span> <span class="mi">0</span> <span class="o">=</span> <span class="n">disabled</span>
+        <span class="n">MACADDR</span>         <span class="mi">6</span>       <span class="n">Port</span> <span class="n">MAC</span> <span class="n">address</span>
+        <span class="n">MODE</span>            <span class="mi">1</span>       <span class="mi">0</span> <span class="o">=</span> <span class="n">OF</span><span class="o">-</span><span class="n">DPA</span>
+        <span class="n">LEARNING</span>        <span class="mi">1</span>       <span class="n">MAC</span> <span class="n">address</span> <span class="n">learning</span> <span class="n">on</span> <span class="n">port</span>
+                                        <span class="mi">1</span> <span class="o">=</span> <span class="n">enabled</span>
+                                        <span class="mi">0</span> <span class="o">=</span> <span class="n">disabled</span>
+        <span class="n">PHYS_NAME</span>       <span class="o">&lt;</span><span class="n">var</span><span class="o">&gt;</span>   <span class="n">Physical</span> <span class="n">port</span> <span class="n">name</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+
+<span class="n">Set</span> <span class="n">PORT_SETTINGS</span> <span class="n">descriptor</span><span class="p">:</span>
+
+        <span class="n">field</span>           <span class="n">width</span>   <span class="n">description</span>
+        <span class="o">----------------------------------------------</span>
+        <span class="n">PORT_SETTINGS</span>   <span class="mi">2</span>       <span class="n">CMD_SET</span>
+        <span class="n">PPORT</span>           <span class="mi">4</span>       <span class="n">Physical</span> <span class="n">port</span> <span class="c1">#</span>
+        <span class="n">SPEED</span>           <span class="mi">4</span>       <span class="n">Port</span> <span class="n">interface</span> <span class="n">speed</span><span class="p">,</span> <span class="ow">in</span> <span class="n">Mbps</span>
+        <span class="n">DUPLEX</span>          <span class="mi">1</span>       <span class="mi">1</span> <span class="o">=</span> <span class="n">Full</span><span class="p">,</span> <span class="mi">0</span> <span class="o">=</span> <span class="n">Half</span>
+        <span class="n">AUTONEG</span>         <span class="mi">1</span>       <span class="mi">1</span> <span class="o">=</span> <span class="n">enabled</span><span class="p">,</span> <span class="mi">0</span> <span class="o">=</span> <span class="n">disabled</span>
+        <span class="n">MACADDR</span>         <span class="mi">6</span>       <span class="n">Port</span> <span class="n">MAC</span> <span class="n">address</span>
+        <span class="n">MODE</span>            <span class="mi">1</span>       <span class="mi">0</span> <span class="o">=</span> <span class="n">OF</span><span class="o">-</span><span class="n">DPA</span>
+</pre></div>
+</div>
+</section>
+<section id="port-enable">
+<h3>Port Enable<a class="headerlink" href="#port-enable" title="Permalink to this headline"></a></h3>
+<p>Front-panel ports are initially disabled, which means port ingress and egress
+packets will be dropped.  To enable or disable a port, use PORT_PHYS_ENABLE:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PORT_PHYS_ENABLE</span><span class="p">:</span> <span class="n">offset</span> <span class="mh">0x0318</span><span class="p">,</span> <span class="mi">64</span><span class="o">-</span><span class="n">bit</span><span class="p">,</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">W</span><span class="p">)</span>
+
+<span class="n">Value</span> <span class="ow">is</span> <span class="n">bitmap</span> <span class="n">of</span> <span class="n">first</span> <span class="mi">64</span> <span class="n">ports</span><span class="o">.</span>  <span class="n">Bits</span> <span class="mi">0</span> <span class="ow">and</span> <span class="mi">63</span> <span class="n">are</span> <span class="n">ignored</span>
+<span class="ow">and</span> <span class="n">always</span> <span class="n">read</span> <span class="k">as</span> <span class="mf">0.</span>  <span class="n">Write</span> <span class="mi">1</span> <span class="n">to</span> <span class="n">enable</span> <span class="n">port</span><span class="p">;</span> <span class="n">write</span> <span class="mi">0</span> <span class="n">to</span> <span class="n">disable</span> <span class="n">it</span><span class="o">.</span>
+<span class="n">Default</span> <span class="ow">is</span> <span class="mf">0.</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="switch-control">
+<h2>Switch Control<a class="headerlink" href="#switch-control" title="Permalink to this headline"></a></h2>
+<p>This section covers switch-wide register settings.</p>
+<section id="control">
+<h3>Control<a class="headerlink" href="#control" title="Permalink to this headline"></a></h3>
+<p>This register is used for low level control of the switch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CONTROL</span><span class="p">:</span> <span class="n">offset</span> <span class="mh">0x0300</span><span class="p">,</span> <span class="mi">32</span><span class="o">-</span><span class="n">bit</span><span class="p">,</span> <span class="p">(</span><span class="n">W</span><span class="p">)</span>
+
+<span class="n">bit</span>     <span class="n">name</span>            <span class="n">description</span>
+<span class="o">------------------------------------------------------------------------</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">]</span>     <span class="n">CONTROL_RESET</span>   <span class="n">If</span> <span class="nb">set</span><span class="p">,</span> <span class="n">device</span> <span class="n">will</span> <span class="n">perform</span> <span class="n">reset</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">31</span><span class="p">]</span>  <span class="n">Reserved</span>
+</pre></div>
+</div>
+</section>
+<section id="switch-id">
+<h3>Switch ID<a class="headerlink" href="#switch-id" title="Permalink to this headline"></a></h3>
+<p>The switch has a SWITCH_ID to be used by software to uniquely identify the
+switch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SWITCH_ID</span><span class="p">:</span> <span class="n">offset</span> <span class="mh">0x0320</span><span class="p">,</span> <span class="mi">64</span><span class="o">-</span><span class="n">bit</span><span class="p">,</span> <span class="p">(</span><span class="n">R</span><span class="p">)</span>
+
+<span class="n">Value</span> <span class="ow">is</span> <span class="n">opaque</span> <span class="n">to</span> <span class="n">switch</span> <span class="n">software</span> <span class="ow">and</span> <span class="n">no</span> <span class="n">special</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="n">implied</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="events">
+<h2>Events<a class="headerlink" href="#events" title="Permalink to this headline"></a></h2>
+<p>Non-I/O asynchronous events from the device are notified to the host using the
+event ring.  The TLV structure for events is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>           <span class="n">width</span>   <span class="n">description</span>
+<span class="o">---------------------------------------------------</span>
+<span class="n">TYPE</span>            <span class="mi">4</span>       <span class="n">Event</span> <span class="nb">type</span><span class="p">,</span> <span class="n">one</span> <span class="n">of</span><span class="p">:</span>
+                                <span class="mi">1</span><span class="p">:</span> <span class="n">LINK_CHANGED</span>
+                                <span class="mi">2</span><span class="p">:</span> <span class="n">MAC_VLAN_SEEN</span>
+<span class="n">INFO</span>            <span class="o">&lt;</span><span class="n">nest</span><span class="o">&gt;</span>  <span class="n">Event</span> <span class="n">info</span> <span class="p">(</span><span class="n">details</span> <span class="n">below</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="link-changed-event">
+<h3>Link Changed Event<a class="headerlink" href="#link-changed-event" title="Permalink to this headline"></a></h3>
+<p>When link status changes on a physical port, this event is generated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>           <span class="n">width</span>   <span class="n">description</span>
+<span class="o">---------------------------------------------------</span>
+<span class="n">INFO</span>            <span class="o">&lt;</span><span class="n">nest</span><span class="o">&gt;</span>
+  <span class="n">PPORT</span>         <span class="mi">4</span>       <span class="n">Physical</span> <span class="n">port</span>
+  <span class="n">LINKUP</span>        <span class="mi">1</span>       <span class="n">Link</span> <span class="n">status</span><span class="p">:</span>
+                                <span class="mi">0</span><span class="p">:</span> <span class="n">down</span>
+                                <span class="mi">1</span><span class="p">:</span> <span class="n">up</span>
+</pre></div>
+</div>
+</section>
+<section id="mac-vlan-seen-event">
+<h3>MAC VLAN Seen Event<a class="headerlink" href="#mac-vlan-seen-event" title="Permalink to this headline"></a></h3>
+<p>When a packet ingresses on a port and the source MAC/VLAN isn’t known to the
+device, the device will generate this event.  In response to the event, the
+driver should install to the device the MAC/VLAN on the port into the bridge
+table.  Once installed, the MAC/VLAN is known on the port and this event will
+no longer be generated.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>           <span class="n">width</span>   <span class="n">description</span>
+<span class="o">---------------------------------------------------</span>
+<span class="n">INFO</span>            <span class="o">&lt;</span><span class="n">nest</span><span class="o">&gt;</span>
+  <span class="n">PPORT</span>         <span class="mi">4</span>       <span class="n">Physical</span> <span class="n">port</span>
+  <span class="n">MAC</span>           <span class="mi">6</span>       <span class="n">MAC</span> <span class="n">address</span>
+  <span class="n">VLAN</span>          <span class="mi">2</span>       <span class="n">VLAN</span> <span class="n">ID</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="cpu-packet-processing">
+<h2>CPU Packet Processing<a class="headerlink" href="#cpu-packet-processing" title="Permalink to this headline"></a></h2>
+<p>Ingress packets directed to the host CPU for further processing are delivered
+in the DMA RX ring.  Likewise, host CPU originating packets destined to egress
+on switch ports are scheduled by software using the DMA TX ring.</p>
+<section id="tx-packet-processing">
+<h3>Tx Packet Processing<a class="headerlink" href="#tx-packet-processing" title="Permalink to this headline"></a></h3>
+<p>Software schedules packets for egress on switch ports using the DMA TX ring.  A
+TX descriptor buffer describes the packet location and size in host DMA-able
+memory, the destination port, and any hardware-offload functions (such as L3
+payload checksum offload).  Software then bumps the descriptor head to signal
+hardware of new Tx work.  In response, hardware will DMA read Tx descriptors up
+to head, DMA read descriptor buffer and packet data, perform offloading
+functions, and finally frame packet on wire (network).  Once packet processing
+is complete, hardware will writeback status to descriptor(s) to signal to
+software that Tx is complete and software resources (e.g. skb) backing packet
+can be released.</p>
+<p>Figure 2 shows an example 3-fragment packet queued with one Tx descriptor.  A
+TLV is used for each packet fragment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                                           pkt frag 1
+                                           +–––––––+  +–+
+                                       +–––+       |    |
+                         desc buf      |   |       |    |
+                        +––––––––+     |   |       |    |
+        Tx ring     +–––+        +–––––+   |       |    |
+      +–––––––––+   |   |  TLVs  |         +–––––––+    |
+      |         +–––+   +––––––––+         pkt frag 2   |
+      | desc 0  |       |        +–––––+   +–––––––+    |
+      +–––––––––+       |  TLVs  |     +–––+       |    |
+head+–+         |       +––––––––+         |       |    |
+      | desc 1  |       |        +–––––+   +–––––––+    |pkt
+      +–––––––––+       |  TLVs  |     |                |
+      |         |       +––––––––+     |   pkt frag 3   |
+      |         |                      |   +–––––––+    |
+      +–––––––––+                      +–––+       |    |
+      |         |                          |       |    |
+      |         |                          |       |    |
+      +–––––––––+                          |       |    |
+      |         |                          |       |    |
+      |         |                          |       |    |
+      +–––––––––+                          |       |    |
+      |         |                          +–––––––+  +–+
+      |         |
+      +–––––––––+
+
+                        fig 2.
+</pre></div>
+</div>
+<p>The TLVs for Tx descriptor buffer are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">---------------------------------------------------------------------</span>
+<span class="n">PPORT</span>                   <span class="mi">4</span>       <span class="n">Destination</span> <span class="n">physical</span> <span class="n">port</span> <span class="c1">#</span>
+<span class="n">TX_OFFLOAD</span>              <span class="mi">1</span>       <span class="n">Hardware</span> <span class="n">offload</span> <span class="n">modes</span><span class="p">:</span>
+                                  <span class="mi">0</span><span class="p">:</span> <span class="n">no</span> <span class="n">offload</span>
+                                  <span class="mi">1</span><span class="p">:</span> <span class="n">insert</span> <span class="n">IP</span> <span class="n">csum</span> <span class="p">(</span><span class="n">ipv4</span> <span class="n">only</span><span class="p">)</span>
+                                  <span class="mi">2</span><span class="p">:</span> <span class="n">insert</span> <span class="n">TCP</span><span class="o">/</span><span class="n">UDP</span> <span class="n">csum</span>
+                                  <span class="mi">3</span><span class="p">:</span> <span class="n">L3</span> <span class="n">csum</span> <span class="n">calc</span> <span class="ow">and</span> <span class="n">insert</span>
+                                     <span class="n">into</span> <span class="n">csum</span> <span class="n">offset</span> <span class="p">(</span><span class="n">TX_L3_CSUM_OFF</span><span class="p">)</span>
+                                    <span class="mi">16</span><span class="o">-</span><span class="n">bit</span> <span class="mi">1</span><span class="s1">&#39;s complement csum value.</span>
+                                     <span class="n">IPv4</span> <span class="n">pseudo</span><span class="o">-</span><span class="n">header</span> <span class="ow">and</span> <span class="n">IP</span>
+                                     <span class="n">already</span> <span class="n">calculated</span> <span class="n">by</span> <span class="n">OS</span>
+                                   <span class="ow">and</span> <span class="n">inserted</span><span class="o">.</span>
+                                  <span class="mi">4</span><span class="p">:</span> <span class="n">TSO</span> <span class="p">(</span><span class="n">TCP</span> <span class="n">Segmentation</span> <span class="n">Offload</span><span class="p">)</span>
+<span class="n">TX_L3_CSUM_OFF</span>          <span class="mi">2</span>       <span class="n">For</span> <span class="n">L3</span> <span class="n">csum</span> <span class="n">offload</span> <span class="n">mode</span><span class="p">,</span> <span class="n">the</span> <span class="n">offset</span><span class="p">,</span>
+                                <span class="kn">from</span><span class="w"> </span><span class="nn">the</span> <span class="n">beginning</span> <span class="n">of</span> <span class="n">the</span> <span class="n">packet</span><span class="p">,</span>
+                                <span class="n">of</span> <span class="n">the</span> <span class="n">csum</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">L3</span> <span class="n">header</span>
+<span class="n">TX_TSO_MSS</span>              <span class="mi">2</span>       <span class="n">For</span> <span class="n">TSO</span> <span class="n">offload</span> <span class="n">mode</span><span class="p">,</span> <span class="n">the</span>
+                                <span class="n">Maximum</span> <span class="n">Segment</span> <span class="n">Size</span> <span class="ow">in</span> <span class="nb">bytes</span>
+<span class="n">TX_TSO_HDR_LEN</span>          <span class="mi">2</span>       <span class="n">For</span> <span class="n">TSO</span> <span class="n">offload</span> <span class="n">mode</span><span class="p">,</span> <span class="n">the</span>
+                                <span class="n">length</span> <span class="n">of</span> <span class="n">ethernet</span><span class="p">,</span> <span class="n">IP</span><span class="p">,</span> <span class="ow">and</span>
+                                <span class="n">TCP</span><span class="o">/</span><span class="n">UDP</span> <span class="n">headers</span><span class="p">,</span> <span class="n">including</span> <span class="n">IP</span>
+                                <span class="ow">and</span> <span class="n">TCP</span> <span class="n">options</span><span class="o">.</span>
+<span class="n">TX_FRAGS</span>                <span class="o">&lt;</span><span class="n">array</span><span class="o">&gt;</span> <span class="n">Packet</span> <span class="n">fragments</span>
+  <span class="n">TX_FRAG</span>               <span class="o">&lt;</span><span class="n">nest</span><span class="o">&gt;</span>  <span class="n">Packet</span> <span class="n">fragment</span>
+    <span class="n">TX_FRAG_ADDR</span>        <span class="mi">8</span>       <span class="n">DMA</span> <span class="n">address</span> <span class="n">of</span> <span class="n">packet</span> <span class="n">fragment</span>
+    <span class="n">TX_FRAG_LEN</span>         <span class="mi">2</span>       <span class="n">Packet</span> <span class="n">fragment</span> <span class="n">length</span>
+</pre></div>
+</div>
+<p>Possible status return codes in descriptor on completion are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DESC_COMP_ERR</span>   <span class="n">reason</span>
+<span class="o">--------------------------------------------------------------------</span>
+<span class="mi">0</span>               <span class="n">OK</span>
+<span class="o">-</span><span class="n">ROCKER_ENXIO</span>   <span class="n">address</span> <span class="ow">or</span> <span class="n">data</span> <span class="n">read</span> <span class="n">err</span> <span class="n">on</span> <span class="n">desc</span> <span class="n">buf</span> <span class="ow">or</span> <span class="n">packet</span>
+                <span class="n">fragment</span>
+<span class="o">-</span><span class="n">ROCKER_EINVAL</span>  <span class="n">bad</span> <span class="n">pport</span> <span class="ow">or</span> <span class="n">TSO</span> <span class="ow">or</span> <span class="n">csum</span> <span class="n">offloading</span> <span class="n">error</span>
+<span class="o">-</span><span class="n">ROCKER_ENOMEM</span>  <span class="n">no</span> <span class="n">memory</span> <span class="k">for</span> <span class="n">internal</span> <span class="n">staging</span> <span class="n">tx</span> <span class="n">fragment</span>
+</pre></div>
+</div>
+</section>
+<section id="rx-packet-processing">
+<h3>Rx Packet Processing<a class="headerlink" href="#rx-packet-processing" title="Permalink to this headline"></a></h3>
+<p>For packets ingressing on switch ports that are not forwarded by the switch but
+rather directed to the host CPU for further processing are delivered in the DMA
+RX ring.  Rx descriptor buffers are allocated by software and placed on the
+ring.  Hardware will fill Rx descriptor buffers with packet data, write the
+completion, and signal to software that a new packet is ready.  Since Rx packet
+size is not known a-priori, the Rx descriptor buffer must be allocated for
+worst-case packet size.  A single Rx descriptor will contain the entire Rx
+packet data in one RX_FRAG.  Other Rx TLVs describe and hardware offloads
+performed on the packet, such as checksum validation.</p>
+<p>The TLVs for Rx descriptor buffer are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>           <span class="n">width</span>   <span class="n">description</span>
+<span class="o">---------------------------------------------------</span>
+<span class="n">PPORT</span>           <span class="mi">4</span>       <span class="n">Source</span> <span class="n">physical</span> <span class="n">port</span> <span class="c1">#</span>
+<span class="n">RX_FLAGS</span>        <span class="mi">2</span>       <span class="n">Packet</span> <span class="n">parsing</span> <span class="n">flags</span><span class="p">:</span>
+                          <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">0</span><span class="p">):</span> <span class="n">IPv4</span> <span class="n">packet</span>
+                          <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">):</span> <span class="n">IPv6</span> <span class="n">packet</span>
+                          <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">):</span> <span class="n">csum</span> <span class="n">calculated</span>
+                          <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="p">):</span> <span class="n">IPv4</span> <span class="n">csum</span> <span class="n">good</span>
+                          <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">):</span> <span class="n">IP</span> <span class="n">fragment</span>
+                          <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">5</span><span class="p">):</span> <span class="n">TCP</span> <span class="n">packet</span>
+                          <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">6</span><span class="p">):</span> <span class="n">UDP</span> <span class="n">packet</span>
+                          <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">):</span> <span class="n">TCP</span><span class="o">/</span><span class="n">UDP</span> <span class="n">csum</span> <span class="n">good</span>
+                          <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">):</span> <span class="n">Offload</span> <span class="n">forward</span>
+<span class="n">RX_CSUM</span>         <span class="mi">2</span>       <span class="n">IP</span> <span class="n">calculated</span> <span class="n">checksum</span><span class="p">:</span>
+                          <span class="n">IPv4</span><span class="p">:</span> <span class="n">IP</span> <span class="n">payload</span> <span class="n">csum</span>
+                          <span class="n">IPv6</span><span class="p">:</span> <span class="n">header</span> <span class="ow">and</span> <span class="n">payload</span> <span class="n">csum</span>
+                        <span class="p">(</span><span class="n">Only</span> <span class="n">valid</span> <span class="ow">is</span> <span class="n">RX_FLAGS</span><span class="p">:</span><span class="n">csum</span> <span class="n">calc</span> <span class="ow">is</span> <span class="nb">set</span><span class="p">)</span>
+<span class="n">RX_FRAG_ADDR</span>    <span class="mi">8</span>       <span class="n">DMA</span> <span class="n">address</span> <span class="n">of</span> <span class="n">packet</span> <span class="n">fragment</span>
+<span class="n">RX_FRAG_MAX_LEN</span> <span class="mi">2</span>       <span class="n">Packet</span> <span class="n">maximum</span> <span class="n">fragment</span> <span class="n">length</span>
+<span class="n">RX_FRAG_LEN</span>     <span class="mi">2</span>       <span class="n">Actual</span> <span class="n">packet</span> <span class="n">fragment</span> <span class="n">length</span> <span class="n">after</span> <span class="n">receive</span>
+</pre></div>
+</div>
+<p>Offload forward RX_FLAG indicates the device has already forwarded the packet
+so the host CPU should not also forward the packet.</p>
+<p>Possible status return codes in descriptor on completion are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DESC_COMP_ERR</span>   <span class="n">reason</span>
+<span class="o">--------------------------------------------------------------------</span>
+<span class="mi">0</span>               <span class="n">OK</span>
+<span class="o">-</span><span class="n">ROCKER_ENXIO</span>   <span class="n">address</span> <span class="ow">or</span> <span class="n">data</span> <span class="n">read</span> <span class="n">err</span> <span class="n">on</span> <span class="n">desc</span> <span class="n">buf</span>
+<span class="o">-</span><span class="n">ROCKER_ENOMEM</span>  <span class="n">no</span> <span class="n">memory</span> <span class="k">for</span> <span class="n">internal</span> <span class="n">staging</span> <span class="n">desc</span> <span class="n">buf</span>
+<span class="o">-</span><span class="n">ROCKER_EMSGSIZE</span> <span class="n">Rx</span> <span class="n">descriptor</span> <span class="n">buffer</span> <span class="n">wasn</span><span class="s1">&#39;t big enough to contain</span>
+                <span class="n">packet</span> <span class="n">data</span> <span class="n">TLV</span> <span class="ow">and</span> <span class="n">other</span> <span class="n">TLVs</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="of-dpa-mode">
+<h2>OF-DPA Mode<a class="headerlink" href="#of-dpa-mode" title="Permalink to this headline"></a></h2>
+<p>OF-DPA mode allows the switch to offload flow packet processing functions to
+hardware.  An OpenFlow controller would communicate with an OpenFlow agent
+installed on the switch.  The OpenFlow agent would (directly or indirectly)
+communicate with the Rocker switch driver, which in turn would program switch
+hardware with flow functionality, as defined in OF-DPA.  The block diagram is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>+–––––––––––––––----–––+
+|        OF            |
+|  Remote Controller   |
++––––––––+––----–––––––+
+         |
+         |
++––––––––+–––––––––+
+|       OF         |
+|   Local Agent    |
++––––––––––––––––––+
+|                  |
+|   Rocker Driver  |
++––––––––––––––––––+
+    &lt;this spec&gt;
++––––––––––––––––––+
+|                  |
+|   Rocker Switch  |
++––––––––––––––––––+
+</pre></div>
+</div>
+<p>To participate in flow functions, ports must be configure for OF-DPA mode
+during switch initialization.</p>
+<section id="of-dpa-flow-table-interface">
+<h3>OF-DPA Flow Table Interface<a class="headerlink" href="#of-dpa-flow-table-interface" title="Permalink to this headline"></a></h3>
+<p>There are commands to add, modify, delete, and get stats of flow table entries.
+The commands are issued using the DMA CMD descriptor ring.  The following
+commands are defined:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CMD_ADD</span><span class="p">:</span>                <span class="n">add</span> <span class="n">an</span> <span class="n">entry</span> <span class="n">to</span> <span class="n">flow</span> <span class="n">table</span>
+<span class="n">CMD_MOD</span><span class="p">:</span>                <span class="n">modify</span> <span class="n">an</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">flow</span> <span class="n">table</span>
+<span class="n">CMD_DEL</span><span class="p">:</span>                <span class="n">delete</span> <span class="n">an</span> <span class="n">entry</span> <span class="kn">from</span><span class="w"> </span><span class="nn">flow</span> <span class="n">table</span>
+<span class="n">CMD_GET_STATS</span><span class="p">:</span>          <span class="n">get</span> <span class="n">stats</span> <span class="k">for</span> <span class="n">flow</span> <span class="n">entry</span>
+</pre></div>
+</div>
+<p>TLVs for add and modify commands are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">----------------------------------------------------</span>
+<span class="n">OF_DPA_CMD</span>              <span class="mi">2</span>       <span class="n">CMD_</span><span class="p">[</span><span class="n">ADD</span><span class="o">|</span><span class="n">MOD</span><span class="p">]</span>
+<span class="n">OF_DPA_TBL</span>              <span class="mi">2</span>       <span class="n">Flow</span> <span class="n">table</span> <span class="n">ID</span>
+                                  <span class="mi">0</span><span class="p">:</span> <span class="n">ingress</span> <span class="n">port</span>
+                                  <span class="mi">10</span><span class="p">:</span> <span class="n">vlan</span>
+                                  <span class="mi">20</span><span class="p">:</span> <span class="n">termination</span> <span class="n">mac</span>
+                                  <span class="mi">30</span><span class="p">:</span> <span class="n">unicast</span> <span class="n">routing</span>
+                                  <span class="mi">40</span><span class="p">:</span> <span class="n">multicast</span> <span class="n">routing</span>
+                                  <span class="mi">50</span><span class="p">:</span> <span class="n">bridging</span>
+                                  <span class="mi">60</span><span class="p">:</span> <span class="n">ACL</span> <span class="n">policy</span>
+<span class="n">OF_DPA_PRIORITY</span>         <span class="mi">4</span>       <span class="n">Flow</span> <span class="n">priority</span>
+<span class="n">OF_DPA_HARDTIME</span>         <span class="mi">4</span>       <span class="n">Hard</span> <span class="n">timeout</span> <span class="k">for</span> <span class="n">flow</span>
+<span class="n">OF_DPA_IDLETIME</span>         <span class="mi">4</span>       <span class="n">Idle</span> <span class="n">timeout</span> <span class="k">for</span> <span class="n">flow</span>
+<span class="n">OF_DPA_COOKIE</span>           <span class="mi">8</span>       <span class="n">Cookie</span>
+</pre></div>
+</div>
+<p>Additional TLVs based on flow table ID:</p>
+<p>Table ID 0: ingress port:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">----------------------------------------------------</span>
+<span class="n">OF_DPA_IN_PPORT</span>         <span class="mi">4</span>       <span class="n">ingress</span> <span class="n">physical</span> <span class="n">port</span> <span class="n">number</span>
+<span class="n">OF_DPA_GOTO_TBL</span>         <span class="mi">2</span>       <span class="n">goto</span> <span class="n">table</span> <span class="n">ID</span><span class="p">;</span> <span class="n">zero</span> <span class="n">to</span> <span class="n">drop</span>
+</pre></div>
+</div>
+<p>Table ID 10: vlan:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">----------------------------------------------------</span>
+<span class="n">OF_DPA_IN_PPORT</span>         <span class="mi">4</span>       <span class="n">ingress</span> <span class="n">physical</span> <span class="n">port</span> <span class="n">number</span>
+<span class="n">OF_DPA_VLAN_ID</span>          <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">vlan</span> <span class="n">ID</span>
+<span class="n">OF_DPA_VLAN_ID_MASK</span>     <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">vlan</span> <span class="n">ID</span> <span class="n">mask</span>
+<span class="n">OF_DPA_GOTO_TBL</span>         <span class="mi">2</span>       <span class="n">goto</span> <span class="n">table</span> <span class="n">ID</span><span class="p">;</span> <span class="n">zero</span> <span class="n">to</span> <span class="n">drop</span>
+<span class="n">OF_DPA_NEW_VLAN_ID</span>      <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">new</span> <span class="n">vlan</span> <span class="n">ID</span>
+</pre></div>
+</div>
+<p>Table ID 20: termination mac:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">----------------------------------------------------</span>
+<span class="n">OF_DPA_IN_PPORT</span>         <span class="mi">4</span>       <span class="n">ingress</span> <span class="n">physical</span> <span class="n">port</span> <span class="n">number</span>
+<span class="n">OF_DPA_IN_PPORT_MASK</span>    <span class="mi">4</span>       <span class="n">ingress</span> <span class="n">physical</span> <span class="n">port</span> <span class="n">number</span> <span class="n">mask</span>
+<span class="n">OF_DPA_ETHERTYPE</span>        <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">must</span> <span class="n">be</span> <span class="n">either</span> <span class="mh">0x0800</span> <span class="ow">or</span> <span class="mh">0x86dd</span>
+<span class="n">OF_DPA_DST_MAC</span>          <span class="mi">6</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">destination</span> <span class="n">MAC</span>
+<span class="n">OF_DPA_DST_MAC_MASK</span>     <span class="mi">6</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">destination</span> <span class="n">MAC</span> <span class="n">mask</span>
+<span class="n">OF_DPA_VLAN_ID</span>          <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">vlan</span> <span class="n">ID</span>
+<span class="n">OF_DPA_VLAN_ID_MASK</span>     <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">vlan</span> <span class="n">ID</span> <span class="n">mask</span>
+<span class="n">OF_DPA_GOTO_TBL</span>         <span class="mi">2</span>       <span class="n">only</span> <span class="n">acceptable</span> <span class="n">values</span> <span class="n">are</span>
+                                <span class="n">unicast</span> <span class="ow">or</span> <span class="n">multicast</span> <span class="n">routing</span>
+                                <span class="n">table</span> <span class="n">IDs</span>
+<span class="n">OF_DPA_OUT_PPORT</span>        <span class="mi">2</span>       <span class="k">if</span> <span class="n">specified</span><span class="p">,</span> <span class="n">must</span> <span class="n">be</span>
+                                <span class="n">controller</span><span class="p">,</span> <span class="nb">set</span> <span class="n">zero</span> <span class="n">otherwise</span>
+</pre></div>
+</div>
+<p>Table ID 30: unicast routing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">----------------------------------------------------</span>
+<span class="n">OF_DPA_ETHERTYPE</span>        <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">must</span> <span class="n">be</span> <span class="n">either</span> <span class="mh">0x0800</span> <span class="ow">or</span> <span class="mh">0x86dd</span>
+<span class="n">OF_DPA_DST_IP</span>           <span class="mi">4</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">destination</span> <span class="n">IPv4</span> <span class="n">address</span><span class="o">.</span>
+                                <span class="n">Must</span> <span class="n">be</span> <span class="n">unicast</span> <span class="n">address</span>
+<span class="n">OF_DPA_DST_IP_MASK</span>      <span class="mi">4</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">IP</span> <span class="n">mask</span><span class="o">.</span>  <span class="n">Must</span> <span class="n">be</span> <span class="n">prefix</span> <span class="n">mask</span>
+<span class="n">OF_DPA_DST_IPV6</span>         <span class="mi">16</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>  <span class="n">destination</span> <span class="n">IPv6</span> <span class="n">address</span><span class="o">.</span>
+                                <span class="n">Must</span> <span class="n">be</span> <span class="n">unicast</span> <span class="n">address</span>
+<span class="n">OF_DPA_DST_IPV6_MASK</span>    <span class="mi">16</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>  <span class="n">IPv6</span> <span class="n">mask</span><span class="o">.</span> <span class="n">Must</span> <span class="n">be</span> <span class="n">prefix</span> <span class="n">mask</span>
+<span class="n">OF_DPA_GOTO_TBL</span>         <span class="mi">2</span>       <span class="n">goto</span> <span class="n">table</span> <span class="n">ID</span><span class="p">;</span> <span class="n">zero</span> <span class="n">to</span> <span class="n">drop</span>
+<span class="n">OF_DPA_GROUP_ID</span>         <span class="mi">4</span>       <span class="n">data</span> <span class="k">for</span> <span class="n">GROUP</span> <span class="n">action</span> <span class="n">must</span>
+                                <span class="n">be</span> <span class="n">an</span> <span class="n">L3</span> <span class="n">Unicast</span> <span class="n">group</span> <span class="n">entry</span>
+</pre></div>
+</div>
+<p>Table ID 40: multicast routing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">----------------------------------------------------</span>
+<span class="n">OF_DPA_ETHERTYPE</span>        <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">must</span> <span class="n">be</span> <span class="n">either</span> <span class="mh">0x0800</span> <span class="ow">or</span> <span class="mh">0x86dd</span>
+<span class="n">OF_DPA_VLAN_ID</span>          <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">vlan</span> <span class="n">ID</span>
+<span class="n">OF_DPA_SRC_IP</span>           <span class="mi">4</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">source</span> <span class="n">IPv4</span><span class="o">.</span> <span class="n">Optional</span><span class="p">,</span>
+                                <span class="n">can</span> <span class="n">contain</span> <span class="n">IPv4</span> <span class="n">address</span><span class="p">,</span>
+                                <span class="n">must</span> <span class="n">be</span> <span class="n">completely</span> <span class="n">masked</span>
+                                <span class="k">if</span> <span class="ow">not</span> <span class="n">used</span>
+<span class="n">OF_DPA_SRC_IP_MASK</span>      <span class="mi">4</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">IP</span> <span class="n">Mask</span>
+<span class="n">OF_DPA_DST_IP</span>           <span class="mi">4</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">destination</span> <span class="n">IPv4</span> <span class="n">address</span><span class="o">.</span>
+                                <span class="n">Must</span> <span class="n">be</span> <span class="n">multicast</span> <span class="n">address</span>
+<span class="n">OF_DPA_SRC_IPV6</span>         <span class="mi">16</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>  <span class="n">source</span> <span class="n">IPv6</span> <span class="n">Address</span><span class="o">.</span> <span class="n">Optional</span><span class="o">.</span>
+                                <span class="n">Can</span> <span class="n">contain</span> <span class="n">IPv6</span> <span class="n">address</span><span class="p">,</span>
+                                <span class="n">must</span> <span class="n">be</span> <span class="n">completely</span> <span class="n">masked</span>
+                                <span class="k">if</span> <span class="ow">not</span> <span class="n">used</span>
+<span class="n">OF_DPA_SRC_IPV6_MASK</span>    <span class="mi">16</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>  <span class="n">IPv6</span> <span class="n">mask</span><span class="o">.</span>
+<span class="n">OF_DPA_DST_IPV6</span>         <span class="mi">16</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>  <span class="n">destination</span> <span class="n">IPv6</span> <span class="n">Address</span><span class="o">.</span> <span class="n">Must</span>
+                                <span class="n">be</span> <span class="n">multicast</span> <span class="n">address</span>
+                                <span class="n">Must</span> <span class="n">be</span> <span class="n">multicast</span> <span class="n">address</span>
+<span class="n">OF_DPA_GOTO_TBL</span>         <span class="mi">2</span>       <span class="n">goto</span> <span class="n">table</span> <span class="n">ID</span><span class="p">;</span> <span class="n">zero</span> <span class="n">to</span> <span class="n">drop</span>
+<span class="n">OF_DPA_GROUP_ID</span>         <span class="mi">4</span>       <span class="n">data</span> <span class="k">for</span> <span class="n">GROUP</span> <span class="n">action</span> <span class="n">must</span>
+                                <span class="n">be</span> <span class="n">an</span> <span class="n">L3</span> <span class="n">multicast</span> <span class="n">group</span> <span class="n">entry</span>
+</pre></div>
+</div>
+<p>Table ID 50: bridging:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">----------------------------------------------------</span>
+<span class="n">OF_DPA_VLAN_ID</span>          <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">vlan</span> <span class="n">ID</span>
+<span class="n">OF_DPA_TUNNEL_ID</span>        <span class="mi">4</span>       <span class="n">tunnel</span> <span class="n">ID</span>
+<span class="n">OF_DPA_DST_MAC</span>          <span class="mi">6</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">destination</span> <span class="n">MAC</span>
+<span class="n">OF_DPA_DST_MAC_MASK</span>     <span class="mi">6</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">destination</span> <span class="n">MAC</span> <span class="n">mask</span>
+<span class="n">OF_DPA_GOTO_TBL</span>         <span class="mi">2</span>       <span class="n">goto</span> <span class="n">table</span> <span class="n">ID</span><span class="p">;</span> <span class="n">zero</span> <span class="n">to</span> <span class="n">drop</span>
+<span class="n">OF_DPA_GROUP_ID</span>         <span class="mi">4</span>       <span class="n">data</span> <span class="k">for</span> <span class="n">GROUP</span> <span class="n">action</span> <span class="n">must</span>
+                                <span class="n">be</span> <span class="n">a</span> <span class="n">L2</span> <span class="n">Interface</span><span class="p">,</span> <span class="n">L2</span>
+                                <span class="n">Multicast</span><span class="p">,</span> <span class="n">L2</span> <span class="n">Flood</span><span class="p">,</span>
+                                <span class="ow">or</span> <span class="n">L2</span> <span class="n">Overlay</span> <span class="n">group</span> <span class="n">entry</span>
+                                <span class="k">as</span> <span class="n">appropriate</span>
+<span class="n">OF_DPA_TUNNEL_LPORT</span>     <span class="mi">4</span>       <span class="n">unicast</span> <span class="n">Tenant</span> <span class="n">Bridging</span>
+                                <span class="n">flows</span> <span class="n">specify</span> <span class="n">a</span> <span class="n">tunnel</span>
+                                <span class="n">logical</span> <span class="n">port</span> <span class="n">ID</span>
+<span class="n">OF_DPA_OUT_PPORT</span>        <span class="mi">2</span>       <span class="n">data</span> <span class="k">for</span> <span class="n">OUTPUT</span> <span class="n">action</span><span class="p">,</span>
+                                <span class="n">restricted</span> <span class="n">to</span> <span class="n">CONTROLLER</span><span class="p">,</span>
+                                <span class="nb">set</span> <span class="n">to</span> <span class="mi">0</span> <span class="n">otherwise</span>
+</pre></div>
+</div>
+<p>Table ID 60: acl policy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">----------------------------------------------------</span>
+<span class="n">OF_DPA_IN_PPORT</span>         <span class="mi">4</span>       <span class="n">ingress</span> <span class="n">physical</span> <span class="n">port</span> <span class="n">number</span>
+<span class="n">OF_DPA_IN_PPORT_MASK</span>    <span class="mi">4</span>       <span class="n">ingress</span> <span class="n">physical</span> <span class="n">port</span> <span class="n">number</span> <span class="n">mask</span>
+<span class="n">OF_DPA_ETHERTYPE</span>        <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">ethertype</span>
+<span class="n">OF_DPA_VLAN_ID</span>          <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">vlan</span> <span class="n">ID</span>
+<span class="n">OF_DPA_VLAN_ID_MASK</span>     <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">vlan</span> <span class="n">ID</span> <span class="n">mask</span>
+<span class="n">OF_DPA_VLAN_PCP</span>         <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">vlan</span> <span class="n">Priority</span> <span class="n">Code</span> <span class="n">Point</span>
+<span class="n">OF_DPA_VLAN_PCP_MASK</span>    <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">vlan</span> <span class="n">Priority</span> <span class="n">Code</span> <span class="n">Point</span> <span class="n">mask</span>
+<span class="n">OF_DPA_SRC_MAC</span>          <span class="mi">6</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">source</span> <span class="n">MAC</span>
+<span class="n">OF_DPA_SRC_MAC_MASK</span>     <span class="mi">6</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">source</span> <span class="n">MAC</span> <span class="n">mask</span>
+<span class="n">OF_DPA_DST_MAC</span>          <span class="mi">6</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">destination</span> <span class="n">MAC</span>
+<span class="n">OF_DPA_DST_MAC_MASK</span>     <span class="mi">6</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">destination</span> <span class="n">MAC</span> <span class="n">mask</span>
+<span class="n">OF_DPA_TUNNEL_ID</span>        <span class="mi">4</span>       <span class="n">tunnel</span> <span class="n">ID</span>
+<span class="n">OF_DPA_SRC_IP</span>           <span class="mi">4</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">source</span> <span class="n">IPv4</span><span class="o">.</span> <span class="n">Optional</span><span class="p">,</span>
+                                <span class="n">can</span> <span class="n">contain</span> <span class="n">IPv4</span> <span class="n">address</span><span class="p">,</span>
+                                <span class="n">must</span> <span class="n">be</span> <span class="n">completely</span> <span class="n">masked</span>
+                                <span class="k">if</span> <span class="ow">not</span> <span class="n">used</span>
+<span class="n">OF_DPA_SRC_IP_MASK</span>      <span class="mi">4</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">IP</span> <span class="n">Mask</span>
+<span class="n">OF_DPA_DST_IP</span>           <span class="mi">4</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">destination</span> <span class="n">IPv4</span> <span class="n">address</span><span class="o">.</span>
+                                <span class="n">Must</span> <span class="n">be</span> <span class="n">multicast</span> <span class="n">address</span>
+<span class="n">OF_DPA_DST_IP_MASK</span>      <span class="mi">4</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">IP</span> <span class="n">Mask</span>
+<span class="n">OF_DPA_SRC_IPV6</span>         <span class="mi">16</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>  <span class="n">source</span> <span class="n">IPv6</span> <span class="n">Address</span><span class="o">.</span> <span class="n">Optional</span><span class="o">.</span>
+                                <span class="n">Can</span> <span class="n">contain</span> <span class="n">IPv6</span> <span class="n">address</span><span class="p">,</span>
+                                <span class="n">must</span> <span class="n">be</span> <span class="n">completely</span> <span class="n">masked</span>
+                                <span class="k">if</span> <span class="ow">not</span> <span class="n">used</span>
+<span class="n">OF_DPA_SRC_IPV6_MASK</span>    <span class="mi">16</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>  <span class="n">IPv6</span> <span class="n">mask</span>
+<span class="n">OF_DPA_DST_IPV6</span>         <span class="mi">16</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>  <span class="n">destination</span> <span class="n">IPv6</span> <span class="n">Address</span><span class="o">.</span> <span class="n">Must</span>
+                                <span class="n">be</span> <span class="n">multicast</span> <span class="n">address</span><span class="o">.</span>
+<span class="n">OF_DPA_DST_IPV6_MASK</span>    <span class="mi">16</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>  <span class="n">IPv6</span> <span class="n">mask</span>
+<span class="n">OF_DPA_SRC_ARP_IP</span>       <span class="mi">4</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">source</span> <span class="n">IPv4</span> <span class="n">address</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">ARP</span>
+                                <span class="n">payload</span><span class="o">.</span>  <span class="n">Only</span> <span class="n">used</span> <span class="k">if</span> <span class="n">ethertype</span>
+                                <span class="o">==</span> <span class="mh">0x0806</span><span class="o">.</span>
+<span class="n">OF_DPA_SRC_ARP_IP_MASK</span>  <span class="mi">4</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">IP</span> <span class="n">Mask</span>
+<span class="n">OF_DPA_IP_PROTO</span>         <span class="mi">1</span>       <span class="n">IP</span> <span class="n">protocol</span>
+<span class="n">OF_DPA_IP_PROTO_MASK</span>    <span class="mi">1</span>       <span class="n">IP</span> <span class="n">protocol</span> <span class="n">mask</span>
+<span class="n">OF_DPA_IP_DSCP</span>          <span class="mi">1</span>       <span class="n">DSCP</span>
+<span class="n">OF_DPA_IP_DSCP_MASK</span>     <span class="mi">1</span>       <span class="n">DSCP</span> <span class="n">mask</span>
+<span class="n">OF_DPA_IP_ECN</span>           <span class="mi">1</span>       <span class="n">ECN</span>
+<span class="n">OF_DPA_IP_ECN_MASK</span>              <span class="mi">1</span>       <span class="n">ECN</span> <span class="n">mask</span>
+<span class="n">OF_DPA_L4_SRC_PORT</span>      <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">L4</span> <span class="n">source</span> <span class="n">port</span><span class="p">,</span> <span class="n">only</span> <span class="k">for</span>
+                                <span class="n">TCP</span><span class="p">,</span> <span class="n">UDP</span><span class="p">,</span> <span class="ow">or</span> <span class="n">SCTP</span>
+<span class="n">OF_DPA_L4_SRC_PORT_MASK</span> <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">L4</span> <span class="n">source</span> <span class="n">port</span> <span class="n">mask</span>
+<span class="n">OF_DPA_L4_DST_PORT</span>      <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">L4</span> <span class="n">source</span> <span class="n">port</span><span class="p">,</span> <span class="n">only</span> <span class="k">for</span>
+                                <span class="n">TCP</span><span class="p">,</span> <span class="n">UDP</span><span class="p">,</span> <span class="ow">or</span> <span class="n">SCTP</span>
+<span class="n">OF_DPA_L4_DST_PORT_MASK</span> <span class="mi">2</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">L4</span> <span class="n">source</span> <span class="n">port</span> <span class="n">mask</span>
+<span class="n">OF_DPA_ICMP_TYPE</span>        <span class="mi">1</span>       <span class="n">ICMP</span> <span class="nb">type</span><span class="p">,</span> <span class="n">only</span> <span class="k">if</span> <span class="n">IP</span>
+                                <span class="n">protocol</span> <span class="ow">is</span> <span class="mi">1</span>
+<span class="n">OF_DPA_ICMP_TYPE_MASK</span>   <span class="mi">1</span>       <span class="n">ICMP</span> <span class="nb">type</span> <span class="n">mask</span>
+<span class="n">OF_DPA_ICMP_CODE</span>        <span class="mi">1</span>       <span class="n">ICMP</span> <span class="n">code</span>
+<span class="n">OF_DPA_ICMP_CODE_MASK</span>   <span class="mi">1</span>       <span class="n">ICMP</span> <span class="n">code</span> <span class="n">mask</span>
+<span class="n">OF_DPA_IPV6_LABEL</span>       <span class="mi">4</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">IPv6</span> <span class="n">flow</span> <span class="n">label</span>
+<span class="n">OF_DPA_IPV6_LABEL_MASK</span>  <span class="mi">4</span> <span class="p">(</span><span class="n">N</span><span class="p">)</span>   <span class="n">IPv6</span> <span class="n">flow</span> <span class="n">label</span> <span class="n">mask</span>
+<span class="n">OF_DPA_GROUP_ID</span>         <span class="mi">4</span>       <span class="n">data</span> <span class="k">for</span> <span class="n">GROUP</span> <span class="n">action</span>
+<span class="n">OF_DPA_QUEUE_ID_ACTION</span>  <span class="mi">1</span>       <span class="n">write</span> <span class="n">the</span> <span class="n">queue</span> <span class="n">ID</span>
+<span class="n">OF_DPA_NEW_QUEUE_ID</span>     <span class="mi">1</span>       <span class="n">queue</span> <span class="n">ID</span>
+<span class="n">OF_DPA_VLAN_PCP_ACTION</span>  <span class="mi">1</span>       <span class="n">write</span> <span class="n">the</span> <span class="n">VLAN</span> <span class="n">priority</span>
+<span class="n">OF_DPA_NEW_VLAN_PCP</span>     <span class="mi">1</span>       <span class="n">VLAN</span> <span class="n">priority</span>
+<span class="n">OF_DPA_IP_DSCP_ACTION</span>   <span class="mi">1</span>       <span class="n">write</span> <span class="n">the</span> <span class="n">DSCP</span>
+<span class="n">OF_DPA_NEW_IP_DSCP</span>      <span class="mi">1</span>       <span class="n">new</span> <span class="n">DSCP</span>
+<span class="n">OF_DPA_TUNNEL_LPORT</span>     <span class="mi">4</span>       <span class="n">restrct</span> <span class="n">to</span> <span class="n">valid</span> <span class="n">tunnel</span>
+                                <span class="n">logical</span> <span class="n">port</span><span class="p">,</span> <span class="nb">set</span> <span class="n">to</span> <span class="mi">0</span>
+                                <span class="n">otherwise</span><span class="o">.</span>
+<span class="n">OF_DPA_OUT_PPORT</span>        <span class="mi">2</span>       <span class="n">data</span> <span class="k">for</span> <span class="n">OUTPUT</span> <span class="n">action</span><span class="p">,</span>
+                                <span class="n">restricted</span> <span class="n">to</span> <span class="n">CONTROLLER</span><span class="p">,</span>
+                                <span class="nb">set</span> <span class="n">to</span> <span class="mi">0</span> <span class="n">otherwise</span>
+<span class="n">OF_DPA_CLEAR_ACTIONS</span>    <span class="mi">4</span>       <span class="k">if</span> <span class="mi">1</span> <span class="n">packets</span> <span class="n">matching</span> <span class="n">flow</span> <span class="n">are</span>
+                                <span class="n">dropped</span> <span class="p">(</span><span class="nb">all</span> <span class="n">other</span> <span class="n">instructions</span>
+                                <span class="n">ignored</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>TLVs for flow delete and get stats command are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">---------------------------------------------------</span>
+<span class="n">OF_DPA_CMD</span>              <span class="mi">2</span>       <span class="n">CMD_</span><span class="p">[</span><span class="n">DEL</span><span class="o">|</span><span class="n">GET_STATS</span><span class="p">]</span>
+<span class="n">OF_DPA_COOKIE</span>           <span class="mi">8</span>       <span class="n">Cookie</span>
+</pre></div>
+</div>
+<p>On completion of get stats command, the descriptor buffer is written back with
+the following TLVs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">---------------------------------------------------</span>
+<span class="n">OF_DPA_STAT_DURATION</span>    <span class="mi">4</span>       <span class="n">Flow</span> <span class="n">duration</span>
+<span class="n">OF_DPA_STAT_RX_PKTS</span>     <span class="mi">8</span>       <span class="n">Received</span> <span class="n">packets</span>
+<span class="n">OF_DPA_STAT_TX_PKTS</span>     <span class="mi">8</span>       <span class="n">Transmit</span> <span class="n">packets</span>
+</pre></div>
+</div>
+<p>Possible status return codes in descriptor on completion are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DESC_COMP_ERR</span>   <span class="n">command</span>                 <span class="n">reason</span>
+<span class="o">--------------------------------------------------------------------</span>
+<span class="mi">0</span>               <span class="nb">all</span>                     <span class="n">OK</span>
+<span class="o">-</span><span class="n">ROCKER_EFAULT</span>  <span class="nb">all</span>                     <span class="n">head</span> <span class="ow">or</span> <span class="n">tail</span> <span class="n">index</span> <span class="n">outside</span>
+                                        <span class="n">of</span> <span class="n">ring</span>
+<span class="o">-</span><span class="n">ROCKER_ENXIO</span>   <span class="nb">all</span>                     <span class="n">address</span> <span class="ow">or</span> <span class="n">data</span> <span class="n">read</span> <span class="n">err</span> <span class="n">on</span>
+                                        <span class="n">desc</span> <span class="n">buf</span>
+<span class="o">-</span><span class="n">ROCKER_EMSGSIZE</span> <span class="n">GET_STATS</span>              <span class="n">cmd</span> <span class="n">descriptor</span> <span class="n">buffer</span> <span class="n">wasn</span><span class="s1">&#39;t</span>
+                                        <span class="n">big</span> <span class="n">enough</span> <span class="n">to</span> <span class="n">contain</span> <span class="n">write</span><span class="o">-</span><span class="n">back</span>
+                                        <span class="n">TLVs</span>
+<span class="o">-</span><span class="n">ROCKER_EINVAL</span>  <span class="nb">all</span>                     <span class="n">invalid</span> <span class="n">parameters</span> <span class="n">passed</span> <span class="ow">in</span>
+<span class="o">-</span><span class="n">ROCKER_EEXIST</span>  <span class="n">ADD</span>                     <span class="n">entry</span> <span class="n">already</span> <span class="n">exists</span>
+<span class="o">-</span><span class="n">ROCKER_ENOSPC</span>  <span class="n">ADD</span>                     <span class="n">no</span> <span class="n">space</span> <span class="n">left</span> <span class="ow">in</span> <span class="n">flow</span> <span class="n">table</span>
+<span class="o">-</span><span class="n">ROCKER_ENOENT</span>  <span class="n">MOD</span><span class="o">|</span><span class="n">DEL</span><span class="o">|</span><span class="n">GET_STATS</span>       <span class="n">cookie</span> <span class="n">invalid</span>
+</pre></div>
+</div>
+</section>
+<section id="group-table-interface">
+<h3>Group Table Interface<a class="headerlink" href="#group-table-interface" title="Permalink to this headline"></a></h3>
+<p>There are commands to add, modify, delete, and get stats of group table
+entries.  The commands are issued using the DMA CMD descriptor ring.  The
+following commands are defined:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CMD_ADD</span><span class="p">:</span>                <span class="n">add</span> <span class="n">an</span> <span class="n">entry</span> <span class="n">to</span> <span class="n">group</span> <span class="n">table</span>
+<span class="n">CMD_MOD</span><span class="p">:</span>                <span class="n">modify</span> <span class="n">an</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">group</span> <span class="n">table</span>
+<span class="n">CMD_DEL</span><span class="p">:</span>                <span class="n">delete</span> <span class="n">an</span> <span class="n">entry</span> <span class="kn">from</span><span class="w"> </span><span class="nn">group</span> <span class="n">table</span>
+<span class="n">CMD_GET_STATS</span><span class="p">:</span>          <span class="n">get</span> <span class="n">stats</span> <span class="k">for</span> <span class="n">group</span> <span class="n">entry</span>
+</pre></div>
+</div>
+<p>TLVs for add and modify commands are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">-----------------------------------------------------------</span>
+<span class="n">FLOW_GROUP_CMD</span>          <span class="mi">2</span>       <span class="n">CMD_</span><span class="p">[</span><span class="n">ADD</span><span class="o">|</span><span class="n">MOD</span><span class="p">]</span>
+<span class="n">FLOW_GROUP_ID</span>           <span class="mi">2</span>       <span class="n">Flow</span> <span class="n">group</span> <span class="n">ID</span>
+<span class="n">FLOW_GROUP_TYPE</span>         <span class="mi">1</span>       <span class="n">Group</span> <span class="nb">type</span><span class="p">:</span>
+                                  <span class="mi">0</span><span class="p">:</span> <span class="n">L2</span> <span class="n">interface</span>
+                                  <span class="mi">1</span><span class="p">:</span> <span class="n">L2</span> <span class="n">rewrite</span>
+                                  <span class="mi">2</span><span class="p">:</span> <span class="n">L3</span> <span class="n">unicast</span>
+                                  <span class="mi">3</span><span class="p">:</span> <span class="n">L2</span> <span class="n">multicast</span>
+                                  <span class="mi">4</span><span class="p">:</span> <span class="n">L2</span> <span class="n">flood</span>
+                                  <span class="mi">5</span><span class="p">:</span> <span class="n">L3</span> <span class="n">interface</span>
+                                  <span class="mi">6</span><span class="p">:</span> <span class="n">L3</span> <span class="n">multicast</span>
+                                  <span class="mi">7</span><span class="p">:</span> <span class="n">L3</span> <span class="n">ECMP</span>
+                                  <span class="mi">8</span><span class="p">:</span> <span class="n">L2</span> <span class="n">overlay</span>
+<span class="n">FLOW_VLAN_ID</span>            <span class="mi">2</span>       <span class="n">Vlan</span> <span class="n">ID</span> <span class="p">(</span><span class="n">types</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">FLOW_L2_PORT</span>            <span class="mi">2</span>       <span class="n">Port</span> <span class="p">(</span><span class="n">types</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">FLOW_INDEX</span>              <span class="mi">4</span>       <span class="n">Index</span> <span class="p">(</span><span class="nb">all</span> <span class="n">types</span> <span class="n">but</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">FLOW_OVERLAY_TYPE</span>       <span class="mi">1</span>       <span class="n">Overlay</span> <span class="n">sub</span><span class="o">-</span><span class="nb">type</span> <span class="p">(</span><span class="nb">type</span> <span class="mi">8</span><span class="p">):</span>
+                                  <span class="mi">0</span><span class="p">:</span> <span class="n">Flood</span> <span class="n">unicast</span> <span class="n">tunnel</span>
+                                  <span class="mi">1</span><span class="p">:</span> <span class="n">Flood</span> <span class="n">multicast</span> <span class="n">tunnel</span>
+                                  <span class="mi">2</span><span class="p">:</span> <span class="n">Multicast</span> <span class="n">unicast</span> <span class="n">tunnel</span>
+                                  <span class="mi">3</span><span class="p">:</span> <span class="n">Multicast</span> <span class="n">multicast</span> <span class="n">tunnel</span>
+<span class="n">FLOW_GROUP_ACTION</span>               <span class="n">nest</span>
+  <span class="n">FLOW_GROUP_ID</span>         <span class="mi">2</span>       <span class="nb">next</span> <span class="n">group</span> <span class="n">ID</span> <span class="ow">in</span> <span class="n">chain</span> <span class="p">(</span><span class="nb">all</span>
+                                <span class="n">types</span> <span class="k">except</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="n">FLOW_OUT_PORT</span>         <span class="mi">4</span>       <span class="n">egress</span> <span class="n">port</span> <span class="p">(</span><span class="n">types</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+  <span class="n">FLOW_POP_VLAN_TAG</span>     <span class="mi">1</span>       <span class="n">strip</span> <span class="n">outer</span> <span class="n">VLAN</span> <span class="n">tag</span> <span class="p">(</span><span class="nb">type</span> <span class="mi">1</span>
+                                <span class="n">only</span><span class="p">)</span>
+  <span class="n">FLOW_VLAN_ID</span>          <span class="mi">2</span>       <span class="p">(</span><span class="n">types</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+  <span class="n">FLOW_SRC_MAC</span>          <span class="mi">6</span>       <span class="p">(</span><span class="n">types</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+  <span class="n">FLOW_DST_MAC</span>          <span class="mi">6</span>       <span class="p">(</span><span class="n">types</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>TLVs for flow delete and get stats command are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">-----------------------------------------------------------</span>
+<span class="n">FLOW_GROUP_CMD</span>          <span class="mi">2</span>       <span class="n">CMD_</span><span class="p">[</span><span class="n">DEL</span><span class="o">|</span><span class="n">GET_STATS</span><span class="p">]</span>
+<span class="n">FLOW_GROUP_ID</span>           <span class="mi">2</span>       <span class="n">Flow</span> <span class="n">group</span> <span class="n">ID</span>
+</pre></div>
+</div>
+<p>On completion of get stats command, the descriptor buffer is written back with
+the following TLVs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">field</span>                   <span class="n">width</span>   <span class="n">description</span>
+<span class="o">---------------------------------------------------</span>
+<span class="n">FLOW_GROUP_ID</span>           <span class="mi">2</span>       <span class="n">Flow</span> <span class="n">group</span> <span class="n">ID</span>
+<span class="n">FLOW_STAT_DURATION</span>      <span class="mi">4</span>       <span class="n">Flow</span> <span class="n">duration</span>
+<span class="n">FLOW_STAT_REF_COUNT</span>     <span class="mi">4</span>       <span class="n">Flow</span> <span class="n">reference</span> <span class="n">count</span>
+<span class="n">FLOW_STAT_BUCKET_COUNT</span>  <span class="mi">4</span>       <span class="n">Flow</span> <span class="n">bucket</span> <span class="n">count</span>
+</pre></div>
+</div>
+<p>Possible status return codes in descriptor on completion are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DESC_COMP_ERR</span>   <span class="n">command</span>                 <span class="n">reason</span>
+<span class="o">--------------------------------------------------------------------</span>
+<span class="mi">0</span>               <span class="nb">all</span>                     <span class="n">OK</span>
+<span class="o">-</span><span class="n">ROCKER_EFAULT</span>  <span class="nb">all</span>                     <span class="n">head</span> <span class="ow">or</span> <span class="n">tail</span> <span class="n">index</span> <span class="n">outside</span>
+                                        <span class="n">of</span> <span class="n">ring</span>
+<span class="o">-</span><span class="n">ROCKER_ENXIO</span>   <span class="nb">all</span>                     <span class="n">address</span> <span class="ow">or</span> <span class="n">data</span> <span class="n">read</span> <span class="n">err</span> <span class="n">on</span>
+                                        <span class="n">desc</span> <span class="n">buf</span>
+<span class="o">-</span><span class="n">ROCKER_ENOSPC</span>  <span class="n">GET_STATS</span>               <span class="n">cmd</span> <span class="n">descriptor</span> <span class="n">buffer</span> <span class="n">wasn</span><span class="s1">&#39;t</span>
+                                        <span class="n">big</span> <span class="n">enough</span> <span class="n">to</span> <span class="n">contain</span> <span class="n">write</span><span class="o">-</span><span class="n">back</span>
+                                        <span class="n">TLVs</span>
+<span class="o">-</span><span class="n">ROCKER_EINVAL</span>  <span class="n">ADD</span><span class="o">|</span><span class="n">MOD</span>                 <span class="n">invalid</span> <span class="n">parameters</span> <span class="n">passed</span> <span class="ow">in</span>
+<span class="o">-</span><span class="n">ROCKER_EEXIST</span>  <span class="n">ADD</span>                     <span class="n">entry</span> <span class="n">already</span> <span class="n">exists</span>
+<span class="o">-</span><span class="n">ROCKER_ENOSPC</span>  <span class="n">ADD</span>                     <span class="n">no</span> <span class="n">space</span> <span class="n">left</span> <span class="ow">in</span> <span class="n">flow</span> <span class="n">table</span>
+<span class="o">-</span><span class="n">ROCKER_ENOENT</span>  <span class="n">MOD</span><span class="o">|</span><span class="n">DEL</span><span class="o">|</span><span class="n">GET_STATS</span>       <span class="n">group</span> <span class="n">ID</span> <span class="n">invalid</span>
+<span class="o">-</span><span class="n">ROCKER_EBUSY</span>   <span class="n">DEL</span>                     <span class="n">group</span> <span class="n">reference</span> <span class="n">count</span> <span class="n">non</span><span class="o">-</span><span class="n">zero</span>
+<span class="o">-</span><span class="n">ROCKER_ENODEV</span>  <span class="n">ADD</span>                     <span class="nb">next</span> <span class="n">group</span> <span class="n">ID</span> <span class="n">doesn</span><span class="s1">&#39;t exist</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<p>[1] OpenFlow Data Plane Abstraction (OF-DPA) Abstract Switch Specification,
+Version 1.0, from Broadcom Corporation, February 21, 2014.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rapl-msr.html" class="btn btn-neutral float-left" title="RAPL MSR support" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="riscv-iommu.html" class="btn btn-neutral float-right" title="RISC-V IOMMU support for RISC-V machines" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emulation &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Deprecated features" href="deprecated.html" />
+    <link rel="prev" title="Supported build platforms" href="build-platforms.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">About QEMU</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="build-platforms.html">Supported build platforms</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Emulation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#semihosting">Semihosting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#redirection">Redirection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-targets">Supported Targets</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#tcg-plugins">TCG Plugins</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-plugins">Example Plugins</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#other-emulation-features">Other emulation features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deprecated.html">Deprecated features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="removed-features.html">Removed features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">About QEMU</a> &raquo;</li>
+      <li>Emulation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/about/emulation.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="emulation">
+<h1>Emulation<a class="headerlink" href="#emulation" title="Permalink to this headline"></a></h1>
+<p>QEMU’s Tiny Code Generator (TCG) provides the ability to emulate a
+number of CPU architectures on any supported host platform. Both
+<a class="reference internal" href="../system/index.html#system-emulation"><span class="std std-ref">System Emulation</span></a> and <a class="reference internal" href="../user/index.html#user-mode-emulation"><span class="std std-ref">User Mode Emulation</span></a> are supported
+depending on the guest architecture.</p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Supported Guest Architectures for Emulation</span><a class="headerlink" href="#id3" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Architecture (qemu name)</p></th>
+<th class="head"><p>System</p></th>
+<th class="head"><p>User</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Alpha</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Legacy 64 bit RISC ISA developed by DEC</p></td>
+</tr>
+<tr class="row-odd"><td><p>Arm (arm, aarch64)</p></td>
+<td><p><a class="reference internal" href="../system/target-arm.html#arm-system-emulator"><span class="std std-ref">Yes</span></a></p></td>
+<td><p>Yes</p></td>
+<td><p>Wide range of features, see <a class="reference internal" href="../system/arm/emulation.html#arm-emulation"><span class="std std-ref">A-profile CPU architecture support</span></a> for details</p></td>
+</tr>
+<tr class="row-even"><td><p>AVR</p></td>
+<td><p><a class="reference internal" href="../system/target-avr.html#avr-system-emulator"><span class="std std-ref">Yes</span></a></p></td>
+<td><p>No</p></td>
+<td><p>8 bit micro controller, often used in maker projects</p></td>
+</tr>
+<tr class="row-odd"><td><p>Hexagon</p></td>
+<td><p>No</p></td>
+<td><p>Yes</p></td>
+<td><p>Family of DSPs by Qualcomm</p></td>
+</tr>
+<tr class="row-even"><td><p>PA-RISC (hppa)</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>A legacy RISC system used in HP’s old minicomputers</p></td>
+</tr>
+<tr class="row-odd"><td><p>x86 (i386, x86_64)</p></td>
+<td><p><a class="reference internal" href="../system/target-i386.html#qemu-pc-system-emulator"><span class="std std-ref">Yes</span></a></p></td>
+<td><p>Yes</p></td>
+<td><p>The ubiquitous desktop PC CPU architecture, 32 and 64 bit.</p></td>
+</tr>
+<tr class="row-even"><td><p>LoongArch</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>A MIPS-like 64bit RISC architecture developed in China</p></td>
+</tr>
+<tr class="row-odd"><td><p>m68k</p></td>
+<td><p><a class="reference internal" href="../system/target-m68k.html#coldfire-system-emulator"><span class="std std-ref">Yes</span></a></p></td>
+<td><p>Yes</p></td>
+<td><p>Motorola 68000 variants and ColdFire</p></td>
+</tr>
+<tr class="row-even"><td><p>Microblaze</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>RISC based soft-core by Xilinx</p></td>
+</tr>
+<tr class="row-odd"><td><p>MIPS (mips*)</p></td>
+<td><p><a class="reference internal" href="../system/target-mips.html#mips-system-emulator"><span class="std std-ref">Yes</span></a></p></td>
+<td><p>Yes</p></td>
+<td><p>Venerable RISC architecture originally out of Stanford University</p></td>
+</tr>
+<tr class="row-even"><td><p>OpenRISC</p></td>
+<td><p><a class="reference internal" href="../system/target-openrisc.html#openrisc-system-emulator"><span class="std std-ref">Yes</span></a></p></td>
+<td><p>Yes</p></td>
+<td><p>Open source RISC architecture developed by the OpenRISC community</p></td>
+</tr>
+<tr class="row-odd"><td><p>Power (ppc, ppc64)</p></td>
+<td><p><a class="reference internal" href="../system/target-ppc.html#powerpc-system-emulator"><span class="std std-ref">Yes</span></a></p></td>
+<td><p>Yes</p></td>
+<td><p>A general purpose RISC architecture now managed by IBM</p></td>
+</tr>
+<tr class="row-even"><td><p>RISC-V</p></td>
+<td><p><a class="reference internal" href="../system/target-riscv.html#risc-v-system-emulator"><span class="std std-ref">Yes</span></a></p></td>
+<td><p>Yes</p></td>
+<td><p>An open standard RISC ISA maintained by RISC-V International</p></td>
+</tr>
+<tr class="row-odd"><td><p>RX</p></td>
+<td><p><a class="reference internal" href="../system/target-rx.html#rx-system-emulator"><span class="std std-ref">Yes</span></a></p></td>
+<td><p>No</p></td>
+<td><p>A 32 bit micro controller developed by Renesas</p></td>
+</tr>
+<tr class="row-even"><td><p>s390x</p></td>
+<td><p><a class="reference internal" href="../system/target-s390x.html#s390x-system-emulator"><span class="std std-ref">Yes</span></a></p></td>
+<td><p>Yes</p></td>
+<td><p>A 64 bit CPU found in IBM’s System Z mainframes</p></td>
+</tr>
+<tr class="row-odd"><td><p>sh4</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>A 32 bit RISC embedded CPU developed by Hitachi</p></td>
+</tr>
+<tr class="row-even"><td><p>SPARC (sparc, sparc64)</p></td>
+<td><p><a class="reference internal" href="../system/target-sparc.html#sparc32-system-emulator"><span class="std std-ref">Yes</span></a></p></td>
+<td><p>Yes</p></td>
+<td><p>A RISC ISA originally developed by Sun Microsystems</p></td>
+</tr>
+<tr class="row-odd"><td><p>Tricore</p></td>
+<td><p>Yes</p></td>
+<td><p>No</p></td>
+<td><p>A 32 bit RISC/uController/DSP developed by Infineon</p></td>
+</tr>
+<tr class="row-even"><td><p>Xtensa</p></td>
+<td><p><a class="reference internal" href="../system/target-xtensa.html#xtensa-system-emulator"><span class="std std-ref">Yes</span></a></p></td>
+<td><p>Yes</p></td>
+<td><p>A configurable 32 bit soft core now owned by Cadence</p></td>
+</tr>
+</tbody>
+</table>
+<section id="semihosting">
+<span id="id1"></span><h2>Semihosting<a class="headerlink" href="#semihosting" title="Permalink to this headline"></a></h2>
+<p>Semihosting is a feature defined by the owner of the architecture to
+allow programs to interact with a debugging host system. On real
+hardware this is usually provided by an In-circuit emulator (ICE)
+hooked directly to the board. QEMU’s implementation allows for
+semihosting calls to be passed to the host system or via the
+<code class="docutils literal notranslate"><span class="pre">gdbstub</span></code>.</p>
+<p>Generally semihosting makes it easier to bring up low level code before a
+more fully functional operating system has been enabled. On QEMU it
+also allows for embedded micro-controller code which typically doesn’t
+have a full libc to be run as “bare-metal” code under QEMU’s user-mode
+emulation. It is also useful for writing test cases and indeed a
+number of compiler suites as well as QEMU itself use semihosting calls
+to exit test code while reporting the success state.</p>
+<p>Semihosting is only available using TCG emulation. This is because the
+instructions to trigger a semihosting call are typically reserved
+causing most hypervisors to trap and fault on them.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Semihosting inherently bypasses any isolation there may be between
+the guest and the host. As a result a program using semihosting can
+happily trash your host system. Some semihosting calls (e.g.
+<code class="docutils literal notranslate"><span class="pre">SYS_READC</span></code>) can block execution indefinitely. You should only
+ever run trusted code with semihosting enabled.</p>
+</aside>
+<section id="redirection">
+<h3>Redirection<a class="headerlink" href="#redirection" title="Permalink to this headline"></a></h3>
+<p>Semihosting calls can be re-directed to a (potentially remote) gdb
+during debugging via the <a class="reference internal" href="../system/gdb.html#gdb-usage"><span class="std std-ref">gdbstub</span></a>. Output to the
+semihosting console is configured as a <code class="docutils literal notranslate"><span class="pre">chardev</span></code> so can be
+redirected to a file, pipe or socket like any other <code class="docutils literal notranslate"><span class="pre">chardev</span></code>
+device.</p>
+</section>
+<section id="supported-targets">
+<h3>Supported Targets<a class="headerlink" href="#supported-targets" title="Permalink to this headline"></a></h3>
+<p>Most targets offer similar semihosting implementations with some
+minor changes to define the appropriate instruction to encode the
+semihosting call and which registers hold the parameters. They tend to
+presents a simple POSIX-like API which allows your program to read and
+write files, access the console and some other basic interactions.</p>
+<p>For full details of the ABI for a particular target, and the set of
+calls it provides, you should consult the semihosting specification
+for that architecture.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>QEMU makes an implementation decision to implement all file
+access in <code class="docutils literal notranslate"><span class="pre">O_BINARY</span></code> mode. The user-visible effect of this is
+regardless of the text/binary mode the program sets QEMU will
+always select a binary mode ensuring no line-terminator conversion
+is performed on input or output. This is because gdb semihosting
+support doesn’t make the distinction between the modes and
+magically processing line endings can be confusing.</p>
+</aside>
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-text">Guest Architectures supporting Semihosting</span><a class="headerlink" href="#id4" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Architecture</p></th>
+<th class="head"><p>Modes</p></th>
+<th class="head"><p>Specification</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Arm</p></td>
+<td><p>System and User-mode</p></td>
+<td><p><a class="reference external" href="https://github.com/ARM-software/abi-aa/blob/main/semihosting/semihosting.rst">https://github.com/ARM-software/abi-aa/blob/main/semihosting/semihosting.rst</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>m68k</p></td>
+<td><p>System</p></td>
+<td><p><a class="reference external" href="https://sourceware.org/git/?p=newlib-cygwin.git;a=blob;f=libgloss/m68k/m68k-semi.txt;hb=HEAD">https://sourceware.org/git/?p=newlib-cygwin.git;a=blob;f=libgloss/m68k/m68k-semi.txt;hb=HEAD</a></p></td>
+</tr>
+<tr class="row-even"><td><p>MIPS</p></td>
+<td><p>System</p></td>
+<td><p>Unified Hosting Interface (MD01069)</p></td>
+</tr>
+<tr class="row-odd"><td><p>RISC-V</p></td>
+<td><p>System and User-mode</p></td>
+<td><p><a class="reference external" href="https://github.com/riscv-non-isa/riscv-semihosting/blob/main/riscv-semihosting.adoc">https://github.com/riscv-non-isa/riscv-semihosting/blob/main/riscv-semihosting.adoc</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Xtensa</p></td>
+<td><p>System</p></td>
+<td><p>Tensilica ISS SIMCALL</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="tcg-plugins">
+<span id="id2"></span><h2>TCG Plugins<a class="headerlink" href="#tcg-plugins" title="Permalink to this headline"></a></h2>
+<p>QEMU TCG plugins provide a way for users to run experiments taking
+advantage of the total system control emulation can have over a guest.
+It provides a mechanism for plugins to subscribe to events during
+translation and execution and optionally callback into the plugin
+during these events. TCG plugins are unable to change the system state
+only monitor it passively. However they can do this down to an
+individual instruction granularity including potentially subscribing
+to all load and store operations.</p>
+<p>See the developer section of the manual for details about
+<a class="reference internal" href="../devel/tcg-plugins.html#tcg-plugins"><span class="std std-ref">writing plugins</span></a>.</p>
+<section id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h3>
+<p>Any QEMU binary with TCG support has plugins enabled by default.
+Earlier releases needed to be explicitly enabled with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">configure</span> <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">plugins</span>
+</pre></div>
+</div>
+<p>Once built a program can be run with multiple plugins loaded each with
+their own arguments:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$QEMU $OTHER_QEMU_ARGS \
+    -plugin contrib/plugins/libhowvec.so,inline=on,count=hint \
+    -plugin contrib/plugins/libhotblocks.so
+</pre></div>
+</div>
+<p>Arguments are plugin specific and can be used to modify their
+behaviour. In this case the howvec plugin is being asked to use inline
+ops to count and break down the hint instructions by type.</p>
+<p>Linux user-mode emulation also evaluates the environment variable
+<code class="docutils literal notranslate"><span class="pre">QEMU_PLUGIN</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>QEMU_PLUGIN=&quot;file=contrib/plugins/libhowvec.so,inline=on,count=hint&quot; $QEMU
+</pre></div>
+</div>
+<p>QEMU plugins avoid to write directly to stdin/stderr, and use the log provided
+by the API (see function <code class="docutils literal notranslate"><span class="pre">qemu_plugin_outs</span></code>).
+To show output, you may use this additional parameter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$QEMU $OTHER_QEMU_ARGS \
+  -d plugin \
+  -plugin contrib/plugins/libhowvec.so,inline=on,count=hint
+</pre></div>
+</div>
+</section>
+<section id="example-plugins">
+<h3>Example Plugins<a class="headerlink" href="#example-plugins" title="Permalink to this headline"></a></h3>
+<p>There are a number of plugins included with QEMU and you are
+encouraged to contribute your own plugins plugins upstream. There is a
+<code class="docutils literal notranslate"><span class="pre">contrib/plugins</span></code> directory where they can go. There are also some
+basic plugins that are used to test and exercise the API during the
+<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check-tcg</span></code> target in <code class="docutils literal notranslate"><span class="pre">tests/tcg/plugins</span></code> that are never the
+less useful for basic analysis.</p>
+<section id="empty">
+<h4>Empty<a class="headerlink" href="#empty" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">tests/tcg/plugins/empty.c</span></code></p>
+<p>Purely a test plugin for measuring the overhead of the plugins system
+itself. Does no instrumentation.</p>
+</section>
+<section id="basic-blocks">
+<h4>Basic Blocks<a class="headerlink" href="#basic-blocks" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">tests/tcg/plugins/bb.c</span></code></p>
+<p>A very basic plugin which will measure execution in coarse terms as
+each basic block is executed. By default the results are shown once
+execution finishes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-aarch64 -plugin tests/plugin/libbb.so \
+    -d plugin ./tests/tcg/aarch64-linux-user/sha1
+SHA1=15dd99a1991e0b3826fede3deffc1feba42278e6
+bb&#39;s: 2277338, insns: 158483046
+</pre></div>
+</div>
+<p>Behaviour can be tweaked with the following arguments:</p>
+<table class="docutils align-default" id="id5">
+<caption><span class="caption-text">Basic Block plugin arguments</span><a class="headerlink" href="#id5" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>inline=true|false</p></td>
+<td><p>Use faster inline addition of a single counter.</p></td>
+</tr>
+<tr class="row-odd"><td><p>idle=true|false</p></td>
+<td><p>Dump the current execution stats whenever the guest vCPU idles</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="basic-block-vectors">
+<h4>Basic Block Vectors<a class="headerlink" href="#basic-block-vectors" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">contrib/plugins/bbv.c</span></code></p>
+<p>The bbv plugin allows you to generate basic block vectors for use with the
+<a class="reference external" href="https://cseweb.ucsd.edu/~calder/simpoint/">SimPoint</a> analysis tool.</p>
+<table class="docutils align-default" id="id6">
+<caption><span class="caption-text">Basic block vectors arguments</span><a class="headerlink" href="#id6" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>interval=N</p></td>
+<td><p>The interval to generate a basic block vector specified by the number of
+instructions (Default: N = 100000000)</p></td>
+</tr>
+<tr class="row-odd"><td><p>outfile=PATH</p></td>
+<td><p>The path to output files.
+It will be suffixed with <code class="docutils literal notranslate"><span class="pre">.N.bb</span></code> where <code class="docutils literal notranslate"><span class="pre">N</span></code> is a vCPU index.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-aarch64 \
+  -plugin contrib/plugins/libbbv.so,interval=100,outfile=sha1 \
+  tests/tcg/aarch64-linux-user/sha1
+SHA1=15dd99a1991e0b3826fede3deffc1feba42278e6
+$ du sha1.0.bb
+23128   sha1.0.bb
+</pre></div>
+</div>
+</section>
+<section id="instruction">
+<h4>Instruction<a class="headerlink" href="#instruction" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">tests/tcg/plugins/insn.c</span></code></p>
+<p>This is a basic instruction level instrumentation which can count the
+number of instructions executed on each core/thread:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-aarch64 -plugin tests/plugin/libinsn.so \
+    -d plugin ./tests/tcg/aarch64-linux-user/threadcount
+Created 10 threads
+Done
+cpu 0 insns: 46765
+cpu 1 insns: 3694
+cpu 2 insns: 3694
+cpu 3 insns: 2994
+cpu 4 insns: 1497
+cpu 5 insns: 1497
+cpu 6 insns: 1497
+cpu 7 insns: 1497
+total insns: 63135
+</pre></div>
+</div>
+<p>Behaviour can be tweaked with the following arguments:</p>
+<table class="docutils align-default" id="id7">
+<caption><span class="caption-text">Instruction plugin arguments</span><a class="headerlink" href="#id7" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>inline=true|false</p></td>
+<td><p>Use faster inline addition of a single counter.</p></td>
+</tr>
+<tr class="row-odd"><td><p>sizes=true|false</p></td>
+<td><p>Give a summary of the instruction sizes for the execution</p></td>
+</tr>
+<tr class="row-even"><td><p>match=&lt;string&gt;</p></td>
+<td><p>Only instrument instructions matching the string prefix</p></td>
+</tr>
+</tbody>
+</table>
+<p>The <code class="docutils literal notranslate"><span class="pre">match</span></code> option will show some basic stats including how many
+instructions have executed since the last execution. For
+example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-aarch64 -plugin tests/plugin/libinsn.so,match=bl \
+    -d plugin ./tests/tcg/aarch64-linux-user/sha512-vector
+...
+0x40069c, &#39;bl #0x4002b0&#39;, 10 hits, 1093 match hits, Δ+1257 since last match, 98 avg insns/match
+0x4006ac, &#39;bl #0x403690&#39;, 10 hits, 1094 match hits, Δ+47 since last match, 98 avg insns/match
+0x4037fc, &#39;bl #0x4002b0&#39;, 18 hits, 1095 match hits, Δ+22 since last match, 98 avg insns/match
+0x400720, &#39;bl #0x403690&#39;, 10 hits, 1096 match hits, Δ+58 since last match, 98 avg insns/match
+0x4037fc, &#39;bl #0x4002b0&#39;, 19 hits, 1097 match hits, Δ+22 since last match, 98 avg insns/match
+0x400730, &#39;bl #0x403690&#39;, 10 hits, 1098 match hits, Δ+33 since last match, 98 avg insns/match
+0x4037ac, &#39;bl #0x4002b0&#39;, 12 hits, 1099 match hits, Δ+20 since last match, 98 avg insns/match
+...
+</pre></div>
+</div>
+<p>For more detailed execution tracing see the <code class="docutils literal notranslate"><span class="pre">execlog</span></code> plugin for
+other options.</p>
+</section>
+<section id="memory">
+<h4>Memory<a class="headerlink" href="#memory" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">tests/tcg/plugins/mem.c</span></code></p>
+<p>Basic instruction level memory instrumentation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-aarch64 -plugin tests/plugin/libmem.so,inline=true \
+    -d plugin ./tests/tcg/aarch64-linux-user/sha1
+SHA1=15dd99a1991e0b3826fede3deffc1feba42278e6
+inline mem accesses: 79525013
+</pre></div>
+</div>
+<p>Behaviour can be tweaked with the following arguments:</p>
+<table class="docutils align-default" id="id8">
+<caption><span class="caption-text">Memory plugin arguments</span><a class="headerlink" href="#id8" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>inline=true|false</p></td>
+<td><p>Use faster inline addition of a single counter</p></td>
+</tr>
+<tr class="row-odd"><td><p>callback=true|false</p></td>
+<td><p>Use callbacks on each memory instrumentation.</p></td>
+</tr>
+<tr class="row-even"><td><p>hwaddr=true|false</p></td>
+<td><p>Count IO accesses (only for system emulation)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="system-calls">
+<h4>System Calls<a class="headerlink" href="#system-calls" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">tests/tcg/plugins/syscall.c</span></code></p>
+<p>A basic syscall tracing plugin. This only works for user-mode. By
+default it will give a summary of syscall stats at the end of the
+run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-aarch64 -plugin tests/plugin/libsyscall \
+    -d plugin ./tests/tcg/aarch64-linux-user/threadcount
+Created 10 threads
+Done
+syscall no.  calls  errors
+226          12     0
+99           11     11
+115          11     0
+222          11     0
+93           10     0
+220          10     0
+233          10     0
+215          8      0
+214          4      0
+134          2      0
+64           2      0
+96           1      0
+94           1      0
+80           1      0
+261          1      0
+78           1      0
+160          1      0
+135          1      0
+</pre></div>
+</div>
+<p>Behaviour can be tweaked with the following arguments:</p>
+<table class="docutils align-default" id="id9">
+<caption><span class="caption-text">Syscall plugin arguments</span><a class="headerlink" href="#id9" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>print=true|false</p></td>
+<td><p>Print the number of times each syscall is called</p></td>
+</tr>
+<tr class="row-odd"><td><p>log_writes=true|false</p></td>
+<td><p>Log the buffer of each write syscall in hexdump format</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="test-inline-operations">
+<h4>Test inline operations<a class="headerlink" href="#test-inline-operations" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">tests/plugins/inline.c</span></code></p>
+<p>This plugin is used for testing all inline operations, conditional callbacks and
+scoreboard. It prints a per-cpu summary of all events.</p>
+</section>
+<section id="hot-blocks">
+<h4>Hot Blocks<a class="headerlink" href="#hot-blocks" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">contrib/plugins/hotblocks.c</span></code></p>
+<p>The hotblocks plugin allows you to examine the where hot paths of
+execution are in your program. Once the program has finished you will
+get a sorted list of blocks reporting the starting PC, translation
+count, number of instructions and execution count. This will work best
+with linux-user execution as system emulation tends to generate
+re-translations as blocks from different programs get swapped in and
+out of system memory.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-aarch64 \
+  -plugin contrib/plugins/libhotblocks.so -d plugin \
+  ./tests/tcg/aarch64-linux-user/sha1
+SHA1=15dd99a1991e0b3826fede3deffc1feba42278e6
+collected 903 entries in the hash table
+pc, tcount, icount, ecount
+0x0000000041ed10, 1, 5, 66087
+0x000000004002b0, 1, 4, 66087
+...
+</pre></div>
+</div>
+</section>
+<section id="hot-pages">
+<h4>Hot Pages<a class="headerlink" href="#hot-pages" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">contrib/plugins/hotpages.c</span></code></p>
+<p>Similar to hotblocks but this time tracks memory accesses:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-aarch64 \
+  -plugin contrib/plugins/libhotpages.so -d plugin \
+  ./tests/tcg/aarch64-linux-user/sha1
+SHA1=15dd99a1991e0b3826fede3deffc1feba42278e6
+Addr, RCPUs, Reads, WCPUs, Writes
+0x000055007fe000, 0x0001, 31747952, 0x0001, 8835161
+0x000055007ff000, 0x0001, 29001054, 0x0001, 8780625
+0x00005500800000, 0x0001, 687465, 0x0001, 335857
+0x0000000048b000, 0x0001, 130594, 0x0001, 355
+0x0000000048a000, 0x0001, 1826, 0x0001, 11
+</pre></div>
+</div>
+<p>The hotpages plugin can be configured using the following arguments:</p>
+<table class="docutils align-default" id="id10">
+<caption><span class="caption-text">Hot pages arguments</span><a class="headerlink" href="#id10" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>sortby=reads|writes|address</p></td>
+<td><p>Log the data sorted by either the number of reads, the number of writes, or
+memory address. (Default: entries are sorted by the sum of reads and writes)</p></td>
+</tr>
+<tr class="row-odd"><td><p>io=on</p></td>
+<td><p>Track IO addresses. Only relevant to full system emulation. (Default: off)</p></td>
+</tr>
+<tr class="row-even"><td><p>pagesize=N</p></td>
+<td><p>The page size used. (Default: N = 4096)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="instruction-distribution">
+<h4>Instruction Distribution<a class="headerlink" href="#instruction-distribution" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">contrib/plugins/howvec.c</span></code></p>
+<p>This is an instruction classifier so can be used to count different
+types of instructions. It has a number of options to refine which get
+counted. You can give a value to the <code class="docutils literal notranslate"><span class="pre">count</span></code> argument for a class of
+instructions to break it down fully, so for example to see all the system
+registers accesses:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 $(QEMU_ARGS) \
+  -append &quot;root=/dev/sda2 systemd.unit=benchmark.service&quot; \
+  -smp 4 -plugin ./contrib/plugins/libhowvec.so,count=sreg -d plugin
+</pre></div>
+</div>
+<p>which will lead to a sorted list after the class breakdown:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Instruction</span> <span class="n">Classes</span><span class="p">:</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">UDEF</span>                   <span class="ow">not</span> <span class="n">counted</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">SVE</span>                    <span class="p">(</span><span class="mi">68</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">PCrel</span> <span class="n">addr</span>             <span class="p">(</span><span class="mi">47789483</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">Add</span><span class="o">/</span><span class="n">Sub</span> <span class="p">(</span><span class="n">imm</span><span class="p">)</span>          <span class="p">(</span><span class="mi">192817388</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">Logical</span> <span class="p">(</span><span class="n">imm</span><span class="p">)</span>          <span class="p">(</span><span class="mi">93852565</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">Move</span> <span class="n">Wide</span> <span class="p">(</span><span class="n">imm</span><span class="p">)</span>        <span class="p">(</span><span class="mi">76398116</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">Bitfield</span>               <span class="p">(</span><span class="mi">44706084</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">Extract</span>                <span class="p">(</span><span class="mi">5499257</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">Cond</span> <span class="n">Branch</span> <span class="p">(</span><span class="n">imm</span><span class="p">)</span>      <span class="p">(</span><span class="mi">147202932</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="ne">Exception</span> <span class="n">Gen</span>          <span class="p">(</span><span class="mi">193581</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>     <span class="n">NOP</span>                  <span class="ow">not</span> <span class="n">counted</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">Hints</span>                  <span class="p">(</span><span class="mi">6652291</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">Barriers</span>               <span class="p">(</span><span class="mi">8001661</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">PSTATE</span>                 <span class="p">(</span><span class="mi">1801695</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">System</span> <span class="n">Insn</span>            <span class="p">(</span><span class="mi">6385349</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">System</span> <span class="n">Reg</span>             <span class="n">counted</span> <span class="n">individually</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">Branch</span> <span class="p">(</span><span class="n">reg</span><span class="p">)</span>           <span class="p">(</span><span class="mi">69497127</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">Branch</span> <span class="p">(</span><span class="n">imm</span><span class="p">)</span>           <span class="p">(</span><span class="mi">84393665</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">Cmp</span> <span class="o">&amp;</span> <span class="n">Branch</span>           <span class="p">(</span><span class="mi">110929659</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">Tst</span> <span class="o">&amp;</span> <span class="n">Branch</span>           <span class="p">(</span><span class="mi">44681442</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">AdvSimd</span> <span class="n">ldstmult</span>       <span class="p">(</span><span class="mi">736</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">ldst</span> <span class="n">excl</span>              <span class="p">(</span><span class="mi">9098783</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">Load</span> <span class="n">Reg</span> <span class="p">(</span><span class="n">lit</span><span class="p">)</span>         <span class="p">(</span><span class="mi">87189424</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">ldst</span> <span class="n">noalloc</span> <span class="n">pair</span>      <span class="p">(</span><span class="mi">3264433</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">ldst</span> <span class="n">pair</span>              <span class="p">(</span><span class="mi">412526434</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span>   <span class="n">ldst</span> <span class="n">reg</span> <span class="p">(</span><span class="n">imm</span><span class="p">)</span>         <span class="p">(</span><span class="mi">314734576</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span> <span class="n">Loads</span> <span class="o">&amp;</span> <span class="n">Stores</span>           <span class="p">(</span><span class="mi">2117774</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span> <span class="n">Data</span> <span class="n">Proc</span> <span class="n">Reg</span>            <span class="p">(</span><span class="mi">223519077</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Class</span><span class="p">:</span> <span class="n">Scalar</span> <span class="n">FP</span>                <span class="p">(</span><span class="mi">31657954</span> <span class="n">hits</span><span class="p">)</span>
+<span class="n">Individual</span> <span class="n">Instructions</span><span class="p">:</span>
+<span class="n">Instr</span><span class="p">:</span> <span class="n">mrs</span> <span class="n">x0</span><span class="p">,</span> <span class="n">sp_el0</span>           <span class="p">(</span><span class="mi">2682661</span> <span class="n">hits</span><span class="p">)</span>  <span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="mh">0xd5384100</span><span class="o">/</span>  <span class="n">System</span> <span class="n">Reg</span><span class="p">)</span>
+<span class="n">Instr</span><span class="p">:</span> <span class="n">mrs</span> <span class="n">x1</span><span class="p">,</span> <span class="n">tpidr_el2</span>        <span class="p">(</span><span class="mi">1789339</span> <span class="n">hits</span><span class="p">)</span>  <span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="mh">0xd53cd041</span><span class="o">/</span>  <span class="n">System</span> <span class="n">Reg</span><span class="p">)</span>
+<span class="n">Instr</span><span class="p">:</span> <span class="n">mrs</span> <span class="n">x2</span><span class="p">,</span> <span class="n">tpidr_el2</span>        <span class="p">(</span><span class="mi">1513494</span> <span class="n">hits</span><span class="p">)</span>  <span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="mh">0xd53cd042</span><span class="o">/</span>  <span class="n">System</span> <span class="n">Reg</span><span class="p">)</span>
+<span class="n">Instr</span><span class="p">:</span> <span class="n">mrs</span> <span class="n">x0</span><span class="p">,</span> <span class="n">tpidr_el2</span>        <span class="p">(</span><span class="mi">1490823</span> <span class="n">hits</span><span class="p">)</span>  <span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="mh">0xd53cd040</span><span class="o">/</span>  <span class="n">System</span> <span class="n">Reg</span><span class="p">)</span>
+<span class="n">Instr</span><span class="p">:</span> <span class="n">mrs</span> <span class="n">x1</span><span class="p">,</span> <span class="n">sp_el0</span>           <span class="p">(</span><span class="mi">933793</span> <span class="n">hits</span><span class="p">)</span>   <span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="mh">0xd5384101</span><span class="o">/</span>  <span class="n">System</span> <span class="n">Reg</span><span class="p">)</span>
+<span class="n">Instr</span><span class="p">:</span> <span class="n">mrs</span> <span class="n">x2</span><span class="p">,</span> <span class="n">sp_el0</span>           <span class="p">(</span><span class="mi">699516</span> <span class="n">hits</span><span class="p">)</span>   <span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="mh">0xd5384102</span><span class="o">/</span>  <span class="n">System</span> <span class="n">Reg</span><span class="p">)</span>
+<span class="n">Instr</span><span class="p">:</span> <span class="n">mrs</span> <span class="n">x4</span><span class="p">,</span> <span class="n">tpidr_el2</span>        <span class="p">(</span><span class="mi">528437</span> <span class="n">hits</span><span class="p">)</span>   <span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="mh">0xd53cd044</span><span class="o">/</span>  <span class="n">System</span> <span class="n">Reg</span><span class="p">)</span>
+<span class="n">Instr</span><span class="p">:</span> <span class="n">mrs</span> <span class="n">x30</span><span class="p">,</span> <span class="n">ttbr1_el1</span>       <span class="p">(</span><span class="mi">480776</span> <span class="n">hits</span><span class="p">)</span>   <span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="mh">0xd538203e</span><span class="o">/</span>  <span class="n">System</span> <span class="n">Reg</span><span class="p">)</span>
+<span class="n">Instr</span><span class="p">:</span> <span class="n">msr</span> <span class="n">ttbr1_el1</span><span class="p">,</span> <span class="n">x30</span>       <span class="p">(</span><span class="mi">480713</span> <span class="n">hits</span><span class="p">)</span>   <span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="mh">0xd518203e</span><span class="o">/</span>  <span class="n">System</span> <span class="n">Reg</span><span class="p">)</span>
+<span class="n">Instr</span><span class="p">:</span> <span class="n">msr</span> <span class="n">vbar_el1</span><span class="p">,</span> <span class="n">x30</span>        <span class="p">(</span><span class="mi">480671</span> <span class="n">hits</span><span class="p">)</span>   <span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="mh">0xd518c01e</span><span class="o">/</span>  <span class="n">System</span> <span class="n">Reg</span><span class="p">)</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>To find the argument shorthand for the class you need to examine the
+source code of the plugin at the moment, specifically the <code class="docutils literal notranslate"><span class="pre">*opt</span></code>
+argument in the InsnClassExecCount tables.</p>
+</section>
+<section id="lockstep-execution">
+<h4>Lockstep Execution<a class="headerlink" href="#lockstep-execution" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">contrib/plugins/lockstep.c</span></code></p>
+<p>This is a debugging tool for developers who want to find out when and
+where execution diverges after a subtle change to TCG code generation.
+It is not an exact science and results are likely to be mixed once
+asynchronous events are introduced. While the use of -icount can
+introduce determinism to the execution flow it doesn’t always follow
+the translation sequence will be exactly the same. Typically this is
+caused by a timer firing to service the GUI causing a block to end
+early. However in some cases it has proved to be useful in pointing
+people at roughly where execution diverges. The only argument you need
+for the plugin is a path for the socket the two instances will
+communicate over:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-sparc -monitor none -parallel none \
+  -net none -M SS-20 -m 256 -kernel day11/zImage.elf \
+  -plugin ./contrib/plugins/liblockstep.so,sockpath=lockstep-sparc.sock \
+  -d plugin,nochain
+</pre></div>
+</div>
+<p>which will eventually report:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qemu</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">sparc</span><span class="p">:</span> <span class="n">warning</span><span class="p">:</span> <span class="n">nic</span> <span class="n">lance</span><span class="mf">.0</span> <span class="n">has</span> <span class="n">no</span> <span class="n">peer</span>
+<span class="o">@</span> <span class="mh">0x000000ffd06678</span> <span class="n">vs</span> <span class="mh">0x000000ffd001e0</span> <span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="mi">1</span> <span class="n">since</span> <span class="n">last</span><span class="p">)</span>
+<span class="o">@</span> <span class="mh">0x000000ffd07d9c</span> <span class="n">vs</span> <span class="mh">0x000000ffd06678</span> <span class="p">(</span><span class="mi">3</span><span class="o">/</span><span class="mi">1</span> <span class="n">since</span> <span class="n">last</span><span class="p">)</span>
+<span class="n">Δ</span> <span class="n">insn_count</span> <span class="o">@</span> <span class="mh">0x000000ffd07d9c</span> <span class="p">(</span><span class="mi">809900609</span><span class="p">)</span> <span class="n">vs</span> <span class="mh">0x000000ffd06678</span> <span class="p">(</span><span class="mi">809900612</span><span class="p">)</span>
+  <span class="n">previously</span> <span class="o">@</span> <span class="mh">0x000000ffd06678</span><span class="o">/</span><span class="mi">10</span> <span class="p">(</span><span class="mi">809900609</span> <span class="n">insns</span><span class="p">)</span>
+  <span class="n">previously</span> <span class="o">@</span> <span class="mh">0x000000ffd001e0</span><span class="o">/</span><span class="mi">4</span> <span class="p">(</span><span class="mi">809900599</span> <span class="n">insns</span><span class="p">)</span>
+  <span class="n">previously</span> <span class="o">@</span> <span class="mh">0x000000ffd080ac</span><span class="o">/</span><span class="mi">2</span> <span class="p">(</span><span class="mi">809900595</span> <span class="n">insns</span><span class="p">)</span>
+  <span class="n">previously</span> <span class="o">@</span> <span class="mh">0x000000ffd08098</span><span class="o">/</span><span class="mi">5</span> <span class="p">(</span><span class="mi">809900593</span> <span class="n">insns</span><span class="p">)</span>
+  <span class="n">previously</span> <span class="o">@</span> <span class="mh">0x000000ffd080c0</span><span class="o">/</span><span class="mi">1</span> <span class="p">(</span><span class="mi">809900588</span> <span class="n">insns</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="hardware-profile">
+<h4>Hardware Profile<a class="headerlink" href="#hardware-profile" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">contrib/plugins/hwprofile.c</span></code></p>
+<p>The hwprofile tool can only be used with system emulation and allows
+the user to see what hardware is accessed how often. It has a number of options:</p>
+<table class="docutils align-default" id="id11">
+<caption><span class="caption-text">Hardware Profile arguments</span><a class="headerlink" href="#id11" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>track=[read|write]</p></td>
+<td><p>By default the plugin tracks both reads and writes. You can use
+this option to limit the tracking to just one class of accesses.</p></td>
+</tr>
+<tr class="row-odd"><td><p>source</p></td>
+<td><p>Will include a detailed break down of what the guest PC that made the
+access was. Not compatible with the pattern option. Example output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cirrus</span><span class="o">-</span><span class="n">low</span><span class="o">-</span><span class="n">memory</span> <span class="o">@</span> <span class="mh">0xfffffd00000a0000</span>
+ <span class="n">pc</span><span class="p">:</span><span class="n">fffffc0000005cdc</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">256</span>
+ <span class="n">pc</span><span class="p">:</span><span class="n">fffffc0000005ce8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">256</span>
+ <span class="n">pc</span><span class="p">:</span><span class="n">fffffc0000005cec</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">256</span>
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>pattern</p></td>
+<td><p>Instead break down the accesses based on the offset into the HW
+region. This can be useful for seeing the most used registers of
+a device. Example output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pci0</span><span class="o">-</span><span class="n">conf</span> <span class="o">@</span> <span class="mh">0xfffffd01fe000000</span>
+  <span class="n">off</span><span class="p">:</span><span class="mi">00000004</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span>
+  <span class="n">off</span><span class="p">:</span><span class="mi">00000010</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span>
+  <span class="n">off</span><span class="p">:</span><span class="mi">00000014</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span>
+  <span class="n">off</span><span class="p">:</span><span class="mi">00000018</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+  <span class="n">off</span><span class="p">:</span><span class="mi">0000001</span><span class="n">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+  <span class="n">off</span><span class="p">:</span><span class="mi">00000020</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+  <span class="o">...</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="execution-log">
+<h4>Execution Log<a class="headerlink" href="#execution-log" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">contrib/plugins/execlog.c</span></code></p>
+<p>The execlog tool traces executed instructions with memory access. It can be used
+for debugging and security analysis purposes.
+Please be aware that this will generate a lot of output.</p>
+<p>The plugin needs default argument:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-arm $(QEMU_ARGS) \
+  -plugin ./contrib/plugins/libexeclog.so -d plugin
+</pre></div>
+</div>
+<p>which will output an execution trace following this structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># vCPU, vAddr, opcode, disassembly[, load/store, memory addr, device]...</span>
+<span class="mi">0</span><span class="p">,</span> <span class="mh">0xa12</span><span class="p">,</span> <span class="mh">0xf8012400</span><span class="p">,</span> <span class="s2">&quot;movs r4, #0&quot;</span>
+<span class="mi">0</span><span class="p">,</span> <span class="mh">0xa14</span><span class="p">,</span> <span class="mh">0xf87f42b4</span><span class="p">,</span> <span class="s2">&quot;cmp r4, r6&quot;</span>
+<span class="mi">0</span><span class="p">,</span> <span class="mh">0xa16</span><span class="p">,</span> <span class="mh">0xd206</span><span class="p">,</span> <span class="s2">&quot;bhs #0xa26&quot;</span>
+<span class="mi">0</span><span class="p">,</span> <span class="mh">0xa18</span><span class="p">,</span> <span class="mh">0xfff94803</span><span class="p">,</span> <span class="s2">&quot;ldr r0, [pc, #0xc]&quot;</span><span class="p">,</span> <span class="n">load</span><span class="p">,</span> <span class="mh">0x00010a28</span><span class="p">,</span> <span class="n">RAM</span>
+<span class="mi">0</span><span class="p">,</span> <span class="mh">0xa1a</span><span class="p">,</span> <span class="mh">0xf989f000</span><span class="p">,</span> <span class="s2">&quot;bl #0xd30&quot;</span>
+<span class="mi">0</span><span class="p">,</span> <span class="mh">0xd30</span><span class="p">,</span> <span class="mh">0xfff9b510</span><span class="p">,</span> <span class="s2">&quot;push {r4, lr}&quot;</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="mh">0x20003ee0</span><span class="p">,</span> <span class="n">RAM</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="mh">0x20003ee4</span><span class="p">,</span> <span class="n">RAM</span>
+<span class="mi">0</span><span class="p">,</span> <span class="mh">0xd32</span><span class="p">,</span> <span class="mh">0xf9893014</span><span class="p">,</span> <span class="s2">&quot;adds r0, #0x14&quot;</span>
+<span class="mi">0</span><span class="p">,</span> <span class="mh">0xd34</span><span class="p">,</span> <span class="mh">0xf9c8f000</span><span class="p">,</span> <span class="s2">&quot;bl #0x10c8&quot;</span>
+<span class="mi">0</span><span class="p">,</span> <span class="mh">0x10c8</span><span class="p">,</span> <span class="mh">0xfff96c43</span><span class="p">,</span> <span class="s2">&quot;ldr r3, [r0, #0x44]&quot;</span><span class="p">,</span> <span class="n">load</span><span class="p">,</span> <span class="mh">0x200000e4</span><span class="p">,</span> <span class="n">RAM</span>
+</pre></div>
+</div>
+<p>Please note that you need to configure QEMU with Capstone support to get disassembly.</p>
+<p>The output can be filtered to only track certain instructions or
+addresses using the <code class="docutils literal notranslate"><span class="pre">ifilter</span></code> or <code class="docutils literal notranslate"><span class="pre">afilter</span></code> options. You can stack the
+arguments if required:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-arm $(QEMU_ARGS) \
+  -plugin ./contrib/plugins/libexeclog.so,ifilter=st1w,afilter=0x40001808 -d plugin
+</pre></div>
+</div>
+<p>This plugin can also dump registers when they change value. Specify the name of the
+registers with multiple <code class="docutils literal notranslate"><span class="pre">reg</span></code> options. You can also use glob style matching if you wish:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-arm $(QEMU_ARGS) \
+  -plugin ./contrib/plugins/libexeclog.so,reg=\*_el2,reg=sp -d plugin
+</pre></div>
+</div>
+<p>Be aware that each additional register to check will slow down
+execution quite considerably. You can optimise the number of register
+checks done by using the rdisas option. This will only instrument
+instructions that mention the registers in question in disassembly.
+This is not foolproof as some instructions implicitly change
+instructions. You can use the ifilter to catch these cases:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-arm $(QEMU_ARGS) \
+  -plugin ./contrib/plugins/libexeclog.so,ifilter=msr,ifilter=blr,reg=x30,reg=\*_el1,rdisas=on
+</pre></div>
+</div>
+</section>
+<section id="cache-modelling">
+<h4>Cache Modelling<a class="headerlink" href="#cache-modelling" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">contrib/plugins/cache.c</span></code></p>
+<p>Cache modelling plugin that measures the performance of a given L1 cache
+configuration, and optionally a unified L2 per-core cache when a given working
+set is run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-x86_64 -plugin ./contrib/plugins/libcache.so \
+    -d plugin -D cache.log ./tests/tcg/x86_64-linux-user/float_convs
+</pre></div>
+</div>
+<p>will report the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>core #, data accesses, data misses, dmiss rate, insn accesses, insn misses, imiss rate
+0       996695         508             0.0510%  2642799        18617           0.7044%
+
+address, data misses, instruction
+0x424f1e (_int_malloc), 109, movq %rax, 8(%rcx)
+0x41f395 (_IO_default_xsputn), 49, movb %dl, (%rdi, %rax)
+0x42584d (ptmalloc_init.part.0), 33, movaps %xmm0, (%rax)
+0x454d48 (__tunables_init), 20, cmpb $0, (%r8)
+...
+
+address, fetch misses, instruction
+0x4160a0 (__vfprintf_internal), 744, movl $1, %ebx
+0x41f0a0 (_IO_setb), 744, endbr64
+0x415882 (__vfprintf_internal), 744, movq %r12, %rdi
+0x4268a0 (__malloc), 696, andq $0xfffffffffffffff0, %rax
+...
+</pre></div>
+</div>
+<p>The plugin has a number of arguments, all of them are optional:</p>
+<table class="docutils align-default" id="id12">
+<caption><span class="caption-text">Cache modelling arguments</span><a class="headerlink" href="#id12" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>limit=N</p></td>
+<td><p>Print top N icache and dcache thrashing instructions along with
+their address, number of misses, and its disassembly. (default: 32)</p></td>
+</tr>
+<tr class="row-odd"><td><p>icachesize=N
+iblksize=B
+iassoc=A</p></td>
+<td><p>Instruction cache configuration arguments. They specify the
+cache size, block size, and associativity of the instruction
+cache, respectively. (default: N = 16384, B = 64, A = 8)</p></td>
+</tr>
+<tr class="row-even"><td><p>dcachesize=N</p></td>
+<td><p>Data cache size (default: 16834)</p></td>
+</tr>
+<tr class="row-odd"><td><p>dblksize=B</p></td>
+<td><p>Data cache block size (default: 64)</p></td>
+</tr>
+<tr class="row-even"><td><p>dassoc=A</p></td>
+<td><p>Data cache associativity (default: 8)</p></td>
+</tr>
+<tr class="row-odd"><td><p>evict=POLICY</p></td>
+<td><p>Sets the eviction policy to POLICY. Available policies are:
+<code class="docutils literal notranslate"><span class="pre">lru</span></code>, <code class="docutils literal notranslate"><span class="pre">fifo</span></code>, and <code class="docutils literal notranslate"><span class="pre">rand</span></code>. The plugin will use
+the specified policy for both instruction and data caches.
+(default: POLICY = <code class="docutils literal notranslate"><span class="pre">lru</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p>cores=N</p></td>
+<td><p>Sets the number of cores for which we maintain separate icache
+and dcache. (default: for linux-user, N = 1, for full system
+emulation: N = cores available to guest)</p></td>
+</tr>
+<tr class="row-odd"><td><p>l2=on</p></td>
+<td><p>Simulates a unified L2 cache (stores blocks for both
+instructions and data) using the default L2 configuration (cache
+size = 2MB, associativity = 16-way, block size = 64B).</p></td>
+</tr>
+<tr class="row-even"><td><p>l2cachesize=N</p></td>
+<td><p>L2 cache size (default: 2097152 (2MB)), implies <code class="docutils literal notranslate"><span class="pre">l2=on</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>l2blksize=B</p></td>
+<td><p>L2 cache block size (default: 64), implies <code class="docutils literal notranslate"><span class="pre">l2=on</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>l2assoc=A</p></td>
+<td><p>L2 cache associativity (default: 16), implies <code class="docutils literal notranslate"><span class="pre">l2=on</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="stop-on-trigger">
+<h4>Stop on Trigger<a class="headerlink" href="#stop-on-trigger" title="Permalink to this headline"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">contrib/plugins/stoptrigger.c</span></code></p>
+<p>The stoptrigger plugin allows to setup triggers to stop emulation.
+It can be used for research purposes to launch some code and precisely stop it
+and understand where its execution flow went.</p>
+<p>Two types of triggers can be configured: a count of instructions to stop at,
+or an address to stop at. Multiple triggers can be set at once.</p>
+<p>By default, QEMU will exit with return code 0. A custom return code can be
+configured for each trigger using <code class="docutils literal notranslate"><span class="pre">:CODE</span></code> syntax.</p>
+<p>For example, to stop at the 20-th instruction with return code 41, at address
+0xd4 with return code 0 or at address 0xd8 with return code 42:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-aarch64 $(QEMU_ARGS) \
+  -plugin ./contrib/plugins/libstoptrigger.so,icount=20:41,addr=0xd4,addr=0xd8:42 -d plugin
+</pre></div>
+</div>
+<p>The plugin will log the reason of exit, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0xd4</span> <span class="n">reached</span><span class="p">,</span> <span class="n">exiting</span>
+</pre></div>
+</div>
+</section>
+<section id="limit-instructions-per-second">
+<h4>Limit instructions per second<a class="headerlink" href="#limit-instructions-per-second" title="Permalink to this headline"></a></h4>
+<p>This plugin can limit the number of Instructions Per Second that are executed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># get number of instructions
+$ num_insn=$(./build/qemu-x86_64 -plugin ./build/tests/plugin/libinsn.so -d plugin /bin/true |&amp; grep total | sed -e &#39;s/.*: //&#39;)
+# limit speed to execute in 10 seconds
+$ time ./build/qemu-x86_64 -plugin ./build/contrib/plugins/libips.so,ips=$(($num_insn/10)) /bin/true
+real 10.000s
+</pre></div>
+</div>
+<table class="docutils align-default" id="id13">
+<caption><span class="caption-text">IPS arguments</span><a class="headerlink" href="#id13" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ips=N</p></td>
+<td><p>Maximum number of instructions per cpu that can be executed in one second.
+The plugin will sleep when the given number of instructions is reached.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+<section id="other-emulation-features">
+<h2>Other emulation features<a class="headerlink" href="#other-emulation-features" title="Permalink to this headline"></a></h2>
+<p>When running system emulation you can also enable deterministic
+execution which allows for repeatable record/replay debugging. See
+<a class="reference internal" href="../system/replay.html#replay"><span class="std std-ref">Record/Replay</span></a> for more details.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="build-platforms.html" class="btn btn-neutral float-left" title="Supported build platforms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="deprecated.html" class="btn btn-neutral float-right" title="Deprecated features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

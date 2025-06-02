@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QPL Compression &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="User Space Accelerator Development Kit (UADK) Compression" href="uadk-compression.html" />
+    <link rel="prev" title="CheckPoint and Restart (CPR)" href="CPR.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-build.html">QEMU Build System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testing/index.html">Testing QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rcu.html">Using RCU (Read-Copy-Update) for synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Migration</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="main.html">Migration framework</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="features.html">Migration features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="compatibility.html">Backwards compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="best-practices.html">Best practices</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../s390-cpu-topology.html">QAPI interface for S390 CPU topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uefi-vars.html">UEFI variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../vfio-iommufd.html">IOMMUFD BACKEND usage with VFIO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../crypto.html">Cryptography in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multiple-iothreads.html">Using Multiple <code class="docutils literal notranslate"><span class="pre">IOThread</span></code>s</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index-tcg.html">TCG Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Developer Information</a> &raquo;</li>
+          <li><a href="../index-internals.html">Internal Subsystem Information</a> &raquo;</li>
+          <li><a href="index.html">Migration</a> &raquo;</li>
+          <li><a href="features.html">Migration features</a> &raquo;</li>
+      <li>QPL Compression</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/migration/qpl-compression.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qpl-compression">
+<h1>QPL Compression<a class="headerlink" href="#qpl-compression" title="Permalink to this headline"></a></h1>
+<p>The Intel Query Processing Library (Intel <code class="docutils literal notranslate"><span class="pre">QPL</span></code>) is an open-source library to
+provide compression and decompression features and it is based on deflate
+compression algorithm (RFC 1951).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">QPL</span></code> compression relies on Intel In-Memory Analytics Accelerator(<code class="docutils literal notranslate"><span class="pre">IAA</span></code>)
+and Shared Virtual Memory(<code class="docutils literal notranslate"><span class="pre">SVM</span></code>) technology, they are new features supported
+from Intel 4th Gen Intel Xeon Scalable processors, codenamed Sapphire Rapids
+processor(<code class="docutils literal notranslate"><span class="pre">SPR</span></code>).</p>
+<p>For more <code class="docutils literal notranslate"><span class="pre">QPL</span></code> introduction, please refer to <a class="reference external" href="https://intel.github.io/qpl/documentation/introduction_docs/introduction.html">QPL Introduction</a></p>
+<section id="qpl-compression-framework">
+<h2>QPL Compression Framework<a class="headerlink" href="#qpl-compression-framework" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+----------------+</span>       <span class="o">+------------------+</span>
+<span class="o">|</span> <span class="n">MultiFD</span> <span class="n">Thread</span> <span class="o">|</span>       <span class="o">|</span><span class="n">accel</span><span class="o">-</span><span class="n">config</span> <span class="n">tool</span> <span class="o">|</span>
+<span class="o">+-------+--------+</span>       <span class="o">+--------+---------+</span>
+        <span class="o">|</span>                         <span class="o">|</span>
+        <span class="o">|</span>                         <span class="o">|</span>
+        <span class="o">|</span><span class="n">compress</span><span class="o">/</span><span class="n">decompress</span>      <span class="o">|</span>
+<span class="o">+-------+--------+</span>                <span class="o">|</span> <span class="n">Setup</span> <span class="n">IAA</span>
+<span class="o">|</span>  <span class="n">QPL</span> <span class="n">library</span>   <span class="o">|</span>                <span class="o">|</span> <span class="n">Resources</span>
+<span class="o">+-------+---+----+</span>                <span class="o">|</span>
+        <span class="o">|</span>   <span class="o">|</span>                     <span class="o">|</span>
+        <span class="o">|</span>   <span class="o">+-------------+-------+</span>
+        <span class="o">|</span>   <span class="n">Open</span> <span class="n">IAA</span>      <span class="o">|</span>
+        <span class="o">|</span>   <span class="n">Devices</span> <span class="o">+-----+-----+</span>
+        <span class="o">|</span>           <span class="o">|</span><span class="n">idxd</span> <span class="n">driver</span><span class="o">|</span>
+        <span class="o">|</span>           <span class="o">+-----+-----+</span>
+        <span class="o">|</span>                 <span class="o">|</span>
+        <span class="o">|</span>                 <span class="o">|</span>
+        <span class="o">|</span>           <span class="o">+-----+-----+</span>
+        <span class="o">+-----------+</span><span class="n">IAA</span> <span class="n">Devices</span><span class="o">|</span>
+    <span class="n">Submit</span> <span class="n">jobs</span>     <span class="o">+-----------+</span>
+    <span class="n">via</span> <span class="n">enqcmd</span>
+</pre></div>
+</div>
+<section id="qpl-build-and-installation">
+<h3>QPL Build And Installation<a class="headerlink" href="#qpl-build-and-installation" title="Permalink to this headline"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nv">$git</span><span class="w"> </span>clone<span class="w"> </span>--recursive<span class="w"> </span>https://github.com/intel/qpl.git<span class="w"> </span>qpl
+<span class="nv">$mkdir</span><span class="w"> </span>qpl/build
+<span class="nv">$cd</span><span class="w"> </span>qpl/build
+<span class="nv">$cmake</span><span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>/usr<span class="w"> </span>-DQPL_LIBRARY_TYPE<span class="o">=</span>SHARED<span class="w"> </span>..
+<span class="nv">$sudo</span><span class="w"> </span>cmake<span class="w"> </span>--build<span class="w"> </span>.<span class="w"> </span>--target<span class="w"> </span>install
+</pre></div>
+</div>
+<p>For more details about <code class="docutils literal notranslate"><span class="pre">QPL</span></code> installation, please refer to <a class="reference external" href="https://intel.github.io/qpl/documentation/get_started_docs/installation.html">QPL Installation</a></p>
+</section>
+<section id="iaa-device-management">
+<h3>IAA Device Management<a class="headerlink" href="#iaa-device-management" title="Permalink to this headline"></a></h3>
+<p>The number of <code class="docutils literal notranslate"><span class="pre">IAA</span></code> devices will vary depending on the Xeon product model.
+On a <code class="docutils literal notranslate"><span class="pre">SPR</span></code> server, there can be a maximum of 8 <code class="docutils literal notranslate"><span class="pre">IAA</span></code> devices, with up to
+4 devices per socket.</p>
+<p>By default, all <code class="docutils literal notranslate"><span class="pre">IAA</span></code> devices are disabled and need to be configured and
+enabled by users manually.</p>
+<p>Check the number of devices through the following command</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1">#lspci -d 8086:0cfe</span>
+6a:02.0<span class="w"> </span>System<span class="w"> </span>peripheral:<span class="w"> </span>Intel<span class="w"> </span>Corporation<span class="w"> </span>Device<span class="w"> </span>0cfe
+6f:02.0<span class="w"> </span>System<span class="w"> </span>peripheral:<span class="w"> </span>Intel<span class="w"> </span>Corporation<span class="w"> </span>Device<span class="w"> </span>0cfe
+<span class="m">74</span>:02.0<span class="w"> </span>System<span class="w"> </span>peripheral:<span class="w"> </span>Intel<span class="w"> </span>Corporation<span class="w"> </span>Device<span class="w"> </span>0cfe
+<span class="m">79</span>:02.0<span class="w"> </span>System<span class="w"> </span>peripheral:<span class="w"> </span>Intel<span class="w"> </span>Corporation<span class="w"> </span>Device<span class="w"> </span>0cfe
+e7:02.0<span class="w"> </span>System<span class="w"> </span>peripheral:<span class="w"> </span>Intel<span class="w"> </span>Corporation<span class="w"> </span>Device<span class="w"> </span>0cfe
+ec:02.0<span class="w"> </span>System<span class="w"> </span>peripheral:<span class="w"> </span>Intel<span class="w"> </span>Corporation<span class="w"> </span>Device<span class="w"> </span>0cfe
+f1:02.0<span class="w"> </span>System<span class="w"> </span>peripheral:<span class="w"> </span>Intel<span class="w"> </span>Corporation<span class="w"> </span>Device<span class="w"> </span>0cfe
+f6:02.0<span class="w"> </span>System<span class="w"> </span>peripheral:<span class="w"> </span>Intel<span class="w"> </span>Corporation<span class="w"> </span>Device<span class="w"> </span>0cfe
+</pre></div>
+</div>
+<section id="iaa-device-configuration-and-enabling">
+<h4>IAA Device Configuration And Enabling<a class="headerlink" href="#iaa-device-configuration-and-enabling" title="Permalink to this headline"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">accel-config</span></code> tool is used to enable <code class="docutils literal notranslate"><span class="pre">IAA</span></code> devices and configure
+<code class="docutils literal notranslate"><span class="pre">IAA</span></code> hardware resources(work queues and engines). One <code class="docutils literal notranslate"><span class="pre">IAA</span></code> device
+has 8 work queues and 8 processing engines, multiple engines can be assigned
+to a work queue via <code class="docutils literal notranslate"><span class="pre">group</span></code> attribute.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">accel-config</span></code> installation, please refer to <a class="reference external" href="https://github.com/intel/idxd-config">accel-config installation</a></p>
+<p>One example of configuring and enabling an <code class="docutils literal notranslate"><span class="pre">IAA</span></code> device.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1">#accel-config config-engine iax1/engine1.0 -g 0</span>
+<span class="c1">#accel-config config-engine iax1/engine1.1 -g 0</span>
+<span class="c1">#accel-config config-engine iax1/engine1.2 -g 0</span>
+<span class="c1">#accel-config config-engine iax1/engine1.3 -g 0</span>
+<span class="c1">#accel-config config-engine iax1/engine1.4 -g 0</span>
+<span class="c1">#accel-config config-engine iax1/engine1.5 -g 0</span>
+<span class="c1">#accel-config config-engine iax1/engine1.6 -g 0</span>
+<span class="c1">#accel-config config-engine iax1/engine1.7 -g 0</span>
+<span class="c1">#accel-config config-wq iax1/wq1.0 -g 0 -s 128 -p 10 -b 1 -t 128 -m shared -y user -n app1 -d user</span>
+<span class="c1">#accel-config enable-device iax1</span>
+<span class="c1">#accel-config enable-wq iax1/wq1.0</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>IAX is an early name for IAA</p>
+</aside>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">IAA</span></code> device index is 1, use <code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-lh</span> <span class="pre">/sys/bus/dsa/devices/iax*</span></code>
+command to query the <code class="docutils literal notranslate"><span class="pre">IAA</span></code> device index.</p></li>
+<li><p>8 engines and 1 work queue are configured in group 0, so all compression jobs
+submitted to this work queue can be processed by all engines at the same time.</p></li>
+<li><p>Set work queue attributes including the work mode, work queue size and so on.</p></li>
+<li><p>Enable the <code class="docutils literal notranslate"><span class="pre">IAA1</span></code> device and work queue 1.0</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Set work queue mode to shared mode, since <code class="docutils literal notranslate"><span class="pre">QPL</span></code> library only supports
+shared mode</p>
+</aside>
+<p>For more detailed configuration, please refer to <a class="reference external" href="https://github.com/intel/idxd-config/tree/stable/Documentation/accfg">IAA Configuration Samples</a></p>
+</section>
+<section id="iaa-unit-test">
+<h4>IAA Unit Test<a class="headerlink" href="#iaa-unit-test" title="Permalink to this headline"></a></h4>
+<ul class="simple">
+<li><p>Enabling <code class="docutils literal notranslate"><span class="pre">IAA</span></code> devices for Xeon platform, please refer to <a class="reference external" href="https://www.intel.com/content/www/us/en/content-details/780887/intel-in-memory-analytics-accelerator-intel-iaa.html">IAA User Guide</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IAA</span></code> device driver is Intel Data Accelerator Driver (idxd), it is
+recommended that the minimum version of Linux kernel is 5.18.</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">&quot;intel_iommu=on,sm_on&quot;</span></code> parameter to kernel command line
+for <code class="docutils literal notranslate"><span class="pre">SVM</span></code> feature enabling.</p></li>
+</ul>
+<p>Here is an easy way to verify <code class="docutils literal notranslate"><span class="pre">IAA</span></code> device driver and <code class="docutils literal notranslate"><span class="pre">SVM</span></code> with <a class="reference external" href="https://github.com/intel/idxd-config/tree/stable/test">iaa_test</a></p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1">#./test/iaa_test</span>
+<span class="w"> </span><span class="o">[</span><span class="w"> </span>info<span class="o">]</span><span class="w"> </span>alloc<span class="w"> </span>wq<span class="w"> </span><span class="m">0</span><span class="w"> </span>shared<span class="w"> </span>size<span class="w"> </span><span class="m">128</span><span class="w"> </span>addr<span class="w"> </span>0x7f26cebe5000<span class="w"> </span>batch<span class="w"> </span>sz<span class="w"> </span>0xfffffffe<span class="w"> </span>xfer<span class="w"> </span>sz<span class="w"> </span>0x80000000
+<span class="w"> </span><span class="o">[</span><span class="w"> </span>info<span class="o">]</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>noop:<span class="w"> </span>tflags<span class="w"> </span>0x1<span class="w"> </span>num_desc<span class="w"> </span><span class="m">1</span>
+<span class="w"> </span><span class="o">[</span><span class="w"> </span>info<span class="o">]</span><span class="w"> </span>preparing<span class="w"> </span>descriptor<span class="w"> </span><span class="k">for</span><span class="w"> </span>noop
+<span class="w"> </span><span class="o">[</span><span class="w"> </span>info<span class="o">]</span><span class="w"> </span>Submitted<span class="w"> </span>all<span class="w"> </span>noop<span class="w"> </span><span class="nb">jobs</span>
+<span class="w"> </span><span class="o">[</span><span class="w"> </span>info<span class="o">]</span><span class="w"> </span>verifying<span class="w"> </span>task<span class="w"> </span>result<span class="w"> </span><span class="k">for</span><span class="w"> </span>0x16f7e20
+<span class="w"> </span><span class="o">[</span><span class="w"> </span>info<span class="o">]</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>with<span class="w"> </span>op<span class="w"> </span><span class="m">0</span><span class="w"> </span>passed
+</pre></div>
+</div>
+</section>
+<section id="iaa-resources-allocation-for-migration">
+<h4>IAA Resources Allocation For Migration<a class="headerlink" href="#iaa-resources-allocation-for-migration" title="Permalink to this headline"></a></h4>
+<p>There is no <code class="docutils literal notranslate"><span class="pre">IAA</span></code> resource configuration parameters for migration and
+<code class="docutils literal notranslate"><span class="pre">accel-config</span></code> tool configuration cannot directly specify the <code class="docutils literal notranslate"><span class="pre">IAA</span></code>
+resources used for migration.</p>
+<p>The multifd migration with <code class="docutils literal notranslate"><span class="pre">QPL</span></code> compression method  will use all work
+queues that are enabled and shared mode.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Accessing IAA resources requires <code class="docutils literal notranslate"><span class="pre">sudo</span></code> command or <code class="docutils literal notranslate"><span class="pre">root</span></code> privileges
+by default. Administrators can modify the IAA device node ownership
+so that QEMU can use IAA with specified user permissions.</p>
+<p>For example</p>
+<p>#chown -R qemu /dev/iax</p>
+</aside>
+</section>
+</section>
+</section>
+<section id="shared-virtual-memory-svm-introduction">
+<h2>Shared Virtual Memory(SVM) Introduction<a class="headerlink" href="#shared-virtual-memory-svm-introduction" title="Permalink to this headline"></a></h2>
+<p>An ability for an accelerator I/O device to operate in the same virtual
+memory space of applications on host processors. It also implies the
+ability to operate from pageable memory, avoiding functional requirements
+to pin memory for DMA operations.</p>
+<p>When using <code class="docutils literal notranslate"><span class="pre">SVM</span></code> technology, users do not need to reserve memory for the
+<code class="docutils literal notranslate"><span class="pre">IAA</span></code> device and perform pin memory operation. The <code class="docutils literal notranslate"><span class="pre">IAA</span></code> device can
+directly access data using the virtual address of the process.</p>
+<p>For more <code class="docutils literal notranslate"><span class="pre">SVM</span></code> technology, please refer to
+<a class="reference external" href="https://docs.kernel.org/next/x86/sva.html">Shared Virtual Addressing (SVA) with ENQCMD</a></p>
+</section>
+<section id="how-to-use-qpl-compression-in-migration">
+<h2>How To Use QPL Compression In Migration<a class="headerlink" href="#how-to-use-qpl-compression-in-migration" title="Permalink to this headline"></a></h2>
+<p>1 - Installation of <code class="docutils literal notranslate"><span class="pre">QPL</span></code> library and <code class="docutils literal notranslate"><span class="pre">accel-config</span></code> library if using IAA</p>
+<p>2 - Configure and enable <code class="docutils literal notranslate"><span class="pre">IAA</span></code> devices and work queues via <code class="docutils literal notranslate"><span class="pre">accel-config</span></code></p>
+<p>3 - Build <code class="docutils literal notranslate"><span class="pre">QEMU</span></code> with <code class="docutils literal notranslate"><span class="pre">--enable-qpl</span></code> parameter</p>
+<blockquote>
+<div><p>E.g. configure –target-list=x86_64-softmmu –enable-kvm <code class="docutils literal notranslate"><span class="pre">--enable-qpl</span></code></p>
+</div></blockquote>
+<p>4 - Enable <code class="docutils literal notranslate"><span class="pre">QPL</span></code> compression during migration</p>
+<blockquote>
+<div><p>Set <code class="docutils literal notranslate"><span class="pre">migrate_set_parameter</span> <span class="pre">multifd-compression</span> <span class="pre">qpl</span></code> when migrating, the
+<code class="docutils literal notranslate"><span class="pre">QPL</span></code> compression does not support configuring the compression level, it
+only supports one compression level.</p>
+</div></blockquote>
+</section>
+<section id="the-difference-between-qpl-and-zlib">
+<h2>The Difference Between QPL And ZLIB<a class="headerlink" href="#the-difference-between-qpl-and-zlib" title="Permalink to this headline"></a></h2>
+<p>Although both <code class="docutils literal notranslate"><span class="pre">QPL</span></code> and <code class="docutils literal notranslate"><span class="pre">ZLIB</span></code> are based on the deflate compression
+algorithm, and <code class="docutils literal notranslate"><span class="pre">QPL</span></code> can support the header and tail of <code class="docutils literal notranslate"><span class="pre">ZLIB</span></code>, <code class="docutils literal notranslate"><span class="pre">QPL</span></code>
+is still not fully compatible with the <code class="docutils literal notranslate"><span class="pre">ZLIB</span></code> compression in the migration.</p>
+<p><code class="docutils literal notranslate"><span class="pre">QPL</span></code> only supports 4K history buffer, and <code class="docutils literal notranslate"><span class="pre">ZLIB</span></code> is 32K by default.
+<code class="docutils literal notranslate"><span class="pre">ZLIB</span></code> compresses data that <code class="docutils literal notranslate"><span class="pre">QPL</span></code> may not decompress correctly and
+vice versa.</p>
+<p><code class="docutils literal notranslate"><span class="pre">QPL</span></code> does not support the <code class="docutils literal notranslate"><span class="pre">Z_SYNC_FLUSH</span></code> operation in <code class="docutils literal notranslate"><span class="pre">ZLIB</span></code> streaming
+compression, current <code class="docutils literal notranslate"><span class="pre">ZLIB</span></code> implementation uses <code class="docutils literal notranslate"><span class="pre">Z_SYNC_FLUSH</span></code>, so each
+<code class="docutils literal notranslate"><span class="pre">multifd</span></code> thread has a <code class="docutils literal notranslate"><span class="pre">ZLIB</span></code> streaming context, and all page compression
+and decompression are based on this stream. <code class="docutils literal notranslate"><span class="pre">QPL</span></code> cannot decompress such data
+and vice versa.</p>
+<p>The introduction for <code class="docutils literal notranslate"><span class="pre">Z_SYNC_FLUSH</span></code>, please refer to <a class="reference external" href="https://www.zlib.net/manual.html">Zlib Manual</a></p>
+</section>
+<section id="the-best-practices">
+<h2>The Best Practices<a class="headerlink" href="#the-best-practices" title="Permalink to this headline"></a></h2>
+<p>When user enables the IAA device for <code class="docutils literal notranslate"><span class="pre">QPL</span></code> compression, it is recommended
+to add <code class="docutils literal notranslate"><span class="pre">-mem-prealloc</span></code> parameter to the destination boot parameters. This
+parameter can avoid the occurrence of I/O page fault and reduce the overhead
+of IAA compression and decompression.</p>
+<p>The example of booting with <code class="docutils literal notranslate"><span class="pre">-mem-prealloc</span></code> parameter</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nv">$qemu</span>-system-x86_64<span class="w"> </span>--enable-kvm<span class="w"> </span>-cpu<span class="w"> </span>host<span class="w"> </span>--mem-prealloc<span class="w"> </span>...
+</pre></div>
+</div>
+<p>An example about I/O page fault measurement of destination without
+<code class="docutils literal notranslate"><span class="pre">-mem-prealloc</span></code>, the <code class="docutils literal notranslate"><span class="pre">svm_prq</span></code> indicates the number of I/O page fault
+occurrences and processing time.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1">#echo 1 &gt; /sys/kernel/debug/iommu/intel/dmar_perf_latency</span>
+<span class="c1">#echo 2 &gt; /sys/kernel/debug/iommu/intel/dmar_perf_latency</span>
+<span class="c1">#echo 3 &gt; /sys/kernel/debug/iommu/intel/dmar_perf_latency</span>
+<span class="c1">#echo 4 &gt; /sys/kernel/debug/iommu/intel/dmar_perf_latency</span>
+<span class="c1">#cat /sys/kernel/debug/iommu/intel/dmar_perf_latency</span>
+IOMMU:<span class="w"> </span>dmar18<span class="w"> </span>Register<span class="w"> </span>Base<span class="w"> </span>Address:<span class="w"> </span>c87fc000
+<span class="w">                </span>&lt;<span class="m">0</span>.1us<span class="w">   </span><span class="m">0</span>.1us-1us<span class="w">    </span>1us-10us<span class="w">  </span>10us-100us<span class="w">   </span>100us-1ms<span class="w">    </span>1ms-10ms<span class="w">      </span>&gt;<span class="o">=</span>10ms<span class="w">     </span>min<span class="o">(</span>us<span class="o">)</span><span class="w">     </span>max<span class="o">(</span>us<span class="o">)</span><span class="w"> </span>average<span class="o">(</span>us<span class="o">)</span>
+<span class="w"> </span>inv_iotlb<span class="w">           </span><span class="m">0</span><span class="w">         </span><span class="m">286</span><span class="w">         </span><span class="m">123</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">1</span><span class="w">           </span><span class="m">0</span>
+inv_devtlb<span class="w">           </span><span class="m">0</span><span class="w">         </span><span class="m">276</span><span class="w">         </span><span class="m">133</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">2</span><span class="w">           </span><span class="m">0</span>
+<span class="w">   </span>inv_iec<span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span>
+<span class="w">   </span>svm_prq<span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">       </span><span class="m">25206</span><span class="w">         </span><span class="m">364</span><span class="w">         </span><span class="m">395</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">0</span><span class="w">           </span><span class="m">1</span><span class="w">         </span><span class="m">556</span><span class="w">           </span><span class="m">9</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="CPR.html" class="btn btn-neutral float-left" title="CheckPoint and Restart (CPR)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="uadk-compression.html" class="btn btn-neutral float-right" title="User Space Accelerator Development Kit (UADK) Compression" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

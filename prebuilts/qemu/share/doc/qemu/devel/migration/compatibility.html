@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backwards compatibility &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Best practices" href="best-practices.html" />
+    <link rel="prev" title="QATzip Compression" href="qatzip-compression.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-build.html">QEMU Build System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testing/index.html">Testing QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rcu.html">Using RCU (Read-Copy-Update) for synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Migration</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="main.html">Migration framework</a></li>
+<li class="toctree-l4"><a class="reference internal" href="features.html">Migration features</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Backwards compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="best-practices.html">Best practices</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../s390-cpu-topology.html">QAPI interface for S390 CPU topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uefi-vars.html">UEFI variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../vfio-iommufd.html">IOMMUFD BACKEND usage with VFIO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../crypto.html">Cryptography in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multiple-iothreads.html">Using Multiple <code class="docutils literal notranslate"><span class="pre">IOThread</span></code>s</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index-tcg.html">TCG Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Developer Information</a> &raquo;</li>
+          <li><a href="../index-internals.html">Internal Subsystem Information</a> &raquo;</li>
+          <li><a href="index.html">Migration</a> &raquo;</li>
+      <li>Backwards compatibility</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/migration/compatibility.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="backwards-compatibility">
+<h1>Backwards compatibility<a class="headerlink" href="#backwards-compatibility" title="Permalink to this headline"></a></h1>
+<section id="how-backwards-compatibility-works">
+<h2>How backwards compatibility works<a class="headerlink" href="#how-backwards-compatibility-works" title="Permalink to this headline"></a></h2>
+<p>When we do migration, we have two QEMU processes: the source and the
+target.  There are two cases, they are the same version or they are
+different versions.  The easy case is when they are the same version.
+The difficult one is when they are different versions.</p>
+<p>There are two things that are different, but they have very similar
+names and sometimes get confused:</p>
+<ul class="simple">
+<li><p>QEMU version</p></li>
+<li><p>machine type version</p></li>
+</ul>
+<p>Let’s start with a practical example, we start with:</p>
+<ul class="simple">
+<li><p>qemu-system-x86_64 (v5.2), from now on qemu-5.2.</p></li>
+<li><p>qemu-system-x86_64 (v5.1), from now on qemu-5.1.</p></li>
+</ul>
+<p>Related to this are the “latest” machine types defined on each of
+them:</p>
+<ul class="simple">
+<li><p>pc-q35-5.2 (newer one in qemu-5.2) from now on pc-5.2</p></li>
+<li><p>pc-q35-5.1 (newer one in qemu-5.1) from now on pc-5.1</p></li>
+</ul>
+<p>First of all, migration is only supposed to work if you use the same
+machine type in both source and destination. The QEMU hardware
+configuration needs to be the same also on source and destination.
+Most aspects of the backend configuration can be changed at will,
+except for a few cases where the backend features influence frontend
+device feature exposure.  But that is not relevant for this section.</p>
+<p>I am going to list the number of combinations that we can have.  Let’s
+start with the trivial ones, QEMU is the same on source and
+destination:</p>
+<p>1 - qemu-5.2 -M pc-5.2  -&gt; migrates to -&gt; qemu-5.2 -M pc-5.2</p>
+<blockquote>
+<div><p>This is the latest QEMU with the latest machine type.
+This have to work, and if it doesn’t work it is a bug.</p>
+</div></blockquote>
+<p>2 - qemu-5.1 -M pc-5.1  -&gt; migrates to -&gt; qemu-5.1 -M pc-5.1</p>
+<blockquote>
+<div><p>Exactly the same case than the previous one, but for 5.1.
+Nothing to see here either.</p>
+</div></blockquote>
+<p>This are the easiest ones, we will not talk more about them in this
+section.</p>
+<p>Now we start with the more interesting cases.  Consider the case where
+we have the same QEMU version in both sides (qemu-5.2) but we are using
+the latest machine type for that version (pc-5.2) but one of an older
+QEMU version, in this case pc-5.1.</p>
+<p>3 - qemu-5.2 -M pc-5.1  -&gt; migrates to -&gt; qemu-5.2 -M pc-5.1</p>
+<blockquote>
+<div><p>It needs to use the definition of pc-5.1 and the devices as they
+were configured on 5.1, but this should be easy in the sense that
+both sides are the same QEMU and both sides have exactly the same
+idea of what the pc-5.1 machine is.</p>
+</div></blockquote>
+<p>4 - qemu-5.1 -M pc-5.2  -&gt; migrates to -&gt; qemu-5.1 -M pc-5.2</p>
+<blockquote>
+<div><p>This combination is not possible as the qemu-5.1 doesn’t understand
+pc-5.2 machine type.  So nothing to worry here.</p>
+</div></blockquote>
+<p>Now it comes the interesting ones, when both QEMU processes are
+different.  Notice also that the machine type needs to be pc-5.1,
+because we have the limitation than qemu-5.1 doesn’t know pc-5.2.  So
+the possible cases are:</p>
+<p>5 - qemu-5.2 -M pc-5.1  -&gt; migrates to -&gt; qemu-5.1 -M pc-5.1</p>
+<blockquote>
+<div><p>This migration is known as newer to older.  We need to make sure
+when we are developing 5.2 we need to take care about not to break
+migration to qemu-5.1.  Notice that we can’t make updates to
+qemu-5.1 to understand whatever qemu-5.2 decides to change, so it is
+in qemu-5.2 side to make the relevant changes.</p>
+</div></blockquote>
+<p>6 - qemu-5.1 -M pc-5.1  -&gt; migrates to -&gt; qemu-5.2 -M pc-5.1</p>
+<blockquote>
+<div><p>This migration is known as older to newer.  We need to make sure
+than we are able to receive migrations from qemu-5.1. The problem is
+similar to the previous one.</p>
+</div></blockquote>
+<p>If qemu-5.1 and qemu-5.2 were the same, there will not be any
+compatibility problems.  But the reason that we create qemu-5.2 is to
+get new features, devices, defaults, etc.</p>
+<p>If we get a device that has a new feature, or change a default value,
+we have a problem when we try to migrate between different QEMU
+versions.</p>
+<p>So we need a way to tell qemu-5.2 that when we are using machine type
+pc-5.1, it needs to <strong>not</strong> use the feature, to be able to migrate to
+real qemu-5.1.</p>
+<p>And the equivalent part when migrating from qemu-5.1 to qemu-5.2.
+qemu-5.2 has to expect that it is not going to get data for the new
+feature, because qemu-5.1 doesn’t know about it.</p>
+<p>How do we tell QEMU about these device feature changes?  In
+hw/core/machine.c:hw_compat_X_Y arrays.</p>
+<p>If we change a default value, we need to put back the old value on
+that array.  And the device, during initialization needs to look at
+that array to see what value it needs to get for that feature.  And
+what are we going to put in that array, the value of a property.</p>
+<p>To create a property for a device, we need to use one of the
+DEFINE_PROP_*() macros. See include/hw/qdev-properties.h to find the
+macros that exist.  With it, we set the default value for that
+property, and that is what it is going to get in the latest released
+version.  But if we want a different value for a previous version, we
+can change that in the hw_compat_X_Y arrays.</p>
+<p>hw_compat_X_Y is an array of registers that have the format:</p>
+<ul class="simple">
+<li><p>name_device</p></li>
+<li><p>name_property</p></li>
+<li><p>value</p></li>
+</ul>
+<p>Let’s see a practical example.</p>
+<p>In qemu-5.2 virtio-blk-device got multi queue support.  This is a
+change that is not backward compatible.  In qemu-5.1 it has one
+queue. In qemu-5.2 it has the same number of queues as the number of
+cpus in the system.</p>
+<p>When we are doing migration, if we migrate from a device that has 4
+queues to a device that have only one queue, we don’t know where to
+put the extra information for the other 3 queues, and we fail
+migration.</p>
+<p>Similar problem when we migrate from qemu-5.1 that has only one queue
+to qemu-5.2, we only sent information for one queue, but destination
+has 4, and we have 3 queues that are not properly initialized and
+anything can happen.</p>
+<p>So, how can we address this problem.  Easy, just convince qemu-5.2
+that when it is running pc-5.1, it needs to set the number of queues
+for virtio-blk-devices to 1.</p>
+<p>That way we fix the cases 5 and 6.</p>
+<p>5 - qemu-5.2 -M pc-5.1  -&gt; migrates to -&gt; qemu-5.1 -M pc-5.1</p>
+<blockquote>
+<div><p>qemu-5.2 -M pc-5.1 sets number of queues to be 1.
+qemu-5.1 -M pc-5.1 expects number of queues to be 1.</p>
+<p>correct.  migration works.</p>
+</div></blockquote>
+<p>6 - qemu-5.1 -M pc-5.1  -&gt; migrates to -&gt; qemu-5.2 -M pc-5.1</p>
+<blockquote>
+<div><p>qemu-5.1 -M pc-5.1 sets number of queues to be 1.
+qemu-5.2 -M pc-5.1 expects number of queues to be 1.</p>
+<p>correct.  migration works.</p>
+</div></blockquote>
+<p>And now the other interesting case, case 3.  In this case we have:</p>
+<p>3 - qemu-5.2 -M pc-5.1  -&gt; migrates to -&gt; qemu-5.2 -M pc-5.1</p>
+<blockquote>
+<div><p>Here we have the same QEMU in both sides.  So it doesn’t matter a
+lot if we have set the number of queues to 1 or not, because
+they are the same.</p>
+<p>WRONG!</p>
+<p>Think what happens if we do one of this double migrations:</p>
+<p>A -&gt; migrates -&gt; B -&gt; migrates -&gt; C</p>
+<p>where:</p>
+<p>A: qemu-5.1 -M pc-5.1
+B: qemu-5.2 -M pc-5.1
+C: qemu-5.2 -M pc-5.1</p>
+<p>migration A -&gt; B is case 6, so number of queues needs to be 1.</p>
+<p>migration B -&gt; C is case 3, so we don’t care.  But actually we
+care because we haven’t started the guest in qemu-5.2, it came
+migrated from qemu-5.1.  So to be in the safe place, we need to
+always use number of queues 1 when we are using pc-5.1.</p>
+</div></blockquote>
+<p>Now, how was this done in reality?  The following commit shows how it
+was done:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">commit</span> <span class="mf">9445e1</span><span class="n">e15e66c19e42bea942ba810db28052cd05</span>
+<span class="n">Author</span><span class="p">:</span> <span class="n">Stefan</span> <span class="n">Hajnoczi</span> <span class="o">&lt;</span><span class="n">stefanha</span><span class="nd">@redhat</span><span class="o">.</span><span class="n">com</span><span class="o">&gt;</span>
+<span class="n">Date</span><span class="p">:</span>   <span class="n">Tue</span> <span class="n">Aug</span> <span class="mi">18</span> <span class="mi">15</span><span class="p">:</span><span class="mi">33</span><span class="p">:</span><span class="mi">47</span> <span class="mi">2020</span> <span class="o">+</span><span class="mi">0100</span>
+
+<span class="n">virtio</span><span class="o">-</span><span class="n">blk</span><span class="o">-</span><span class="n">pci</span><span class="p">:</span> <span class="n">default</span> <span class="n">num_queues</span> <span class="n">to</span> <span class="o">-</span><span class="n">smp</span> <span class="n">N</span>
+</pre></div>
+</div>
+<p>The relevant parts for migration are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">@@</span> <span class="o">-</span><span class="mi">1281</span><span class="p">,</span><span class="mi">7</span> <span class="o">+</span><span class="mi">1284</span><span class="p">,</span><span class="mi">8</span> <span class="o">@@</span> <span class="n">static</span> <span class="n">const</span> <span class="n">Property</span> <span class="n">virtio_blk_properties</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+ <span class="c1">#endif</span>
+     <span class="n">DEFINE_PROP_BIT</span><span class="p">(</span><span class="s2">&quot;request-merging&quot;</span><span class="p">,</span> <span class="n">VirtIOBlock</span><span class="p">,</span> <span class="n">conf</span><span class="o">.</span><span class="n">request_merging</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">true</span><span class="p">),</span>
+<span class="o">-</span>    <span class="n">DEFINE_PROP_UINT16</span><span class="p">(</span><span class="s2">&quot;num-queues&quot;</span><span class="p">,</span> <span class="n">VirtIOBlock</span><span class="p">,</span> <span class="n">conf</span><span class="o">.</span><span class="n">num_queues</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="o">+</span>    <span class="n">DEFINE_PROP_UINT16</span><span class="p">(</span><span class="s2">&quot;num-queues&quot;</span><span class="p">,</span> <span class="n">VirtIOBlock</span><span class="p">,</span> <span class="n">conf</span><span class="o">.</span><span class="n">num_queues</span><span class="p">,</span>
+<span class="o">+</span>                       <span class="n">VIRTIO_BLK_AUTO_NUM_QUEUES</span><span class="p">),</span>
+     <span class="n">DEFINE_PROP_UINT16</span><span class="p">(</span><span class="s2">&quot;queue-size&quot;</span><span class="p">,</span> <span class="n">VirtIOBlock</span><span class="p">,</span> <span class="n">conf</span><span class="o">.</span><span class="n">queue_size</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span>
+</pre></div>
+</div>
+<p>It changes the default value of num_queues.  But it fishes it for old
+machine types to have the right value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">@@</span> <span class="o">-</span><span class="mi">31</span><span class="p">,</span><span class="mi">6</span> <span class="o">+</span><span class="mi">31</span><span class="p">,</span><span class="mi">7</span> <span class="o">@@</span>
+ <span class="n">GlobalProperty</span> <span class="n">hw_compat_5_1</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="o">...</span>
+<span class="o">+</span>    <span class="p">{</span> <span class="s2">&quot;virtio-blk-device&quot;</span><span class="p">,</span> <span class="s2">&quot;num-queues&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">},</span>
+     <span class="o">...</span>
+ <span class="p">};</span>
+</pre></div>
+</div>
+</section>
+<section id="a-device-with-different-features-on-both-sides">
+<h2>A device with different features on both sides<a class="headerlink" href="#a-device-with-different-features-on-both-sides" title="Permalink to this headline"></a></h2>
+<p>Let’s assume that we are using the same QEMU binary on both sides,
+just to make the things easier.  But we have a device that has
+different features on both sides of the migration.  That can be
+because the devices are different, because the kernel driver of both
+devices have different features, whatever.</p>
+<p>How can we get this to work with migration.  The way to do that is
+“theoretically” easy.  You have to get the features that the device
+has in the source of the migration.  The features that the device has
+on the target of the migration, you get the intersection of the
+features of both sides, and that is the way that you should launch
+QEMU.</p>
+<p>Notice that this is not completely related to QEMU.  The most
+important thing here is that this should be handled by the managing
+application that launches QEMU.  If QEMU is configured correctly, the
+migration will succeed.</p>
+<p>That said, actually doing it is complicated.  Almost all devices are
+bad at being able to be launched with only some features enabled.
+With one big exception: cpus.</p>
+<p>You can read the documentation for QEMU x86 cpu models here:</p>
+<p><a class="reference external" href="https://qemu-project.gitlab.io/qemu/system/qemu-cpu-models.html">https://qemu-project.gitlab.io/qemu/system/qemu-cpu-models.html</a></p>
+<p>See when they talk about migration they recommend that one chooses the
+newest cpu model that is supported for all cpus.</p>
+<p>Let’s say that we have:</p>
+<p>Host A:</p>
+<p>Device X has the feature Y</p>
+<p>Host B:</p>
+<p>Device X has not the feature Y</p>
+<p>If we try to migrate without any care from host A to host B, it will
+fail because when migration tries to load the feature Y on
+destination, it will find that the hardware is not there.</p>
+<p>Doing this would be the equivalent of doing with cpus:</p>
+<p>Host A:</p>
+<p>$ qemu-system-x86_64 -cpu host</p>
+<p>Host B:</p>
+<p>$ qemu-system-x86_64 -cpu host</p>
+<p>When both hosts have different cpu features this is guaranteed to
+fail.  Especially if Host B has less features than host A.  If host A
+has less features than host B, sometimes it works.  Important word of
+last sentence is “sometimes”.</p>
+<p>So, forgetting about cpu models and continuing with the -cpu host
+example, let’s see that the differences of the cpus is that Host A and
+B have the following features:</p>
+<p>Features:   ‘pcid’  ‘stibp’ ‘taa-no’
+Host A:        X       X
+Host B:                        X</p>
+<p>And we want to migrate between them, the way configure both QEMU cpu
+will be:</p>
+<p>Host A:</p>
+<p>$ qemu-system-x86_64 -cpu host,pcid=off,stibp=off</p>
+<p>Host B:</p>
+<p>$ qemu-system-x86_64 -cpu host,taa-no=off</p>
+<p>And you would be able to migrate between them.  It is responsibility
+of the management application or of the user to make sure that the
+configuration is correct.  QEMU doesn’t know how to look at this kind
+of features in general.</p>
+<p>Notice that we don’t recommend to use -cpu host for migration.  It is
+used in this example because it makes the example simpler.</p>
+<p>Other devices have worse control about individual features.  If they
+want to be able to migrate between hosts that show different features,
+the device needs a way to configure which ones it is going to use.</p>
+<p>In this section we have considered that we are using the same QEMU
+binary in both sides of the migration.  If we use different QEMU
+versions process, then we need to have into account all other
+differences and the examples become even more complicated.</p>
+</section>
+<section id="how-to-mitigate-when-we-have-a-backward-compatibility-error">
+<h2>How to mitigate when we have a backward compatibility error<a class="headerlink" href="#how-to-mitigate-when-we-have-a-backward-compatibility-error" title="Permalink to this headline"></a></h2>
+<p>We broke migration for old machine types continuously during
+development.  But as soon as we find that there is a problem, we fix
+it.  The problem is what happens when we detect after we have done a
+release that something has gone wrong.</p>
+<p>Let see how it worked with one example.</p>
+<p>After the release of qemu-8.0 we found a problem when doing migration
+of the machine type pc-7.2.</p>
+<ul>
+<li><p>$ qemu-7.2 -M pc-7.2  -&gt;  qemu-7.2 -M pc-7.2</p>
+<p>This migration works</p>
+</li>
+<li><p>$ qemu-8.0 -M pc-7.2  -&gt;  qemu-8.0 -M pc-7.2</p>
+<p>This migration works</p>
+</li>
+<li><p>$ qemu-8.0 -M pc-7.2  -&gt;  qemu-7.2 -M pc-7.2</p>
+<p>This migration fails</p>
+</li>
+<li><p>$ qemu-7.2 -M pc-7.2  -&gt;  qemu-8.0 -M pc-7.2</p>
+<p>This migration fails</p>
+</li>
+</ul>
+<p>So clearly something fails when migration between qemu-7.2 and
+qemu-8.0 with machine type pc-7.2.  The error messages, and git bisect
+pointed to this commit.</p>
+<p>In qemu-8.0 we got this commit:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">commit</span> <span class="mi">010746</span><span class="n">ae1db7f52700cb2e2c46eb94f299cfa0d2</span>
+<span class="n">Author</span><span class="p">:</span> <span class="n">Jonathan</span> <span class="n">Cameron</span> <span class="o">&lt;</span><span class="n">Jonathan</span><span class="o">.</span><span class="n">Cameron</span><span class="nd">@huawei</span><span class="o">.</span><span class="n">com</span><span class="o">&gt;</span>
+<span class="n">Date</span><span class="p">:</span>   <span class="n">Thu</span> <span class="n">Mar</span> <span class="mi">2</span> <span class="mi">13</span><span class="p">:</span><span class="mi">37</span><span class="p">:</span><span class="mi">02</span> <span class="mi">2023</span> <span class="o">+</span><span class="mi">0000</span>
+
+<span class="n">hw</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">aer</span><span class="p">:</span> <span class="n">Implement</span> <span class="n">PCI_ERR_UNCOR_MASK</span> <span class="n">register</span>
+</pre></div>
+</div>
+<p>The relevant bits of the commit for our example are this ones:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">---</span> <span class="n">a</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">pcie_aer</span><span class="o">.</span><span class="n">c</span>
+<span class="o">+++</span> <span class="n">b</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">pcie_aer</span><span class="o">.</span><span class="n">c</span>
+<span class="o">@@</span> <span class="o">-</span><span class="mi">112</span><span class="p">,</span><span class="mi">6</span> <span class="o">+</span><span class="mi">112</span><span class="p">,</span><span class="mi">10</span> <span class="o">@@</span> <span class="nb">int</span> <span class="n">pcie_aer_init</span><span class="p">(</span><span class="n">PCIDevice</span> <span class="o">*</span><span class="n">dev</span><span class="p">,</span>
+
+     <span class="n">pci_set_long</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">w1cmask</span> <span class="o">+</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">PCI_ERR_UNCOR_STATUS</span><span class="p">,</span>
+                  <span class="n">PCI_ERR_UNC_SUPPORTED</span><span class="p">);</span>
+<span class="o">+</span>    <span class="n">pci_set_long</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">config</span> <span class="o">+</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">PCI_ERR_UNCOR_MASK</span><span class="p">,</span>
+<span class="o">+</span>                 <span class="n">PCI_ERR_UNC_MASK_DEFAULT</span><span class="p">);</span>
+<span class="o">+</span>    <span class="n">pci_set_long</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">wmask</span> <span class="o">+</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">PCI_ERR_UNCOR_MASK</span><span class="p">,</span>
+<span class="o">+</span>                 <span class="n">PCI_ERR_UNC_SUPPORTED</span><span class="p">);</span>
+
+     <span class="n">pci_set_long</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">config</span> <span class="o">+</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">PCI_ERR_UNCOR_SEVER</span><span class="p">,</span>
+                 <span class="n">PCI_ERR_UNC_SEVERITY_DEFAULT</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The patch changes how we configure PCI space for AER.  But QEMU fails
+when the PCI space configuration is different between source and
+destination.</p>
+<p>The following commit shows how this got fixed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">commit</span> <span class="mi">5</span><span class="n">ed3dabe57dd9f4c007404345e5f5bf0e347317f</span>
+<span class="n">Author</span><span class="p">:</span> <span class="n">Leonardo</span> <span class="n">Bras</span> <span class="o">&lt;</span><span class="n">leobras</span><span class="nd">@redhat</span><span class="o">.</span><span class="n">com</span><span class="o">&gt;</span>
+<span class="n">Date</span><span class="p">:</span>   <span class="n">Tue</span> <span class="n">May</span> <span class="mi">2</span> <span class="mi">21</span><span class="p">:</span><span class="mi">27</span><span class="p">:</span><span class="mi">02</span> <span class="mi">2023</span> <span class="o">-</span><span class="mi">0300</span>
+
+<span class="n">hw</span><span class="o">/</span><span class="n">pci</span><span class="p">:</span> <span class="n">Disable</span> <span class="n">PCI_ERR_UNCOR_MASK</span> <span class="n">register</span> <span class="k">for</span> <span class="n">machine</span> <span class="nb">type</span> <span class="o">&lt;</span> <span class="mf">8.0</span>
+
+<span class="p">[</span><span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The relevant parts of the fix in QEMU are as follow:</p>
+<p>First, we create a new property for the device to be able to configure
+the old behaviour or the new behaviour:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">diff</span> <span class="o">--</span><span class="n">git</span> <span class="n">a</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">pci</span><span class="o">.</span><span class="n">c</span> <span class="n">b</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">pci</span><span class="o">.</span><span class="n">c</span>
+<span class="n">index</span> <span class="mi">8</span><span class="n">a87ccc8b0</span><span class="o">.</span><span class="mf">.5153</span><span class="n">ad63d6</span> <span class="mi">100644</span>
+<span class="o">---</span> <span class="n">a</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">pci</span><span class="o">.</span><span class="n">c</span>
+<span class="o">+++</span> <span class="n">b</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">pci</span><span class="o">.</span><span class="n">c</span>
+<span class="o">@@</span> <span class="o">-</span><span class="mi">79</span><span class="p">,</span><span class="mi">6</span> <span class="o">+</span><span class="mi">79</span><span class="p">,</span><span class="mi">8</span> <span class="o">@@</span> <span class="n">static</span> <span class="n">const</span> <span class="n">Property</span> <span class="n">pci_props</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="n">DEFINE_PROP_STRING</span><span class="p">(</span><span class="s2">&quot;failover_pair_id&quot;</span><span class="p">,</span> <span class="n">PCIDevice</span><span class="p">,</span>
+                        <span class="n">failover_pair_id</span><span class="p">),</span>
+     <span class="n">DEFINE_PROP_UINT32</span><span class="p">(</span><span class="s2">&quot;acpi-index&quot;</span><span class="p">,</span>  <span class="n">PCIDevice</span><span class="p">,</span> <span class="n">acpi_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<span class="o">+</span>    <span class="n">DEFINE_PROP_BIT</span><span class="p">(</span><span class="s2">&quot;x-pcie-err-unc-mask&quot;</span><span class="p">,</span> <span class="n">PCIDevice</span><span class="p">,</span> <span class="n">cap_present</span><span class="p">,</span>
+<span class="o">+</span>                    <span class="n">QEMU_PCIE_ERR_UNC_MASK_BITNR</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span>
+ <span class="p">};</span>
+</pre></div>
+</div>
+<p>Notice that we enable the feature for new machine types.</p>
+<p>Now we see how the fix is done.  This is going to depend on what kind
+of breakage happens, but in this case it is quite simple:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">diff</span> <span class="o">--</span><span class="n">git</span> <span class="n">a</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">pcie_aer</span><span class="o">.</span><span class="n">c</span> <span class="n">b</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">pcie_aer</span><span class="o">.</span><span class="n">c</span>
+<span class="n">index</span> <span class="mi">103667</span><span class="n">c368</span><span class="o">.</span><span class="mf">.374</span><span class="n">d593ead</span> <span class="mi">100644</span>
+<span class="o">---</span> <span class="n">a</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">pcie_aer</span><span class="o">.</span><span class="n">c</span>
+<span class="o">+++</span> <span class="n">b</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">pcie_aer</span><span class="o">.</span><span class="n">c</span>
+<span class="o">@@</span> <span class="o">-</span><span class="mi">112</span><span class="p">,</span><span class="mi">10</span> <span class="o">+</span><span class="mi">112</span><span class="p">,</span><span class="mi">13</span> <span class="o">@@</span> <span class="nb">int</span> <span class="n">pcie_aer_init</span><span class="p">(</span><span class="n">PCIDevice</span> <span class="o">*</span><span class="n">dev</span><span class="p">,</span> <span class="n">uint8_t</span> <span class="n">cap_ver</span><span class="p">,</span>
+<span class="n">uint16_t</span> <span class="n">offset</span><span class="p">,</span>
+
+     <span class="n">pci_set_long</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">w1cmask</span> <span class="o">+</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">PCI_ERR_UNCOR_STATUS</span><span class="p">,</span>
+                  <span class="n">PCI_ERR_UNC_SUPPORTED</span><span class="p">);</span>
+<span class="o">-</span>    <span class="n">pci_set_long</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">config</span> <span class="o">+</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">PCI_ERR_UNCOR_MASK</span><span class="p">,</span>
+<span class="o">-</span>                 <span class="n">PCI_ERR_UNC_MASK_DEFAULT</span><span class="p">);</span>
+<span class="o">-</span>    <span class="n">pci_set_long</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">wmask</span> <span class="o">+</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">PCI_ERR_UNCOR_MASK</span><span class="p">,</span>
+<span class="o">-</span>                 <span class="n">PCI_ERR_UNC_SUPPORTED</span><span class="p">);</span>
+<span class="o">+</span>
+<span class="o">+</span>    <span class="k">if</span> <span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">cap_present</span> <span class="o">&amp;</span> <span class="n">QEMU_PCIE_ERR_UNC_MASK</span><span class="p">)</span> <span class="p">{</span>
+<span class="o">+</span>        <span class="n">pci_set_long</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">config</span> <span class="o">+</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">PCI_ERR_UNCOR_MASK</span><span class="p">,</span>
+<span class="o">+</span>                     <span class="n">PCI_ERR_UNC_MASK_DEFAULT</span><span class="p">);</span>
+<span class="o">+</span>        <span class="n">pci_set_long</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">wmask</span> <span class="o">+</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">PCI_ERR_UNCOR_MASK</span><span class="p">,</span>
+<span class="o">+</span>                     <span class="n">PCI_ERR_UNC_SUPPORTED</span><span class="p">);</span>
+<span class="o">+</span>    <span class="p">}</span>
+
+     <span class="n">pci_set_long</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">config</span> <span class="o">+</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">PCI_ERR_UNCOR_SEVER</span><span class="p">,</span>
+                  <span class="n">PCI_ERR_UNC_SEVERITY_DEFAULT</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>I.e. If the property bit is enabled, we configure it as we did for
+qemu-8.0.  If the property bit is not set, we configure it as it was in 7.2.</p>
+<p>And now, everything that is missing is disabling the feature for old
+machine types:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">diff</span> <span class="o">--</span><span class="n">git</span> <span class="n">a</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">machine</span><span class="o">.</span><span class="n">c</span> <span class="n">b</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">machine</span><span class="o">.</span><span class="n">c</span>
+<span class="n">index</span> <span class="mi">47</span><span class="n">a34841a5</span><span class="o">.</span><span class="mf">.07</span><span class="n">f763eb2e</span> <span class="mi">100644</span>
+<span class="o">---</span> <span class="n">a</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">machine</span><span class="o">.</span><span class="n">c</span>
+<span class="o">+++</span> <span class="n">b</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">machine</span><span class="o">.</span><span class="n">c</span>
+<span class="o">@@</span> <span class="o">-</span><span class="mi">48</span><span class="p">,</span><span class="mi">6</span> <span class="o">+</span><span class="mi">48</span><span class="p">,</span><span class="mi">7</span> <span class="o">@@</span> <span class="n">GlobalProperty</span> <span class="n">hw_compat_7_2</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="p">{</span> <span class="s2">&quot;e1000e&quot;</span><span class="p">,</span> <span class="s2">&quot;migrate-timadj&quot;</span><span class="p">,</span> <span class="s2">&quot;off&quot;</span> <span class="p">},</span>
+     <span class="p">{</span> <span class="s2">&quot;virtio-mem&quot;</span><span class="p">,</span> <span class="s2">&quot;x-early-migration&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span> <span class="p">},</span>
+     <span class="p">{</span> <span class="s2">&quot;migration&quot;</span><span class="p">,</span> <span class="s2">&quot;x-preempt-pre-7-2&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span> <span class="p">},</span>
+<span class="o">+</span>    <span class="p">{</span> <span class="n">TYPE_PCI_DEVICE</span><span class="p">,</span> <span class="s2">&quot;x-pcie-err-unc-mask&quot;</span><span class="p">,</span> <span class="s2">&quot;off&quot;</span> <span class="p">},</span>
+ <span class="p">};</span>
+ <span class="n">const</span> <span class="n">size_t</span> <span class="n">hw_compat_7_2_len</span> <span class="o">=</span> <span class="n">G_N_ELEMENTS</span><span class="p">(</span><span class="n">hw_compat_7_2</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>And now, when qemu-8.0.1 is released with this fix, all combinations
+are going to work as supposed.</p>
+<ul class="simple">
+<li><p>$ qemu-7.2 -M pc-7.2  -&gt;  qemu-7.2 -M pc-7.2 (works)</p></li>
+<li><p>$ qemu-8.0.1 -M pc-7.2  -&gt;  qemu-8.0.1 -M pc-7.2 (works)</p></li>
+<li><p>$ qemu-8.0.1 -M pc-7.2  -&gt;  qemu-7.2 -M pc-7.2 (works)</p></li>
+<li><p>$ qemu-7.2 -M pc-7.2  -&gt;  qemu-8.0.1 -M pc-7.2 (works)</p></li>
+</ul>
+<p>So the normality has been restored and everything is ok, no?</p>
+<p>Not really, now our matrix is much bigger.  We started with the easy
+cases, migration from the same version to the same version always
+works:</p>
+<ul class="simple">
+<li><p>$ qemu-7.2 -M pc-7.2  -&gt;  qemu-7.2 -M pc-7.2</p></li>
+<li><p>$ qemu-8.0 -M pc-7.2  -&gt;  qemu-8.0 -M pc-7.2</p></li>
+<li><p>$ qemu-8.0.1 -M pc-7.2  -&gt;  qemu-8.0.1 -M pc-7.2</p></li>
+</ul>
+<p>Now the interesting ones.  When the QEMU processes versions are
+different.  For the 1st set, their fail and we can do nothing, both
+versions are released and we can’t change anything.</p>
+<ul class="simple">
+<li><p>$ qemu-7.2 -M pc-7.2  -&gt;  qemu-8.0 -M pc-7.2</p></li>
+<li><p>$ qemu-8.0 -M pc-7.2  -&gt;  qemu-7.2 -M pc-7.2</p></li>
+</ul>
+<p>This two are the ones that work. The whole point of making the
+change in qemu-8.0.1 release was to fix this issue:</p>
+<ul class="simple">
+<li><p>$ qemu-7.2 -M pc-7.2  -&gt;  qemu-8.0.1 -M pc-7.2</p></li>
+<li><p>$ qemu-8.0.1 -M pc-7.2  -&gt;  qemu-7.2 -M pc-7.2</p></li>
+</ul>
+<p>But now we found that qemu-8.0 neither can migrate to qemu-7.2 not
+qemu-8.0.1.</p>
+<ul class="simple">
+<li><p>$ qemu-8.0 -M pc-7.2  -&gt;  qemu-8.0.1 -M pc-7.2</p></li>
+<li><p>$ qemu-8.0.1 -M pc-7.2  -&gt;  qemu-8.0 -M pc-7.2</p></li>
+</ul>
+<p>So, if we start a pc-7.2 machine in qemu-8.0 we can’t migrate it to
+anything except to qemu-8.0.</p>
+<p>Can we do better?</p>
+<p>Yeap.  If we know that we are going to do this migration:</p>
+<ul class="simple">
+<li><p>$ qemu-8.0 -M pc-7.2  -&gt;  qemu-8.0.1 -M pc-7.2</p></li>
+</ul>
+<p>We can launch the appropriate devices with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">device</span><span class="o">...</span><span class="p">,</span><span class="n">x</span><span class="o">-</span><span class="n">pci</span><span class="o">-</span><span class="n">e</span><span class="o">-</span><span class="n">err</span><span class="o">-</span><span class="n">unc</span><span class="o">-</span><span class="n">mask</span><span class="o">=</span><span class="n">on</span>
+</pre></div>
+</div>
+<p>And now we can receive a migration from 8.0.  And from now on, we can
+do that migration to new machine types if we remember to enable that
+property for pc-7.2.  Notice that we need to remember, it is not
+enough to know that the source of the migration is qemu-8.0.  Think of
+this example:</p>
+<p>$ qemu-8.0 -M pc-7.2 -&gt; qemu-8.0.1 -M pc-7.2 -&gt; qemu-8.2 -M pc-7.2</p>
+<p>In the second migration, the source is not qemu-8.0, but we still have
+that “problem” and have that property enabled.  Notice that we need to
+continue having this mark/property until we have this machine
+rebooted.  But it is not a normal reboot (that don’t reload QEMU) we
+need the machine to poweroff/poweron on a fixed QEMU.  And from now
+on we can use the proper real machine.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qatzip-compression.html" class="btn btn-neutral float-left" title="QATzip Compression" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="best-practices.html" class="btn btn-neutral float-right" title="Best practices" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

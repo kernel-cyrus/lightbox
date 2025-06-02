@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arm Server Base System Architecture Reference board (sbsa-ref) &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Arm Versatile boards (versatileab, versatilepb)" href="versatile.html" />
+    <link rel="prev" title="Arm Realview boards (realview-eb, realview-eb-mpcore, realview-pb-a8, realview-pbx-a9)" href="realview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Emulation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../invocation.html">Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../device-emulation.html">Device Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../keys.html">Keys in the graphical frontends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux-chardev.html">Keys in the character backend multiplexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../monitor.html">QEMU Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../images.html">Disk Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtio-net-failover.html">QEMU virtio-net standby (net_failover)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linuxboot.html">Direct Linux Boot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generic-loader.html">Generic Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guest-loader.html">Guest Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../barrier.html">QEMU Barrier Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vnc-security.html">VNC security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tls.html">TLS setup for network services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets.html">Providing secret data to QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../authz.html">Client authorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gdb.html">GDB usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replay.html">Record/replay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managed-startup.html">Managed start up options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bootindex.html">Managing device boot order with bootindex properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cpu-hotplug.html">Virtual CPU hotplug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pr-manager.html">Persistent reservation managers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../targets.html">QEMU System Emulator Targets</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../target-arm.html">Arm System emulator</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#choosing-a-board-model">Choosing a board model</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../target-arm.html#board-specific-documentation">Board-specific documentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#emulated-cpu-architecture-support">Emulated CPU architecture support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../target-arm.html#arm-cpu-features">Arm CPU features</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../target-avr.html">AVR System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-loongarch.html">LoongArch System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-m68k.html">ColdFire System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-mips.html">MIPS System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-ppc.html">PowerPC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-openrisc.html">OpenRISC System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-riscv.html">RISC-V System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-rx.html">RX System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-s390x.html">s390x System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc.html">Sparc32 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-sparc64.html">Sparc64 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-i386.html">x86 System emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../target-xtensa.html">Xtensa System emulator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../security.html">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../confidential-guest-support.html">Confidential Guest Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vm-templating.html">QEMU VM templating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sriov.html">Compsable SR-IOV device</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">System Emulation</a> &raquo;</li>
+          <li><a href="../targets.html">QEMU System Emulator Targets</a> &raquo;</li>
+          <li><a href="../target-arm.html">Arm System emulator</a> &raquo;</li>
+      <li>Arm Server Base System Architecture Reference board (<code class="docutils literal notranslate"><span class="pre">sbsa-ref</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/system/arm/sbsa.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="arm-server-base-system-architecture-reference-board-sbsa-ref">
+<h1>Arm Server Base System Architecture Reference board (<code class="docutils literal notranslate"><span class="pre">sbsa-ref</span></code>)<a class="headerlink" href="#arm-server-base-system-architecture-reference-board-sbsa-ref" title="Permalink to this headline"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">sbsa-ref</span></code> board intends to look like real hardware (while the <code class="docutils literal notranslate"><span class="pre">virt</span></code>
+board is a generic board platform that doesn’t match any real hardware).</p>
+<p>The hardware part is defined by two specifications:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://developer.arm.com/documentation/den0094/">Base System Architecture</a> (BSA)</p></li>
+<li><p><a class="reference external" href="https://developer.arm.com/documentation/den0029/">Server Base System Architecture</a> (SBSA)</p></li>
+</ul>
+</div></blockquote>
+<p>The <a class="reference external" href="https://developer.arm.com/documentation/den0044/">Arm Base Boot Requirements</a> (BBR)
+specification defines how the firmware reports that to any operating system.</p>
+<p>It is intended to be a machine for developing firmware and testing
+standards compliance with operating systems.</p>
+<section id="supported-devices">
+<h2>Supported devices<a class="headerlink" href="#supported-devices" title="Permalink to this headline"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">sbsa-ref</span></code> board supports:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A configurable number of AArch64 CPUs</p></li>
+<li><p>GIC version 3</p></li>
+<li><p>System bus AHCI controller</p></li>
+<li><p>System bus XHCI controller</p></li>
+<li><p>CDROM and hard disc on AHCI bus</p></li>
+<li><p>E1000E ethernet card on PCIe bus</p></li>
+<li><p>Bochs display adapter on PCIe bus</p></li>
+<li><p>A generic SBSA watchdog device</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="board-to-firmware-interface">
+<h2>Board to firmware interface<a class="headerlink" href="#board-to-firmware-interface" title="Permalink to this headline"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">sbsa-ref</span></code> is a static system that reports a very minimal devicetree to the
+firmware for non-discoverable information about system components. This
+includes both internal hardware and parts affected by the qemu command line
+(i.e. CPUs and memory). As a result it must have a firmware specifically built
+to expect a certain hardware layout (as you would in a real machine).</p>
+<section id="note">
+<h3>Note<a class="headerlink" href="#note" title="Permalink to this headline"></a></h3>
+<p>QEMU provides the guest EL3 firmware with minimal information about hardware
+platform using minimalistic devicetree. This is not a Linux devicetree. It is
+not even a firmware devicetree.</p>
+<p>It is information passed from QEMU to describe the information a hardware
+platform would have other mechanisms to discover at runtime, that are affected
+by the QEMU command line.</p>
+<p>Ultimately this devicetree may be replaced by IPC calls to an emulated SCP.</p>
+</section>
+<section id="devicetree-information">
+<h3>DeviceTree information<a class="headerlink" href="#devicetree-information" title="Permalink to this headline"></a></h3>
+<p>The devicetree reports:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>CPUs</p></li>
+<li><p>memory</p></li>
+<li><p>platform version</p></li>
+<li><p>GIC addresses</p></li>
+<li><p>NUMA node id for CPUs and memory</p></li>
+<li><p>CPU topology information</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="platform-version">
+<h3>Platform version<a class="headerlink" href="#platform-version" title="Permalink to this headline"></a></h3>
+<p>The platform version is only for informing platform firmware about
+what kind of <code class="docutils literal notranslate"><span class="pre">sbsa-ref</span></code> board it is running on. It is neither
+a QEMU versioned machine type nor a reflection of the level of the
+SBSA/SystemReady SR support provided.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">machine-version-major</span></code> value is updated when changes breaking
+fw compatibility are introduced. The <code class="docutils literal notranslate"><span class="pre">machine-version-minor</span></code> value
+is updated when features are added that don’t break fw compatibility.</p>
+<p>Platform version changes:</p>
+<dl class="simple">
+<dt>0.0</dt><dd><p>Devicetree holds information about CPUs, memory and platform version.</p>
+</dd>
+<dt>0.1</dt><dd><p>GIC information is present in devicetree.</p>
+</dd>
+<dt>0.2</dt><dd><p>GIC ITS information is present in devicetree.</p>
+</dd>
+<dt>0.3</dt><dd><p>The USB controller is an XHCI device, not EHCI.</p>
+</dd>
+<dt>0.4</dt><dd><p>CPU topology information is present in devicetree.</p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="realview.html" class="btn btn-neutral float-left" title="Arm Realview boards (realview-eb, realview-eb-mpcore, realview-pb-a8, realview-pbx-a9)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="versatile.html" class="btn btn-neutral float-right" title="Arm Versatile boards (versatileab, versatilepb)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QEMU Guest Agent Protocol Reference &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="QEMU QMP Reference Manual" href="qemu-qmp-ref.html" />
+    <link rel="prev" title="QEMU Guest Agent" href="qemu-ga.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Management and Interoperability</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="barrier.html">Barrier client protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitmaps.html">Dirty Bitmaps and Incremental Backup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus.html">D-Bus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-vmstate.html">D-Bus VMState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dbus-display.html">D-Bus display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="live-block-operations.html">Live Block Device Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nbd.html">QEMU NBD protocol support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parallels.html">Parallels Expandable Image File Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prl-xml.html">Parallels Disk Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qcow2.html">Qcow2 Image File Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pr-helper.html">Persistent reservation helper protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qmp-spec.html">QEMU Machine Protocol Specification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-ga.html">QEMU Guest Agent</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">QEMU Guest Agent Protocol Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-qmp-ref.html">QEMU QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qemu-storage-daemon-qmp-ref.html">QEMU Storage Daemon QMP Reference Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user.html">Vhost-user Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-user-gpu.html">Vhost-user-gpu Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vhost-vdpa.html">Vhost-vdpa Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtio-balloon-stats.html">Virtio balloon memory statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vnc-ledstate-pseudo-encoding.html">VNC LED state Pseudo-encoding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">System Emulation Management and Interoperability</a> &raquo;</li>
+      <li>QEMU Guest Agent Protocol Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/interop/qemu-ga-ref.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qemu-guest-agent-protocol-reference">
+<h1>QEMU Guest Agent Protocol Reference<a class="headerlink" href="#qemu-guest-agent-protocol-reference" title="Permalink to this headline"></a></h1>
+<p id="module-QGA-qapi-schema">This manual describes the commands supported by the QEMU Guest
+Agent Protocol.</p>
+<p>For locating  a particular item, please see the <a class="reference internal" href="../qapi-qga-index.html"><span class="std std-ref">QGA Index</span></a>.</p>
+<p>The following notation is used in examples:</p>
+<div class="admonition admonition-example">
+<p class="admonition-title">Example:</p>
+<div class="highlight-QMP notranslate"><div class="highlight"><pre><span></span><span class="gp">-&gt; </span><span class="cm">... text sent by client (commands) ...</span>
+<span class="gp">&lt;- </span><span class="cm">... text sent by server (command responses and events) ...</span>
+</pre></div>
+</div>
+</aside>
+<p>Example text is formatted for readability.  However, in real
+protocol usage, its commonly emitted as a single line.</p>
+<p>Please refer to the
+<a class="reference internal" href="qmp-spec.html"><span class="doc">QEMU Machine Protocol Specification</span></a>
+for the general format of commands, responses, and events.</p>
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-sync-delimited">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-sync-delimited</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.1)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-sync-delimited" title="Permalink to this definition"></a></dt>
+<dd><p>Echo back a unique integer value, and prepend to response a leading
+sentinel byte (0xFF) the client can check scan for.</p>
+<p>This is used by clients talking to the guest agent over the wire to
+ensure the stream is in sync and doesn’t contain stale data from
+previous client.  It must be issued upon initial connection, and
+after any client-side timeouts (including timeouts on receiving a
+response to this command).</p>
+<p>After issuing this request, all guest agent responses should be
+ignored until the response containing the unique integer value the
+client passed in is returned.  Receival of the 0xFF sentinel byte
+must be handled as an indication that the client’s
+lexer/tokenizer/parser state should be flushed/reset in preparation
+for reliably receiving the subsequent response.  As an optimization,
+clients may opt to ignore all data until a sentinel value is
+receiving to avoid unnecessary processing of stale data.</p>
+<p>Similarly, clients should also precede this <em>request</em> with a 0xFF
+byte to make sure the guest agent flushes any partially read JSON
+data from a previous client connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – randomly generated 64-bit integer</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span> – The unique integer id passed in by the client</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-sync">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-sync</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-sync" title="Permalink to this definition"></a></dt>
+<dd><p>Echo back a unique integer value</p>
+<p>This is used by clients talking to the guest agent over the wire to
+ensure the stream is in sync and doesn’t contain stale data from
+previous client.  All guest agent responses should be ignored until
+the provided unique integer value is returned, and it is up to the
+client to handle stale whole or partially-delivered JSON text in
+such a way that this response can be obtained.</p>
+<p>In cases where a partial stale response was previously received by
+the client, this cannot always be done reliably.  One particular
+scenario being if qemu-ga responses are fed character-by-character
+into a JSON parser.  In these situations, using guest-sync-delimited
+may be optimal.</p>
+<p>For clients that fetch responses line by line and convert them to
+JSON objects, guest-sync should be sufficient, but note that in
+cases where the channel is dirty some attempts at parsing the
+response may result in a parser error.</p>
+<p>Such clients should also precede this command with a 0xFF byte to
+make sure the guest agent flushes any partially read JSON data from
+a previous session.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – randomly generated 64-bit integer</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span> – The unique integer id passed in by the client</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-ping">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-ping</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-ping" title="Permalink to this definition"></a></dt>
+<dd><p>Ping the guest agent, a non-error return implies success</p>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-time">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-time</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.5)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-time" title="Permalink to this definition"></a></dt>
+<dd><p>Get the information about guest’s System Time relative to the Epoch
+of 1970-01-01 in UTC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span> – Time in nanoseconds.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-set-time">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-set-time</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.5)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-set-time" title="Permalink to this definition"></a></dt>
+<dd><p>Set guest time.</p>
+<p>When a guest is paused or migrated to a file then loaded from that
+file, the guest OS has no idea that there was a big gap in the time.
+Depending on how long the gap was, NTP might not be able to
+resynchronize the guest.</p>
+<p>This command tries to set guest’s System Time to the given value,
+then sets the Hardware Clock (RTC) to the current System Time.  This
+will make it easier for a guest to resynchronize without waiting for
+NTP. If no <code class="docutils literal notranslate"><span class="pre">time</span></code> is specified, then the time to set is read from
+RTC. However, this may not be supported on all platforms (i.e.
+Windows). If that’s the case users are advised to always pass a
+value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – time of nanoseconds, relative to the Epoch of 1970-01-01 in
+UTC.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestAgentCommandInfo">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestAgentCommandInfo</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.1.0)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestAgentCommandInfo" title="Permalink to this definition"></a></dt>
+<dd><p>Information about guest agent commands.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – name of the command</p></li>
+<li><p><strong>enabled</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code></span>) – whether command is currently enabled by guest admin</p></li>
+<li><p><strong>success-response</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code></span>) – whether command returns a response on success
+(since 1.7)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestAgentInfo">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestAgentInfo</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestAgentInfo" title="Permalink to this definition"></a></dt>
+<dd><p>Information about guest agent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>version</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – guest agent version</p></li>
+<li><p><strong>supported_commands</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestAgentCommandInfo" title="QGA:qapi-schema.GuestAgentCommandInfo"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestAgentCommandInfo</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span>) – Information about guest agent commands</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-info">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-info</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-info" title="Permalink to this definition"></a></dt>
+<dd><p>Get some information about the guest agent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><a class="reference internal" href="#object-QGA-qapi-schema.GuestAgentInfo" title="QGA:qapi-schema.GuestAgentInfo"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestAgentInfo</span></code></a></span> – <code class="docutils literal notranslate"><span class="pre">GuestAgentInfo</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-shutdown">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-shutdown</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-shutdown" title="Permalink to this definition"></a></dt>
+<dd><p>Initiate guest-activated shutdown.  Note: this is an asynchronous
+shutdown request, with no guarantee of successful shutdown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – “halt”, “powerdown” (default), or “reboot”</p></li>
+</ul>
+</dd>
+</dl>
+<p>This command does NOT return a response on success.  Success
+condition is indicated by the VM exiting with a zero exit status or,
+when running with –no-shutdown, by issuing the query-status QMP
+command to confirm the VM status is “shutdown”.</p>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-file-open">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-file-open</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-file-open" title="Permalink to this definition"></a></dt>
+<dd><p>Open a file in the guest and retrieve a file handle for it</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – Full path to the file in the guest to open.</p></li>
+<li><p><strong>mode</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – open mode, as per fopen(), “r” is the default.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span> – Guest file handle</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-file-close">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-file-close</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-file-close" title="Permalink to this definition"></a></dt>
+<dd><p>Close an open file in the guest</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – filehandle returned by guest-file-open</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestFileRead">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestFileRead</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestFileRead" title="Permalink to this definition"></a></dt>
+<dd><p>Result of guest agent file-read operation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – number of bytes read (note: count is <em>before</em>
+base64-encoding is applied)</p></li>
+<li><p><strong>buf-b64</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – base64-encoded bytes read</p></li>
+<li><p><strong>eof</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code></span>) – whether EOF was encountered during read operation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-file-read">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-file-read</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-file-read" title="Permalink to this definition"></a></dt>
+<dd><p>Read from an open file in the guest.  Data will be base64-encoded.
+As this command is just for limited, ad-hoc debugging, such as log
+file access, the number of bytes to read is limited to 48 MB.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – filehandle returned by guest-file-open</p></li>
+<li><p><strong>count</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – maximum number of bytes to read (default is 4KB, maximum is
+48MB)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><a class="reference internal" href="#object-QGA-qapi-schema.GuestFileRead" title="QGA:qapi-schema.GuestFileRead"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestFileRead</span></code></a></span> – <code class="docutils literal notranslate"><span class="pre">GuestFileRead</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestFileWrite">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestFileWrite</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestFileWrite" title="Permalink to this definition"></a></dt>
+<dd><p>Result of guest agent file-write operation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – number of bytes written (note: count is actual bytes
+written, after base64-decoding of provided buffer)</p></li>
+<li><p><strong>eof</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code></span>) – whether EOF was encountered during write operation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-file-write">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-file-write</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-file-write" title="Permalink to this definition"></a></dt>
+<dd><p>Write to an open file in the guest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – filehandle returned by guest-file-open</p></li>
+<li><p><strong>buf-b64</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – base64-encoded string representing data to be written</p></li>
+<li><p><strong>count</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – bytes to write (actual bytes, after base64-decode), default
+is all content in buf-b64 buffer after base64 decoding</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><a class="reference internal" href="#object-QGA-qapi-schema.GuestFileWrite" title="QGA:qapi-schema.GuestFileWrite"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestFileWrite</span></code></a></span> – <code class="docutils literal notranslate"><span class="pre">GuestFileWrite</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestFileSeek">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestFileSeek</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestFileSeek" title="Permalink to this definition"></a></dt>
+<dd><p>Result of guest agent file-seek operation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>position</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – current file position</p></li>
+<li><p><strong>eof</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code></span>) – whether EOF was encountered during file seek</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi enum">
+<dt class="sig sig-object qapi" id="enum-QGA-qapi-schema.QGASeek">
+<em class="property"><span class="k"><span class="pre">Enum</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QGASeek</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.6)</span></span><a class="headerlink" href="#enum-QGA-qapi-schema.QGASeek" title="Permalink to this definition"></a></dt>
+<dd><p>Symbolic names for use in <code class="docutils literal notranslate"><span class="pre">guest-file-seek</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Values<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>set</strong> – Set to the specified offset (same effect as ‘whence’:0)</p></li>
+<li><p><strong>cur</strong> – Add offset to the current location (same effect as ‘whence’:1)</p></li>
+<li><p><strong>end</strong> – Add offset to the end of the file (same effect as ‘whence’:2)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi alternate">
+<dt class="sig sig-object qapi" id="alternate-QGA-qapi-schema.GuestFileWhence">
+<em class="property"><span class="k"><span class="pre">Alternate</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestFileWhence</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.6)</span></span><a class="headerlink" href="#alternate-QGA-qapi-schema.GuestFileWhence" title="Permalink to this definition"></a></dt>
+<dd><p>Controls the meaning of offset to <code class="docutils literal notranslate"><span class="pre">guest-file-seek</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Alternatives<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Integral value (0 for set, 1 for cur, 2 for end), available
+for historical reasons, and might differ from the host’s or
+guest’s SEEK_* values (since: 0.15)</p></li>
+<li><p><strong>name</strong> (<span><a class="reference internal" href="#enum-QGA-qapi-schema.QGASeek" title="QGA:qapi-schema.QGASeek"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">QGASeek</span></code></a></span>) – Symbolic name, and preferred interface</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-file-seek">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-file-seek</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-file-seek" title="Permalink to this definition"></a></dt>
+<dd><p>Seek to a position in the file, as with fseek(), and return the
+current file position afterward.  Also encapsulates ftell()’s
+functionality, with offset=0 and whence=1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – filehandle returned by guest-file-open</p></li>
+<li><p><strong>offset</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – bytes to skip over in the file stream</p></li>
+<li><p><strong>whence</strong> (<span><a class="reference internal" href="#alternate-QGA-qapi-schema.GuestFileWhence" title="QGA:qapi-schema.GuestFileWhence"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestFileWhence</span></code></a></span>) – Symbolic or numeric code for interpreting offset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><a class="reference internal" href="#object-QGA-qapi-schema.GuestFileSeek" title="QGA:qapi-schema.GuestFileSeek"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestFileSeek</span></code></a></span> – <code class="docutils literal notranslate"><span class="pre">GuestFileSeek</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-file-flush">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-file-flush</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-file-flush" title="Permalink to this definition"></a></dt>
+<dd><p>Write file changes buffered in userspace to disk/kernel buffers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – filehandle returned by guest-file-open</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi enum">
+<dt class="sig sig-object qapi" id="enum-QGA-qapi-schema.GuestFsfreezeStatus">
+<em class="property"><span class="k"><span class="pre">Enum</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestFsfreezeStatus</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#enum-QGA-qapi-schema.GuestFsfreezeStatus" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_FSFREEZE</span></code></div>
+</div>
+<p>An enumeration of filesystem freeze states</p>
+<dl class="field-list simple">
+<dt class="field-odd">Values<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>thawed</strong> – filesystems thawed/unfrozen</p></li>
+<li><p><strong>frozen</strong> – all non-network guest filesystems frozen</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-fsfreeze-status">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-fsfreeze-status</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-fsfreeze-status" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_FSFREEZE</span></code></div>
+</div>
+<p>Get guest fsfreeze state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><a class="reference internal" href="#enum-QGA-qapi-schema.GuestFsfreezeStatus" title="QGA:qapi-schema.GuestFsfreezeStatus"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestFsfreezeStatus</span></code></a></span> – GuestFsfreezeStatus (“thawed”, “frozen”, etc., as defined
+below)</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This may fail to properly report the current state as a
+result of some other guest processes having issued an fs
+freeze/thaw.</p>
+</aside>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-fsfreeze-freeze">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-fsfreeze-freeze</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-fsfreeze-freeze" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_FSFREEZE</span></code></div>
+</div>
+<p>Sync and freeze all freezable, local guest filesystems.  If this
+command succeeded, you may call <code class="docutils literal notranslate"><span class="pre">guest-fsfreeze-thaw</span></code> later to
+unfreeze.</p>
+<p>On error, all filesystems will be thawed.  If no filesystems are
+frozen as a result of this call, then <code class="docutils literal notranslate"><span class="pre">guest-fsfreeze-status</span></code> will
+remain “thawed” and calling <code class="docutils literal notranslate"><span class="pre">guest-fsfreeze-thaw</span></code> is not necessary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span> – Number of file systems currently frozen.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On Windows, the command is implemented with the help of a
+Volume Shadow-copy Service DLL helper.  The frozen state is limited
+for up to 10 seconds by VSS.</p>
+</aside>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-fsfreeze-freeze-list">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-fsfreeze-freeze-list</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.2)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-fsfreeze-freeze-list" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_FSFREEZE</span></code></div>
+</div>
+<p>Sync and freeze specified guest filesystems.  See also
+<code class="docutils literal notranslate"><span class="pre">guest-fsfreeze-freeze</span></code>.</p>
+<p>On error, all filesystems will be thawed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mountpoints</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code><code class="docutils literal notranslate"><span class="pre">]</span></code>, <em>optional</em></span>) – an array of mountpoints of filesystems to be frozen.
+If omitted, every mounted filesystem is frozen.  Invalid mount
+points are ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span> – Number of file systems currently frozen.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-fsfreeze-thaw">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-fsfreeze-thaw</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">0.15.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-fsfreeze-thaw" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_FSFREEZE</span></code></div>
+</div>
+<p>Unfreeze all frozen guest filesystems</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span> – Number of file systems thawed by this call</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the return value does not match the previous call to
+guest-fsfreeze-freeze, this likely means some freezable filesystems
+were unfrozen before this call, and that the filesystem state may
+have changed before issuing this command.</p>
+</aside>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestFilesystemTrimResult">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestFilesystemTrimResult</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.4)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestFilesystemTrimResult" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_FSTRIM</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – path that was trimmed</p></li>
+<li><p><strong>error</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – an error message when trim failed</p></li>
+<li><p><strong>trimmed</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – bytes trimmed for this path</p></li>
+<li><p><strong>minimum</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – reported effective minimum for this path</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestFilesystemTrimResponse">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestFilesystemTrimResponse</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.4)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestFilesystemTrimResponse" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_FSTRIM</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>paths</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestFilesystemTrimResult" title="QGA:qapi-schema.GuestFilesystemTrimResult"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestFilesystemTrimResult</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span>) – list of <code class="docutils literal notranslate"><span class="pre">GuestFilesystemTrimResult</span></code> per path that was trimmed</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-fstrim">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-fstrim</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.2)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-fstrim" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_FSTRIM</span></code></div>
+</div>
+<p>Discard (or “trim”) blocks which are not in use by the filesystem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>minimum</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – Minimum contiguous free range to discard, in bytes.  Free
+ranges smaller than this may be ignored (this is a hint and the
+guest may not respect it).  By increasing this value, the fstrim
+operation will complete more quickly for filesystems with badly
+fragmented free space, although not all blocks will be
+discarded.  The default value is zero, meaning “discard every
+free block”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><a class="reference internal" href="#object-QGA-qapi-schema.GuestFilesystemTrimResponse" title="QGA:qapi-schema.GuestFilesystemTrimResponse"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestFilesystemTrimResponse</span></code></a></span> – A <code class="docutils literal notranslate"><span class="pre">GuestFilesystemTrimResponse</span></code> which contains the status of
+all trimmed paths.  (since 2.4)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-suspend-disk">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-suspend-disk</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.1)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-suspend-disk" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span> <span class="pre">or</span> <span class="pre">CONFIG_WIN32</span></code></div>
+</div>
+<p>Suspend guest to disk.</p>
+<p>This command attempts to suspend the guest using three strategies,
+in this order:</p>
+<ul class="simple">
+<li><p>systemd hibernate</p></li>
+<li><p>pm-utils (via pm-hibernate)</p></li>
+<li><p>manual write into sysfs</p></li>
+</ul>
+<p>This command does NOT return a response on success.  There is a high
+chance the command succeeded if the VM exits with a zero exit status
+or, when running with –no-shutdown, by issuing the query-status QMP
+command to to confirm the VM status is “shutdown”. However, the VM
+could also exit (or set its status to “shutdown”) due to other
+reasons.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Errors<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>If suspend to disk is not supported, Unsupported</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It’s strongly recommended to issue the guest-sync command
+before sending commands when the guest resumes.</p>
+</aside>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-suspend-ram">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-suspend-ram</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.1)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-suspend-ram" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span> <span class="pre">or</span> <span class="pre">CONFIG_WIN32</span></code></div>
+</div>
+<p>Suspend guest to ram.</p>
+<p>This command attempts to suspend the guest using three strategies,
+in this order:</p>
+<ul class="simple">
+<li><p>systemd hibernate</p></li>
+<li><p>pm-utils (via pm-hibernate)</p></li>
+<li><p>manual write into sysfs</p></li>
+</ul>
+<p>IMPORTANT: guest-suspend-ram requires working wakeup support in
+QEMU. You should check QMP command query-current-machine returns
+wakeup-suspend-support: true before issuing this command.  Failure
+in doing so can result in a suspended guest that QEMU will not be
+able to awaken, forcing the user to power cycle the guest to bring
+it back.</p>
+<p>This command does NOT return a response on success.  There are two
+options to check for success:</p>
+<ol class="arabic simple">
+<li><p>Wait for the SUSPEND QMP event from QEMU</p></li>
+<li><p>Issue the query-status QMP command to confirm the VM status is
+“suspended”</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Errors<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>If suspend to ram is not supported, Unsupported</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It’s strongly recommended to issue the guest-sync command
+before sending commands when the guest resumes.</p>
+</aside>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-suspend-hybrid">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-suspend-hybrid</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.1)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-suspend-hybrid" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>Save guest state to disk and suspend to ram.</p>
+<p>This command attempts to suspend the guest by executing, in this
+order:</p>
+<ul class="simple">
+<li><p>systemd hybrid-sleep</p></li>
+<li><p>pm-utils (via pm-suspend-hybrid)</p></li>
+</ul>
+<p>IMPORTANT: guest-suspend-hybrid requires working wakeup support in
+QEMU. You should check QMP command query-current-machine returns
+wakeup-suspend-support: true before issuing this command.  Failure
+in doing so can result in a suspended guest that QEMU will not be
+able to awaken, forcing the user to power cycle the guest to bring
+it back.</p>
+<p>This command does NOT return a response on success.  There are two
+options to check for success:</p>
+<ol class="arabic simple">
+<li><p>Wait for the SUSPEND QMP event from QEMU</p></li>
+<li><p>Issue the query-status QMP command to confirm the VM status is
+“suspended”</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Errors<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>If hybrid suspend is not supported, Unsupported</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It’s strongly recommended to issue the guest-sync command
+before sending commands when the guest resumes.</p>
+</aside>
+</dd></dl>
+
+<dl class="qapi enum">
+<dt class="sig sig-object qapi" id="enum-QGA-qapi-schema.GuestIpAddressType">
+<em class="property"><span class="k"><span class="pre">Enum</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestIpAddressType</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.1)</span></span><a class="headerlink" href="#enum-QGA-qapi-schema.GuestIpAddressType" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">HAVE_GETIFADDRS</span></code></div>
+</div>
+<p>An enumeration of supported IP address types</p>
+<dl class="field-list simple">
+<dt class="field-odd">Values<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ipv4</strong> – IP version 4</p></li>
+<li><p><strong>ipv6</strong> – IP version 6</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestIpAddress">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestIpAddress</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.1)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestIpAddress" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">HAVE_GETIFADDRS</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ip-address</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – IP address</p></li>
+<li><p><strong>ip-address-type</strong> (<span><a class="reference internal" href="#enum-QGA-qapi-schema.GuestIpAddressType" title="QGA:qapi-schema.GuestIpAddressType"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestIpAddressType</span></code></a></span>) – Type of <code class="docutils literal notranslate"><span class="pre">ip-address</span></code> (e.g. ipv4, ipv6)</p></li>
+<li><p><strong>prefix</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Network prefix length of <code class="docutils literal notranslate"><span class="pre">ip-address</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestNetworkInterfaceStat">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestNetworkInterfaceStat</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.11)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestNetworkInterfaceStat" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">HAVE_GETIFADDRS</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rx-bytes</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – total bytes received</p></li>
+<li><p><strong>rx-packets</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – total packets received</p></li>
+<li><p><strong>rx-errs</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – bad packets received</p></li>
+<li><p><strong>rx-dropped</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – receiver dropped packets</p></li>
+<li><p><strong>tx-bytes</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – total bytes transmitted</p></li>
+<li><p><strong>tx-packets</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – total packets transmitted</p></li>
+<li><p><strong>tx-errs</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – packet transmit problems</p></li>
+<li><p><strong>tx-dropped</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – dropped packets transmitted</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestNetworkInterface">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestNetworkInterface</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.1)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestNetworkInterface" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">HAVE_GETIFADDRS</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – The name of interface for which info are being delivered</p></li>
+<li><p><strong>hardware-address</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – Hardware address of <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><strong>ip-addresses</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestIpAddress" title="QGA:qapi-schema.GuestIpAddress"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestIpAddress</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code>, <em>optional</em></span>) – List of addresses assigned to <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><strong>statistics</strong> (<span><a class="reference internal" href="#object-QGA-qapi-schema.GuestNetworkInterfaceStat" title="QGA:qapi-schema.GuestNetworkInterfaceStat"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestNetworkInterfaceStat</span></code></a>, <em>optional</em></span>) – various statistic counters related to <code class="docutils literal notranslate"><span class="pre">name</span></code> (since
+2.11)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-network-get-interfaces">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-network-get-interfaces</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.1)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-network-get-interfaces" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">HAVE_GETIFADDRS</span></code></div>
+</div>
+<p>Get list of guest IP addresses, MAC addresses and netmasks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestNetworkInterface" title="QGA:qapi-schema.GuestNetworkInterface"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestNetworkInterface</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span> – List of GuestNetworkInterface</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestLogicalProcessor">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestLogicalProcessor</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.5)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestLogicalProcessor" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span> <span class="pre">or</span> <span class="pre">CONFIG_WIN32</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logical-id</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Arbitrary guest-specific unique identifier of the VCPU.</p></li>
+<li><p><strong>online</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code></span>) – Whether the VCPU is enabled.</p></li>
+<li><p><strong>can-offline</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code>, <em>optional</em></span>) – Whether offlining the VCPU is possible.  This member
+is always filled in by the guest agent when the structure is
+returned, and always ignored on input (hence it can be omitted
+then).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-vcpus">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-vcpus</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.5)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-vcpus" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span> <span class="pre">or</span> <span class="pre">CONFIG_WIN32</span></code></div>
+</div>
+<p>Retrieve the list of the guest’s logical processors.</p>
+<p>This is a read-only operation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestLogicalProcessor" title="QGA:qapi-schema.GuestLogicalProcessor"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestLogicalProcessor</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span> – The list of all VCPUs the guest knows about.  Each VCPU is
+put on the list exactly once, but their order is unspecified.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-set-vcpus">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-set-vcpus</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">1.5)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-set-vcpus" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>Attempt to reconfigure (currently: enable/disable) logical
+processors inside the guest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vcpus</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestLogicalProcessor" title="QGA:qapi-schema.GuestLogicalProcessor"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestLogicalProcessor</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span>) – The logical processors to be reconfigured.  This list is
+processed node by node in order.  In each node <code class="docutils literal notranslate"><span class="pre">logical-id</span></code> is
+used to look up the guest VCPU, for which <code class="docutils literal notranslate"><span class="pre">online</span></code> specifies the
+requested state.  The set of distinct <code class="docutils literal notranslate"><span class="pre">logical-id</span></code>’s is only
+required to be a subset of the guest-supported identifiers.
+There’s no restriction on list length or on repeating the same
+<code class="docutils literal notranslate"><span class="pre">logical-id</span></code> (with possibly different <code class="docutils literal notranslate"><span class="pre">online</span></code> field).  Preferably
+the input list should describe a modified subset of
+<code class="docutils literal notranslate"><span class="pre">guest-get-vcpus</span></code>’ return value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span> – <p>The length of the initial sublist that has been
+successfully processed.  The guest agent maximizes this value.
+Possible cases:</p>
+<ul class="simple">
+<li><p>0:
+if the <code class="docutils literal notranslate"><span class="pre">vcpus</span></code> list was empty on input.  Guest state has not
+been changed.  Otherwise,</p></li>
+<li><p>&lt; length(<code class="docutils literal notranslate"><span class="pre">vcpus</span></code>):
+more than zero initial nodes have been processed, but not the
+entire <code class="docutils literal notranslate"><span class="pre">vcpus</span></code> list.  Guest state has changed accordingly.  To
+retrieve the error (assuming it persists), repeat the call
+with the successfully processed initial sublist removed.
+Otherwise,</p></li>
+<li><p>length(<code class="docutils literal notranslate"><span class="pre">vcpus</span></code>):
+call successful.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Errors<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>If the reconfiguration of the first node in <code class="docutils literal notranslate"><span class="pre">vcpus</span></code> failed.
+Guest state has not been changed.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi enum">
+<dt class="sig sig-object qapi" id="enum-QGA-qapi-schema.GuestDiskBusType">
+<em class="property"><span class="k"><span class="pre">Enum</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestDiskBusType</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.2;</span> <span class="pre">'Unknown'</span> <span class="pre">and</span> <span class="pre">all</span> <span class="pre">entries</span> <span class="pre">below</span> <span class="pre">since</span> <span class="pre">2.4)</span></span><a class="headerlink" href="#enum-QGA-qapi-schema.GuestDiskBusType" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>An enumeration of bus type of disks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Values<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ide</strong> – IDE disks</p></li>
+<li><p><strong>fdc</strong> – floppy disks</p></li>
+<li><p><strong>scsi</strong> – SCSI disks</p></li>
+<li><p><strong>virtio</strong> – virtio disks</p></li>
+<li><p><strong>xen</strong> – Xen disks</p></li>
+<li><p><strong>usb</strong> – USB disks</p></li>
+<li><p><strong>uml</strong> – UML disks</p></li>
+<li><p><strong>sata</strong> – SATA disks</p></li>
+<li><p><strong>sd</strong> – SD cards</p></li>
+<li><p><strong>unknown</strong> – Unknown bus type</p></li>
+<li><p><strong>ieee1394</strong> – Win IEEE 1394 bus type</p></li>
+<li><p><strong>ssa</strong> – Win SSA bus type</p></li>
+<li><p><strong>fibre</strong> – Win fiber channel bus type</p></li>
+<li><p><strong>raid</strong> – Win RAID bus type</p></li>
+<li><p><strong>iscsi</strong> – Win iScsi bus type</p></li>
+<li><p><strong>sas</strong> – Win serial-attaches SCSI bus type</p></li>
+<li><p><strong>mmc</strong> – Win multimedia card (MMC) bus type</p></li>
+<li><p><strong>virtual</strong> – Win virtual bus type</p></li>
+<li><p><strong>file-backed-virtual</strong> – Win file-backed bus type</p></li>
+<li><p><strong>nvme</strong> – NVMe disks (since 7.1)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestPCIAddress">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestPCIAddress</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.2)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestPCIAddress" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>domain</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – domain id</p></li>
+<li><p><strong>bus</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – bus id</p></li>
+<li><p><strong>slot</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – slot id</p></li>
+<li><p><strong>function</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – function id</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestCCWAddress">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestCCWAddress</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">6.0)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestCCWAddress" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cssid</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – channel subsystem image id</p></li>
+<li><p><strong>ssid</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – subchannel set id</p></li>
+<li><p><strong>subchno</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – subchannel number</p></li>
+<li><p><strong>devno</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – device number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestDiskAddress">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestDiskAddress</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.2)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestDiskAddress" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pci-controller</strong> (<span><a class="reference internal" href="#object-QGA-qapi-schema.GuestPCIAddress" title="QGA:qapi-schema.GuestPCIAddress"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestPCIAddress</span></code></a></span>) – controller’s PCI address (fields are set to -1 if
+invalid)</p></li>
+<li><p><strong>bus-type</strong> (<span><a class="reference internal" href="#enum-QGA-qapi-schema.GuestDiskBusType" title="QGA:qapi-schema.GuestDiskBusType"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestDiskBusType</span></code></a></span>) – bus type</p></li>
+<li><p><strong>bus</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – bus id</p></li>
+<li><p><strong>target</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – target id</p></li>
+<li><p><strong>unit</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – unit id</p></li>
+<li><p><strong>serial</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – serial number (since: 3.1)</p></li>
+<li><p><strong>dev</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – device node (POSIX) or device UNC (Windows) (since: 3.1)</p></li>
+<li><p><strong>ccw-address</strong> (<span><a class="reference internal" href="#object-QGA-qapi-schema.GuestCCWAddress" title="QGA:qapi-schema.GuestCCWAddress"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestCCWAddress</span></code></a>, <em>optional</em></span>) – CCW address on s390x (since: 6.0)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestNVMeSmart">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestNVMeSmart</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">7.1)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestNVMeSmart" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_LIBUDEV</span></code></div>
+</div>
+<p>NVMe smart information, based on NVMe specification, section
+&lt;SMART / Health Information (Log Identifier 02h)&gt;</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>critical-warning</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>temperature</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>available-spare</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>available-spare-threshold</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>percentage-used</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>data-units-read-lo</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>data-units-read-hi</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>data-units-written-lo</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>data-units-written-hi</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>host-read-commands-lo</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>host-read-commands-hi</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>host-write-commands-lo</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>host-write-commands-hi</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>controller-busy-time-lo</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>controller-busy-time-hi</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>power-cycles-lo</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>power-cycles-hi</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>power-on-hours-lo</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>power-on-hours-hi</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>unsafe-shutdowns-lo</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>unsafe-shutdowns-hi</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>media-errors-lo</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>media-errors-hi</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>number-of-error-log-entries-lo</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+<li><p><strong>number-of-error-log-entries-hi</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Not documented</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestDiskSmart">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestDiskSmart</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">7.1)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestDiskSmart" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_LIBUDEV</span></code></div>
+</div>
+<p>Disk type related smart information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> (<span><a class="reference internal" href="#enum-QGA-qapi-schema.GuestDiskBusType" title="QGA:qapi-schema.GuestDiskBusType"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestDiskBusType</span></code></a></span>) – disk bus type</p></li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">type</span></code> is <code class="docutils literal notranslate"><span class="pre">nvme</span></code>: The members of <a class="reference internal" href="#object-QGA-qapi-schema.GuestNVMeSmart" title="QGA:qapi-schema.GuestNVMeSmart"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestNVMeSmart</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestDiskInfo">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestDiskInfo</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">5.2)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestDiskInfo" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_LIBUDEV</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – device node (Linux) or device UNC (Windows)</p></li>
+<li><p><strong>partition</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code></span>) – whether this is a partition or disk</p></li>
+<li><p><strong>dependencies</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code><code class="docutils literal notranslate"><span class="pre">]</span></code>, <em>optional</em></span>) – list of device dependencies; e.g. for LVs of the LVM
+this will hold the list of PVs, for LUKS encrypted volume this
+will contain the disk where the volume is placed.  (Linux)</p></li>
+<li><p><strong>address</strong> (<span><a class="reference internal" href="#object-QGA-qapi-schema.GuestDiskAddress" title="QGA:qapi-schema.GuestDiskAddress"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestDiskAddress</span></code></a>, <em>optional</em></span>) – disk address information (only for non-virtual devices)</p></li>
+<li><p><strong>alias</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – optional alias assigned to the disk, on Linux this is a name
+assigned by device mapper</p></li>
+<li><p><strong>smart</strong> (<span><a class="reference internal" href="#object-QGA-qapi-schema.GuestDiskSmart" title="QGA:qapi-schema.GuestDiskSmart"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestDiskSmart</span></code></a>, <em>optional</em></span>) – disk smart information (Since 7.1)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-disks">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-disks</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">5.2)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-disks" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_LIBUDEV</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestDiskInfo" title="QGA:qapi-schema.GuestDiskInfo"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestDiskInfo</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span> – The list of disks in the guest.  For Windows these are only
+the physical disks.  On Linux these are all root block devices
+of non-zero size including e.g. removable devices, loop devices,
+NBD, etc.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestFilesystemInfo">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestFilesystemInfo</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.2)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestFilesystemInfo" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – disk name</p></li>
+<li><p><strong>mountpoint</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – mount point path</p></li>
+<li><p><strong>type</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – file system type string</p></li>
+<li><p><strong>used-bytes</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – file system used bytes (since 3.0)</p></li>
+<li><p><strong>total-bytes</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – filesystem capacity in bytes for unprivileged users (since 3.0)</p></li>
+<li><p><strong>total-bytes-privileged</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – filesystem capacity in bytes for privileged users
+(since 9.1)</p></li>
+<li><p><strong>disk</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestDiskAddress" title="QGA:qapi-schema.GuestDiskAddress"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestDiskAddress</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span>) – an array of disk hardware information that the volume lies
+on, which may be empty if the disk type is not supported</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-fsinfo">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-fsinfo</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.2)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-fsinfo" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestFilesystemInfo" title="QGA:qapi-schema.GuestFilesystemInfo"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestFilesystemInfo</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span> – The list of filesystems information mounted in the guest.
+The returned mountpoints may be specified to
+<code class="docutils literal notranslate"><span class="pre">guest-fsfreeze-freeze-list</span></code>.  Network filesystems (such as CIFS
+and NFS) are not listed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-set-user-password">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-set-user-password</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.3)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-set-user-password" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">CONFIG_LINUX</span> <span class="pre">or</span> <span class="pre">CONFIG_FREEBSD</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>username</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – the user account whose password to change</p></li>
+<li><p><strong>password</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – the new password entry string, base64 encoded</p></li>
+<li><p><strong>crypted</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code></span>) – true if password is already crypt()d, false if raw</p></li>
+</ul>
+</dd>
+</dl>
+<p>If the <code class="docutils literal notranslate"><span class="pre">crypted</span></code> flag is true, it is the caller’s responsibility to
+ensure the correct crypt() encryption scheme is used.  This command
+does not attempt to interpret or report on the encryption scheme.
+Refer to the documentation of the guest operating system in question
+to determine what is supported.</p>
+<p>Not all guest operating systems will support use of the <code class="docutils literal notranslate"><span class="pre">crypted</span></code>
+flag, as they may require the clear-text password</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">password</span></code> parameter must always be base64 encoded before
+transmission, even if already crypt()d, to ensure it is 8-bit safe
+when passed as JSON.</p>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestMemoryBlock">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestMemoryBlock</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.3)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestMemoryBlock" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phys-index</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Arbitrary guest-specific unique identifier of the
+MEMORY BLOCK.</p></li>
+<li><p><strong>online</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code></span>) – Whether the MEMORY BLOCK is enabled in guest.</p></li>
+<li><p><strong>can-offline</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code>, <em>optional</em></span>) – Whether offlining the MEMORY BLOCK is possible.  This
+member is always filled in by the guest agent when the structure
+is returned, and always ignored on input (hence it can be
+omitted then).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-memory-blocks">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-memory-blocks</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.3)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-memory-blocks" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>Retrieve the list of the guest’s memory blocks.</p>
+<p>This is a read-only operation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestMemoryBlock" title="QGA:qapi-schema.GuestMemoryBlock"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestMemoryBlock</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span> – The list of all memory blocks the guest knows about.  Each
+memory block is put on the list exactly once, but their order is
+unspecified.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi enum">
+<dt class="sig sig-object qapi" id="enum-QGA-qapi-schema.GuestMemoryBlockResponseType">
+<em class="property"><span class="k"><span class="pre">Enum</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestMemoryBlockResponseType</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.3)</span></span><a class="headerlink" href="#enum-QGA-qapi-schema.GuestMemoryBlockResponseType" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>An enumeration of memory block operation result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Values<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>success</strong> – the operation of online/offline memory block is
+successful.</p></li>
+<li><p><strong>not-found</strong> – can’t find the corresponding memoryXXX directory in
+sysfs.</p></li>
+<li><p><strong>operation-not-supported</strong> – for some old kernels, it does not support
+online or offline memory block.</p></li>
+<li><p><strong>operation-failed</strong> – the operation of online/offline memory block
+fails, because of some errors happen.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestMemoryBlockResponse">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestMemoryBlockResponse</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.3)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestMemoryBlockResponse" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phys-index</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – same with the ‘phys-index’ member of <code class="docutils literal notranslate"><span class="pre">GuestMemoryBlock</span></code>.</p></li>
+<li><p><strong>response</strong> (<span><a class="reference internal" href="#enum-QGA-qapi-schema.GuestMemoryBlockResponseType" title="QGA:qapi-schema.GuestMemoryBlockResponseType"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestMemoryBlockResponseType</span></code></a></span>) – the result of memory block operation.</p></li>
+<li><p><strong>error-code</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – the error number.  When memory block operation fails,
+we assign the value of ‘errno’ to this member, it indicates what
+goes wrong.  When the operation succeeds, it will be omitted.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-set-memory-blocks">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-set-memory-blocks</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.3)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-set-memory-blocks" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>Attempt to reconfigure (currently: enable/disable) state of memory
+blocks inside the guest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mem-blks</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestMemoryBlock" title="QGA:qapi-schema.GuestMemoryBlock"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestMemoryBlock</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span>) – The memory blocks to be reconfigured.  This list is
+processed node by node in order.  In each node <code class="docutils literal notranslate"><span class="pre">phys-index</span></code> is
+used to look up the guest MEMORY BLOCK, for which <code class="docutils literal notranslate"><span class="pre">online</span></code>
+specifies the requested state.  The set of distinct
+<code class="docutils literal notranslate"><span class="pre">phys-index</span></code>’s is only required to be a subset of the
+guest-supported identifiers.  There’s no restriction on list
+length or on repeating the same <code class="docutils literal notranslate"><span class="pre">phys-index</span></code> (with possibly
+different <code class="docutils literal notranslate"><span class="pre">online</span></code> field).  Preferably the input list should
+describe a modified subset of <code class="docutils literal notranslate"><span class="pre">guest-get-memory-blocks</span></code>’ return
+value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestMemoryBlockResponse" title="QGA:qapi-schema.GuestMemoryBlockResponse"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestMemoryBlockResponse</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span> – <p>The operation results, it is a list of
+<code class="docutils literal notranslate"><span class="pre">GuestMemoryBlockResponse</span></code>, which is corresponding to the input
+list.</p>
+<p>Note: it will return an empty list if the <code class="docutils literal notranslate"><span class="pre">mem-blks</span></code> list was
+empty on input, or there is an error, and in this case, guest
+state will not be changed.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestMemoryBlockInfo">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestMemoryBlockInfo</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.3)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestMemoryBlockInfo" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>size</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – the size (in bytes) of the guest memory blocks, which are the
+minimal units of memory block online/offline operations (also
+called Logical Memory Hotplug).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-memory-block-info">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-memory-block-info</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.3)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-memory-block-info" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>Get information relating to guest memory blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><a class="reference internal" href="#object-QGA-qapi-schema.GuestMemoryBlockInfo" title="QGA:qapi-schema.GuestMemoryBlockInfo"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestMemoryBlockInfo</span></code></a></span> – <code class="docutils literal notranslate"><span class="pre">GuestMemoryBlockInfo</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestExecStatus">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestExecStatus</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.5)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestExecStatus" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>exited</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code></span>) – true if process has already terminated.</p></li>
+<li><p><strong>exitcode</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – process exit code if it was normally terminated.</p></li>
+<li><p><strong>signal</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – signal number (linux) or unhandled exception code (windows)
+if the process was abnormally terminated.</p></li>
+<li><p><strong>out-data</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – base64-encoded stdout of the process.  This field will
+only be populated after the process exits.</p></li>
+<li><p><strong>err-data</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – base64-encoded stderr of the process.  Note: <code class="docutils literal notranslate"><span class="pre">out-data</span></code>
+and <code class="docutils literal notranslate"><span class="pre">err-data</span></code> are present only if ‘capture-output’ was specified
+for ‘guest-exec’.  This field will only be populated after the
+process exits.</p></li>
+<li><p><strong>out-truncated</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code>, <em>optional</em></span>) – true if stdout was not fully captured due to size
+limitation.</p></li>
+<li><p><strong>err-truncated</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code>, <em>optional</em></span>) – true if stderr was not fully captured due to size
+limitation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-exec-status">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-exec-status</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.5)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-exec-status" title="Permalink to this definition"></a></dt>
+<dd><p>Check status of process associated with PID retrieved via
+guest-exec.  Reap the process and associated metadata if it has
+exited.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pid</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – pid returned from guest-exec</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><a class="reference internal" href="#object-QGA-qapi-schema.GuestExecStatus" title="QGA:qapi-schema.GuestExecStatus"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestExecStatus</span></code></a></span> – GuestExecStatus</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestExec">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestExec</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.5)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestExec" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pid</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – pid of child process in guest OS</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi enum">
+<dt class="sig sig-object qapi" id="enum-QGA-qapi-schema.GuestExecCaptureOutputMode">
+<em class="property"><span class="k"><span class="pre">Enum</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestExecCaptureOutputMode</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">8.0)</span></span><a class="headerlink" href="#enum-QGA-qapi-schema.GuestExecCaptureOutputMode" title="Permalink to this definition"></a></dt>
+<dd><p>An enumeration of guest-exec capture modes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Values<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>none</strong> – do not capture any output</p></li>
+<li><p><strong>stdout</strong> – only capture stdout</p></li>
+<li><p><strong>stderr</strong> – only capture stderr</p></li>
+<li><p><strong>separated</strong> – capture both stdout and stderr, but separated into
+GuestExecStatus out-data and err-data, respectively</p></li>
+<li><p><strong>merged</strong> – capture both stdout and stderr, but merge together into
+out-data.  Not effective on windows guests.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi alternate">
+<dt class="sig sig-object qapi" id="alternate-QGA-qapi-schema.GuestExecCaptureOutput">
+<em class="property"><span class="k"><span class="pre">Alternate</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestExecCaptureOutput</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">8.0)</span></span><a class="headerlink" href="#alternate-QGA-qapi-schema.GuestExecCaptureOutput" title="Permalink to this definition"></a></dt>
+<dd><p>Controls what guest-exec output gets captures.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Alternatives<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flag</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code></span>) – captures both stdout and stderr if true.  Equivalent to
+GuestExecCaptureOutputMode::all.  (since 2.5)</p></li>
+<li><p><strong>mode</strong> (<span><a class="reference internal" href="#enum-QGA-qapi-schema.GuestExecCaptureOutputMode" title="QGA:qapi-schema.GuestExecCaptureOutputMode"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestExecCaptureOutputMode</span></code></a></span>) – capture mode; preferred interface</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-exec">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-exec</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.5)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-exec" title="Permalink to this definition"></a></dt>
+<dd><p>Execute a command in the guest</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – path or executable name to execute</p></li>
+<li><p><strong>arg</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code><code class="docutils literal notranslate"><span class="pre">]</span></code>, <em>optional</em></span>) – argument list to pass to executable</p></li>
+<li><p><strong>env</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code><code class="docutils literal notranslate"><span class="pre">]</span></code>, <em>optional</em></span>) – environment variables to pass to executable</p></li>
+<li><p><strong>input-data</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – data to be passed to process stdin (base64 encoded)</p></li>
+<li><p><strong>capture-output</strong> (<span><a class="reference internal" href="#alternate-QGA-qapi-schema.GuestExecCaptureOutput" title="QGA:qapi-schema.GuestExecCaptureOutput"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestExecCaptureOutput</span></code></a>, <em>optional</em></span>) – bool flag to enable capture of stdout/stderr of
+running process.  Defaults to false.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><a class="reference internal" href="#object-QGA-qapi-schema.GuestExec" title="QGA:qapi-schema.GuestExec"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestExec</span></code></a></span> – PID</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestHostName">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestHostName</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.10)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestHostName" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host-name</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – Fully qualified domain name of the guest OS</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-host-name">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-host-name</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.10)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-host-name" title="Permalink to this definition"></a></dt>
+<dd><p>Return a name for the machine.</p>
+<p>The returned name is not necessarily a fully-qualified domain name,
+or even present in DNS or some other name service at all.  It need
+not even be unique on your local network or site, but usually it is.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><a class="reference internal" href="#object-QGA-qapi-schema.GuestHostName" title="QGA:qapi-schema.GuestHostName"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestHostName</span></code></a></span> – the host name of the machine</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestUser">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestUser</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.10)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestUser" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">HAVE_UTMPX</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – Username</p></li>
+<li><p><strong>domain</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – Logon domain (windows only)</p></li>
+<li><p><strong>login-time</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">number</span></code></span>) – Time of login of this user on the computer.  If
+multiple instances of the user are logged in, the earliest login
+time is reported.  The value is in fractional seconds since
+epoch time.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-users">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-users</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.10)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-users" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span> <span class="pre">or</span> <span class="pre">HAVE_UTMPX</span></code></div>
+</div>
+<p>Retrieves a list of currently active users on the VM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestUser" title="QGA:qapi-schema.GuestUser"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestUser</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span> – A unique list of users.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestTimezone">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestTimezone</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.10)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestTimezone" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>zone</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – Timezone name.  These values may differ depending on guest/OS
+and should only be used for informational purposes.</p></li>
+<li><p><strong>offset</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Offset to UTC in seconds, negative numbers for time zones
+west of GMT, positive numbers for east</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-timezone">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-timezone</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.10)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-timezone" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieves the timezone information from the guest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><a class="reference internal" href="#object-QGA-qapi-schema.GuestTimezone" title="QGA:qapi-schema.GuestTimezone"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestTimezone</span></code></a></span> – A GuestTimezone dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestOSInfo">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestOSInfo</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.10)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestOSInfo" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kernel-release</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – <ul>
+<li><p>POSIX: release field returned by uname(2)</p></li>
+<li><p>Windows: build number of the OS</p></li>
+</ul>
+</p></li>
+<li><p><strong>kernel-version</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – <ul>
+<li><p>POSIX: version field returned by uname(2)</p></li>
+<li><p>Windows: version number of the OS</p></li>
+</ul>
+</p></li>
+<li><p><strong>machine</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – <ul>
+<li><p>POSIX: machine field returned by uname(2)</p></li>
+<li><p>Windows: one of x86, x86_64, arm, ia64</p></li>
+</ul>
+</p></li>
+<li><p><strong>id</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – <ul>
+<li><p>POSIX: as defined by os-release(5)</p></li>
+<li><p>Windows: contains string “mswindows”</p></li>
+</ul>
+</p></li>
+<li><p><strong>name</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – <ul>
+<li><p>POSIX: as defined by os-release(5)</p></li>
+<li><p>Windows: contains string “Microsoft Windows”</p></li>
+</ul>
+</p></li>
+<li><p><strong>pretty-name</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – <ul>
+<li><p>POSIX: as defined by os-release(5)</p></li>
+<li><p>Windows: product name, e.g. “Microsoft Windows 10 Enterprise”</p></li>
+</ul>
+</p></li>
+<li><p><strong>version</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – <ul>
+<li><p>POSIX: as defined by os-release(5)</p></li>
+<li><p>Windows: long version string, e.g. “Microsoft Windows Server
+2008”</p></li>
+</ul>
+</p></li>
+<li><p><strong>version-id</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – <ul>
+<li><p>POSIX: as defined by os-release(5)</p></li>
+<li><p>Windows: short version identifier, e.g. “7” or “20012r2”</p></li>
+</ul>
+</p></li>
+<li><p><strong>variant</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – <ul>
+<li><p>POSIX: as defined by os-release(5)</p></li>
+<li><p>Windows: contains string “server” or “client”</p></li>
+</ul>
+</p></li>
+<li><p><strong>variant-id</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – <ul>
+<li><p>POSIX: as defined by os-release(5)</p></li>
+<li><p>Windows: contains string “server” or “client”</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On POSIX systems the fields <code class="docutils literal notranslate"><span class="pre">id</span></code>, <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">pretty-name</span></code>,
+<code class="docutils literal notranslate"><span class="pre">version</span></code>, <code class="docutils literal notranslate"><span class="pre">version-id</span></code>, <code class="docutils literal notranslate"><span class="pre">variant</span></code> and <code class="docutils literal notranslate"><span class="pre">variant-id</span></code> follow the
+definition specified in os-release(5). Refer to the manual page for
+exact description of the fields.  Their values are taken from the
+os-release file.  If the file is not present in the system, or the
+values are not present in the file, the fields are not included.</p>
+<p>On Windows the values are filled from information gathered from
+the system.</p>
+</aside>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-osinfo">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-osinfo</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">2.10)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-osinfo" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieve guest operating system information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><a class="reference internal" href="#object-QGA-qapi-schema.GuestOSInfo" title="QGA:qapi-schema.GuestOSInfo"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestOSInfo</span></code></a></span> – <code class="docutils literal notranslate"><span class="pre">GuestOSInfo</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi enum">
+<dt class="sig sig-object qapi" id="enum-QGA-qapi-schema.GuestDeviceType">
+<em class="property"><span class="k"><span class="pre">Enum</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestDeviceType</span></span><a class="headerlink" href="#enum-QGA-qapi-schema.GuestDeviceType" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Values<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pci</strong> – PCI device</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestDeviceIdPCI">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestDeviceIdPCI</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">5.2)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestDeviceIdPCI" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vendor-id</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – vendor ID</p></li>
+<li><p><strong>device-id</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – device ID</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestDeviceId">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestDeviceId</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">5.2)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestDeviceId" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span></code></div>
+</div>
+<p>Id of the device</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> (<span><a class="reference internal" href="#enum-QGA-qapi-schema.GuestDeviceType" title="QGA:qapi-schema.GuestDeviceType"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestDeviceType</span></code></a></span>) – device type</p></li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">type</span></code> is <code class="docutils literal notranslate"><span class="pre">pci</span></code>: The members of <a class="reference internal" href="#object-QGA-qapi-schema.GuestDeviceIdPCI" title="QGA:qapi-schema.GuestDeviceIdPCI"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestDeviceIdPCI</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestDeviceInfo">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestDeviceInfo</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">5.2)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestDeviceInfo" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver-name</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – name of the associated driver</p></li>
+<li><p><strong>driver-date</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – driver release date, in nanoseconds since the epoch</p></li>
+<li><p><strong>driver-version</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – driver version</p></li>
+<li><p><strong>id</strong> (<span><a class="reference internal" href="#object-QGA-qapi-schema.GuestDeviceId" title="QGA:qapi-schema.GuestDeviceId"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestDeviceId</span></code></a>, <em>optional</em></span>) – device ID</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-devices">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-devices</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">5.2)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-devices" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_WIN32</span></code></div>
+</div>
+<p>Retrieve information about device drivers in Windows guest</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestDeviceInfo" title="QGA:qapi-schema.GuestDeviceInfo"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestDeviceInfo</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span> – <code class="docutils literal notranslate"><span class="pre">GuestDeviceInfo</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestAuthorizedKeys">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestAuthorizedKeys</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">5.2)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestAuthorizedKeys" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code><code class="docutils literal notranslate"><span class="pre">]</span></code></span>) – public keys (in OpenSSH/sshd(8) authorized_keys format)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-ssh-get-authorized-keys">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-ssh-get-authorized-keys</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">5.2)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-ssh-get-authorized-keys" title="Permalink to this definition"></a></dt>
+<dd><p>Return the public keys from user .ssh/authorized_keys on Unix
+systems (not implemented for other systems).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>username</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – the user account to add the authorized keys</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><a class="reference internal" href="#object-QGA-qapi-schema.GuestAuthorizedKeys" title="QGA:qapi-schema.GuestAuthorizedKeys"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestAuthorizedKeys</span></code></a></span> – <code class="docutils literal notranslate"><span class="pre">GuestAuthorizedKeys</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-ssh-add-authorized-keys">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-ssh-add-authorized-keys</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">5.2)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-ssh-add-authorized-keys" title="Permalink to this definition"></a></dt>
+<dd><p>Append public keys to user .ssh/authorized_keys on Unix systems (not
+implemented for other systems).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>username</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – the user account to add the authorized keys</p></li>
+<li><p><strong>keys</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code><code class="docutils literal notranslate"><span class="pre">]</span></code></span>) – the public keys to add (in OpenSSH/sshd(8) authorized_keys
+format)</p></li>
+<li><p><strong>reset</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">boolean</span></code>, <em>optional</em></span>) – ignore the existing content, set it with the given keys only</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-ssh-remove-authorized-keys">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-ssh-remove-authorized-keys</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">5.2)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-ssh-remove-authorized-keys" title="Permalink to this definition"></a></dt>
+<dd><p>Remove public keys from the user .ssh/authorized_keys on Unix
+systems (not implemented for other systems). It’s not an error if
+the key is already missing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>username</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – the user account to remove the authorized keys</p></li>
+<li><p><strong>keys</strong> (<span><code class="docutils literal notranslate"><span class="pre">[</span></code><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code><code class="docutils literal notranslate"><span class="pre">]</span></code></span>) – the public keys to remove (in OpenSSH/sshd(8) authorized_keys
+format)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestDiskStats">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestDiskStats</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">7.1)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestDiskStats" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>read-sectors</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – sectors read</p></li>
+<li><p><strong>read-ios</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – reads completed successfully</p></li>
+<li><p><strong>read-merges</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – read requests merged</p></li>
+<li><p><strong>write-sectors</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – sectors written</p></li>
+<li><p><strong>write-ios</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – writes completed</p></li>
+<li><p><strong>write-merges</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – write requests merged</p></li>
+<li><p><strong>discard-sectors</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – sectors discarded</p></li>
+<li><p><strong>discard-ios</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – discards completed successfully</p></li>
+<li><p><strong>discard-merges</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – discard requests merged</p></li>
+<li><p><strong>flush-ios</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – flush requests completed successfully</p></li>
+<li><p><strong>read-ticks</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – time spent reading(ms)</p></li>
+<li><p><strong>write-ticks</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – time spent writing(ms)</p></li>
+<li><p><strong>discard-ticks</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – time spent discarding(ms)</p></li>
+<li><p><strong>flush-ticks</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – time spent flushing(ms)</p></li>
+<li><p><strong>ios-pgr</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – number of I/Os currently in flight</p></li>
+<li><p><strong>total-ticks</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – time spent doing I/Os (ms)</p></li>
+<li><p><strong>weight-ticks</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – weighted time spent doing I/Os since the last update
+of this field(ms)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestDiskStatsInfo">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestDiskStatsInfo</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestDiskStatsInfo" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – disk name</p></li>
+<li><p><strong>major</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – major device number of disk</p></li>
+<li><p><strong>minor</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – minor device number of disk</p></li>
+<li><p><strong>stats</strong> (<span><a class="reference internal" href="#object-QGA-qapi-schema.GuestDiskStats" title="QGA:qapi-schema.GuestDiskStats"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestDiskStats</span></code></a></span>) – I/O statistics</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-diskstats">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-diskstats</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">7.1)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-diskstats" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>Retrieve information about disk stats.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestDiskStatsInfo" title="QGA:qapi-schema.GuestDiskStatsInfo"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestDiskStatsInfo</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span> – List of disk stats of guest.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi enum">
+<dt class="sig sig-object qapi" id="enum-QGA-qapi-schema.GuestCpuStatsType">
+<em class="property"><span class="k"><span class="pre">Enum</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestCpuStatsType</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">7.1)</span></span><a class="headerlink" href="#enum-QGA-qapi-schema.GuestCpuStatsType" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>Guest operating systems supporting CPU statistics</p>
+<dl class="field-list simple">
+<dt class="field-odd">Values<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>linux</strong> – Linux</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestLinuxCpuStats">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestLinuxCpuStats</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">7.1)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestLinuxCpuStats" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>CPU statistics of Linux</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cpu</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – CPU index in guest OS</p></li>
+<li><p><strong>user</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Time spent in user mode</p></li>
+<li><p><strong>nice</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Time spent in user mode with low priority (nice)</p></li>
+<li><p><strong>system</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Time spent in system mode</p></li>
+<li><p><strong>idle</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Time spent in the idle task</p></li>
+<li><p><strong>iowait</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – Time waiting for I/O to complete (since Linux 2.5.41)</p></li>
+<li><p><strong>irq</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – Time servicing interrupts (since Linux 2.6.0-test4)</p></li>
+<li><p><strong>softirq</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – Time servicing softirqs (since Linux 2.6.0-test4)</p></li>
+<li><p><strong>steal</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – Stolen time by host (since Linux 2.6.11)</p></li>
+<li><p><strong>guest</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – ime spent running a virtual CPU for guest operating systems
+under the  control of the Linux kernel (since Linux 2.6.24)</p></li>
+<li><p><strong>guestnice</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – Time spent running a niced guest (since Linux 2.6.33)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestCpuStats">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestCpuStats</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">7.1)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestCpuStats" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>Get statistics of each CPU in millisecond.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> (<span><a class="reference internal" href="#enum-QGA-qapi-schema.GuestCpuStatsType" title="QGA:qapi-schema.GuestCpuStatsType"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestCpuStatsType</span></code></a></span>) – guest operating system</p></li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">type</span></code> is <code class="docutils literal notranslate"><span class="pre">linux</span></code>: The members of <a class="reference internal" href="#object-QGA-qapi-schema.GuestLinuxCpuStats" title="QGA:qapi-schema.GuestLinuxCpuStats"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestLinuxCpuStats</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-cpustats">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-cpustats</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">7.1)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-cpustats" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>Retrieve information about CPU stats.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><code class="docutils literal notranslate"><span class="pre">[</span></code><a class="reference internal" href="#object-QGA-qapi-schema.GuestCpuStats" title="QGA:qapi-schema.GuestCpuStats"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestCpuStats</span></code></a><code class="docutils literal notranslate"><span class="pre">]</span></code></span> – List of CPU stats of guest.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestLoadAverage">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestLoadAverage</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">10.0)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestLoadAverage" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_GETLOADAVG</span></code></div>
+</div>
+<p>Statistics about process load information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>load1m</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">number</span></code></span>) – 1-minute load avage</p></li>
+<li><p><strong>load5m</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">number</span></code></span>) – 5-minute load avage</p></li>
+<li><p><strong>load15m</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">number</span></code></span>) – 15-minute load avage</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-get-load">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-get-load</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">10.0)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-get-load" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_GETLOADAVG</span></code></div>
+</div>
+<p>Retrieve CPU process load information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><a class="reference internal" href="#object-QGA-qapi-schema.GuestLoadAverage" title="QGA:qapi-schema.GuestLoadAverage"><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">GuestLoadAverage</span></code></a></span> – load information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi object">
+<dt class="sig sig-object qapi" id="object-QGA-qapi-schema.GuestNetworkRoute">
+<em class="property"><span class="k"><span class="pre">Object</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GuestNetworkRoute</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">9.1)</span></span><a class="headerlink" href="#object-QGA-qapi-schema.GuestNetworkRoute" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>Route information, currently, only linux supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Members<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>iface</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – The destination network or host’s egress network interface in the routing table</p></li>
+<li><p><strong>destination</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code></span>) – The IP address of the target network or host, The final destination of the packet</p></li>
+<li><p><strong>metric</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – Route metric</p></li>
+<li><p><strong>gateway</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – The IP address of the next hop router</p></li>
+<li><p><strong>mask</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – Subnet Mask (IPv4 only)</p></li>
+<li><p><strong>irtt</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – Initial round-trip delay (not for windows, IPv4 only)</p></li>
+<li><p><strong>flags</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – Route flags (not for windows)</p></li>
+<li><p><strong>refcnt</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – The route’s reference count (not for windows)</p></li>
+<li><p><strong>use</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – Route usage count (not for windows)</p></li>
+<li><p><strong>window</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – TCP window size, used for flow control (not for windows, IPv4 only)</p></li>
+<li><p><strong>mtu</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em></span>) – Data link layer maximum packet size (not for windows)</p></li>
+<li><p><strong>desprefixlen</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – Destination prefix length (for IPv6)</p></li>
+<li><p><strong>source</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – Source IP address (for IPv6)</p></li>
+<li><p><strong>srcprefixlen</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – Source prefix length (for IPv6)</p></li>
+<li><p><strong>nexthop</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">string</span></code>, <em>optional</em></span>) – Next hop IP address (for IPv6)</p></li>
+<li><p><strong>version</strong> (<span><code class="xref qapi qapi-type docutils literal notranslate"><span class="pre">int</span></code></span>) – IP version (4 or 6)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="qapi command">
+<dt class="sig sig-object qapi" id="command-QGA-qapi-schema.guest-network-get-route">
+<em class="property"><span class="k"><span class="pre">Command</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">guest-network-get-route</span></span><span class="w"> </span><span><span class="pre">(Since:</span> <span class="pre">9.1)</span></span><a class="headerlink" href="#command-QGA-qapi-schema.guest-network-get-route" title="Permalink to this definition"></a></dt>
+<dd><div class="qapi-infopips docutils container">
+<div class="qapi-infopip qapi-ifcond docutils container">
+<em>Availability</em>: <code class="docutils literal notranslate"><span class="pre">CONFIG_LINUX</span></code></div>
+</div>
+<p>Retrieve information about route of network.
+Returns: List of route info of guest.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qemu-ga.html" class="btn btn-neutral float-left" title="QEMU Guest Agent" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qemu-qmp-ref.html" class="btn btn-neutral float-right" title="QEMU QMP Reference Manual" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

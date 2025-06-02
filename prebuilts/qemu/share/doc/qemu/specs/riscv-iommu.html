@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RISC-V IOMMU support for RISC-V machines &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RISC-V AIA support for RISC-V machines" href="riscv-aia.html" />
+    <link rel="prev" title="Rocker Network Switch Register Programming Guide" href="rocker.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Emulation Guest Hardware Specifications</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pci-ids.html">PCI IDs for QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pci-serial.html">QEMU PCI serial devices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pci-testdev.html">QEMU PCI test device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-xive.html">POWER9 XIVE interrupt controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-xive.html">XIVE for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html">NUMA mechanics for sPAPR (pseries machines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#how-the-pseries-linux-guest-calculates-numa-distances">How the pseries Linux guest calculates NUMA distances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#pseries-numa-mechanics">pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ppc-spapr-numa.html#legacy-5-1-and-older-pseries-numa-mechanics">Legacy (5.1 and older) pseries NUMA mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hw_reduced_hotplug.html">QEMU and ACPI BIOS Generic Event Device interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tpm.html">QEMU TPM Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_hest_ghes.html">APEI tables generating and CPER record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_cpu_hotplug.html">QEMU&lt;-&gt;ACPI BIOS CPU hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_mem_hotplug.html">QEMU&lt;-&gt;ACPI BIOS memory hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_pci_hotplug.html">QEMU&lt;-&gt;ACPI BIOS PCI hotplug interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_nvdimm.html">QEMU&lt;-&gt;ACPI BIOS NVDIMM interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acpi_erst.html">ACPI ERST DEVICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sev-guest-firmware.html">QEMU/Guest Firmware Interface for AMD SEV and SEV-ES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fw_cfg.html">QEMU Firmware Configuration (fw_cfg) Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fsi.html">IBM’s Flexible Service Interface (FSI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vmw_pvscsi-spec.html">VMWare PVSCSI Device Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="edu.html">EDU device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ivshmem-spec.html">Device Specification for Inter-VM shared memory device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pvpanic.html">PVPANIC DEVICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spdm.html">QEMU Security Protocols and Data Models (SPDM) Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="standard-vga.html">QEMU Standard VGA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virt-ctlr.html">Virtual System Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vmcoreinfo.html">VMCoreInfo device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vmgenid.html">Virtual Machine Generation ID Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rapl-msr.html">RAPL MSR support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rocker.html">Rocker Network Switch Register Programming Guide</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RISC-V IOMMU support for RISC-V machines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#riscv-iommu-pci-reference-device">riscv-iommu-pci reference device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#riscv-iommu-sys-device">riscv-iommu-sys device</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="riscv-aia.html">RISC-V AIA support for RISC-V machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspeed-intc.html">ASPEED Interrupt Controller</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../devel/index.html">Developer Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">System Emulation Guest Hardware Specifications</a> &raquo;</li>
+      <li>RISC-V IOMMU support for RISC-V machines</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/specs/riscv-iommu.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="risc-v-iommu-support-for-risc-v-machines">
+<span id="riscv-iommu"></span><h1>RISC-V IOMMU support for RISC-V machines<a class="headerlink" href="#risc-v-iommu-support-for-risc-v-machines" title="Permalink to this headline"></a></h1>
+<p>QEMU implements a RISC-V IOMMU emulation based on the RISC-V IOMMU spec
+version 1.0 <a class="reference external" href="https://github.com/riscv-non-isa/riscv-iommu/releases/download/v1.0.0/riscv-iommu.pdf">iommu1.0.0</a>.</p>
+<p>The emulation includes a PCI reference device (riscv-iommu-pci) and a platform
+bus device (riscv-iommu-sys) that QEMU RISC-V boards can use.  The ‘virt’
+RISC-V machine is compatible with both devices.</p>
+<section id="riscv-iommu-pci-reference-device">
+<h2>riscv-iommu-pci reference device<a class="headerlink" href="#riscv-iommu-pci-reference-device" title="Permalink to this headline"></a></h2>
+<p>This device implements the RISC-V IOMMU emulation as recommended by the section
+“Integrating an IOMMU as a PCIe device” of <a class="reference external" href="https://github.com/riscv-non-isa/riscv-iommu/releases/download/v1.0.0/riscv-iommu.pdf">iommu1.0.0</a>: a PCI device with base
+class 08h, sub-class 06h and programming interface 00h.</p>
+<p>As a reference device it doesn’t implement anything outside of the specification,
+so it uses a generic default PCI ID given by QEMU: 1b36:0014.</p>
+<p>To include the device in the ‘virt’ machine:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>qemu-system-riscv64<span class="w"> </span>-M<span class="w"> </span>virt<span class="w"> </span>-device<span class="w"> </span>riscv-iommu-pci,<span class="o">[</span>optional_pci_opts<span class="o">]</span><span class="w"> </span><span class="o">(</span>...<span class="o">)</span>
+</pre></div>
+</div>
+<p>This will add a RISC-V IOMMU PCI device in the board following any additional
+PCI parameters (like PCI bus address).  The behavior of the RISC-V IOMMU is
+defined by the spec but its operation is OS dependent.</p>
+<p>As of this writing the existing Linux kernel support <a class="reference external" href="https://lore.kernel.org/linux-riscv/cover.1718388908.git.tjeznach&#64;rivosinc.com/">linux-v8</a>, not yet merged,
+does not have support for features like VFIO passthrough.  The IOMMU emulation
+was tested using a public Ventana Micro Systems kernel repository in
+<a class="reference external" href="https://github.com/ventanamicro/linux/tree/dev-upstream">ventana-linux</a>.  This kernel is based on <a class="reference external" href="https://lore.kernel.org/linux-riscv/cover.1718388908.git.tjeznach&#64;rivosinc.com/">linux-v8</a> with additional patches that
+enable features like KVM VFIO passthrough with irqbypass.  Until the kernel support
+is feature complete feel free to use the kernel available in the Ventana Micro Systems
+mirror.</p>
+<p>The current Linux kernel support will use the IOMMU device to create IOMMU groups
+with any eligible cards available in the system, regardless of factors such as the
+order in which the devices are added in the command line.</p>
+<p>This means that these command lines are equivalent as far as the current
+IOMMU kernel driver behaves:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>qemu-system-riscv64<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-M<span class="w"> </span>virt,aia<span class="o">=</span>aplic-imsic,aia-guests<span class="o">=</span><span class="m">5</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-device<span class="w"> </span>riscv-iommu-pci,addr<span class="o">=</span><span class="m">1</span>.0,vendor-id<span class="o">=</span>0x1efd,device-id<span class="o">=</span>0xedf1<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-device<span class="w"> </span>e1000e,netdev<span class="o">=</span>net1<span class="w"> </span>-netdev<span class="w"> </span>user,id<span class="o">=</span>net1,net<span class="o">=</span><span class="m">192</span>.168.0.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-device<span class="w"> </span>e1000e,netdev<span class="o">=</span>net2<span class="w"> </span>-netdev<span class="w"> </span>user,id<span class="o">=</span>net2,net<span class="o">=</span><span class="m">192</span>.168.200.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span><span class="o">(</span>...<span class="o">)</span>
+
+$<span class="w"> </span>qemu-system-riscv64<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-M<span class="w"> </span>virt,aia<span class="o">=</span>aplic-imsic,aia-guests<span class="o">=</span><span class="m">5</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-device<span class="w"> </span>e1000e,netdev<span class="o">=</span>net1<span class="w"> </span>-netdev<span class="w"> </span>user,id<span class="o">=</span>net1,net<span class="o">=</span><span class="m">192</span>.168.0.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-device<span class="w"> </span>e1000e,netdev<span class="o">=</span>net2<span class="w"> </span>-netdev<span class="w"> </span>user,id<span class="o">=</span>net2,net<span class="o">=</span><span class="m">192</span>.168.200.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-device<span class="w"> </span>riscv-iommu-pci,addr<span class="o">=</span><span class="m">1</span>.0,vendor-id<span class="o">=</span>0x1efd,device-id<span class="o">=</span>0xedf1<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span><span class="o">(</span>...<span class="o">)</span>
+</pre></div>
+</div>
+<p>Both will create iommu groups for the two e1000e cards.</p>
+<p>Another thing to notice on <a class="reference external" href="https://lore.kernel.org/linux-riscv/cover.1718388908.git.tjeznach&#64;rivosinc.com/">linux-v8</a> and <a class="reference external" href="https://github.com/ventanamicro/linux/tree/dev-upstream">ventana-linux</a> is that the kernel driver
+considers an IOMMU identified as a Rivos device, i.e. it uses Rivos vendor ID.  To
+use the riscv-iommu-pci device with the existing kernel support we need to emulate
+a Rivos PCI IOMMU by setting ‘vendor-id’ and ‘device-id’:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>qemu-system-riscv64<span class="w"> </span>-M<span class="w"> </span>virt<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-device<span class="w"> </span>riscv-iommu-pci,vendor-id<span class="o">=</span>0x1efd,device-id<span class="o">=</span>0xedf1<span class="w"> </span><span class="o">(</span>...<span class="o">)</span>
+</pre></div>
+</div>
+<p>Several options are available to control the capabilities of the device, namely:</p>
+<ul class="simple">
+<li><p>“bus”: the bus that the IOMMU device uses</p></li>
+<li><p>“ioatc-limit”: size of the Address Translation Cache (default to 2Mb)</p></li>
+<li><p>“intremap”: enable/disable MSI support</p></li>
+<li><p>“ats”: enable ATS support</p></li>
+<li><p>“off” (Out-of-reset translation mode: ‘on’ for DMA disabled, ‘off’ for ‘BARE’ (passthrough))</p></li>
+<li><p>“s-stage”: enable s-stage support</p></li>
+<li><p>“g-stage”: enable g-stage support</p></li>
+<li><p>“hpm-counters”: number of hardware performance counters available. Maximum value is 31.
+Default value is 31. Use 0 (zero) to disable HPM support</p></li>
+</ul>
+</section>
+<section id="riscv-iommu-sys-device">
+<h2>riscv-iommu-sys device<a class="headerlink" href="#riscv-iommu-sys-device" title="Permalink to this headline"></a></h2>
+<p>This device implements the RISC-V IOMMU emulation as a platform bus device that
+RISC-V boards can use.</p>
+<p>For the ‘virt’ board the device is disabled by default.  To enable it use the
+‘iommu-sys’ machine option:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>qemu-system-riscv64<span class="w"> </span>-M<span class="w"> </span>virt,iommu-sys<span class="o">=</span>on<span class="w"> </span><span class="o">(</span>...<span class="o">)</span>
+</pre></div>
+</div>
+<p>There is no options to configure the capabilities of this device in the ‘virt’
+board using the QEMU command line.  The device is configured with the following
+riscv-iommu options:</p>
+<ul class="simple">
+<li><p>“ioatc-limit”: default value (2Mb)</p></li>
+<li><p>“intremap”: enabled</p></li>
+<li><p>“ats”: enabled</p></li>
+<li><p>“off”: on (DMA disabled)</p></li>
+<li><p>“s-stage”: enabled</p></li>
+<li><p>“g-stage”: enabled</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rocker.html" class="btn btn-neutral float-left" title="Rocker Network Switch Register Programming Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="riscv-aia.html" class="btn btn-neutral float-right" title="RISC-V AIA support for RISC-V machines" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

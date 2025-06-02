@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Block I/O error injection using blkdebug &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/custom.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Block driver correctness testing with blkverify" href="blkverify.html" />
+    <link rel="prev" title="Fuzzing" href="fuzzing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../../index.html" class="icon icon-home"> QEMU
+            <img src="../../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-build.html">QEMU Build System</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Testing QEMU</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="main.html">Testing in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qtest.html">QTest Device Emulation Testing Framework</a></li>
+<li class="toctree-l3"><a class="reference internal" href="functional.html">Functional testing with Python</a></li>
+<li class="toctree-l3"><a class="reference internal" href="acpi-bits.html">ACPI/SMBIOS testing using biosbits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html">Continuous Integration (CI)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#custom-ci-cd-variables">Custom CI/CD variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ci.html#jobs-on-custom-runners">Jobs on Custom Runners</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fuzzing.html">Fuzzing</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Block I/O error injection using <code class="docutils literal notranslate"><span class="pre">blkdebug</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#background">Background</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rules">Rules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#events">Events</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#state-transitions">State transitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#suspend-and-resume">Suspend and resume</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="blkverify.html">Block driver correctness testing with <code class="docutils literal notranslate"><span class="pre">blkverify</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index-tcg.html">TCG Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Developer Information</a> &raquo;</li>
+          <li><a href="index.html">Testing QEMU</a> &raquo;</li>
+      <li>Block I/O error injection using <code class="docutils literal notranslate"><span class="pre">blkdebug</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/testing/blkdebug.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="block-i-o-error-injection-using-blkdebug">
+<h1>Block I/O error injection using <code class="docutils literal notranslate"><span class="pre">blkdebug</span></code><a class="headerlink" href="#block-i-o-error-injection-using-blkdebug" title="Permalink to this headline"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">blkdebug</span></code> block driver is a rule-based error injection engine.  It can be
+used to exercise error code paths in block drivers including <code class="docutils literal notranslate"><span class="pre">ENOSPC</span></code> (out of
+space) and <code class="docutils literal notranslate"><span class="pre">EIO</span></code>.</p>
+<p>This document gives an overview of the features available in <code class="docutils literal notranslate"><span class="pre">blkdebug</span></code>.</p>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Permalink to this headline"></a></h2>
+<p>Block drivers have many error code paths that handle I/O errors.  Image formats
+are especially complex since metadata I/O errors during cluster allocation or
+while updating tables happen halfway through request processing and require
+discipline to keep image files consistent.</p>
+<p>Error injection allows test cases to trigger I/O errors at specific points.
+This way, all error paths can be tested to make sure they are correct.</p>
+</section>
+<section id="rules">
+<h2>Rules<a class="headerlink" href="#rules" title="Permalink to this headline"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">blkdebug</span></code> block driver takes a list of “rules” that tell the error injection
+engine when to fail an I/O request.</p>
+<p>Each I/O request is evaluated against the rules.  If a rule matches the request
+then its “action” is executed.</p>
+<p>Rules can be placed in a configuration file; the configuration file
+follows the same .ini-like format used by QEMU’s <code class="docutils literal notranslate"><span class="pre">-readconfig</span></code> option, and
+each section of the file represents a rule.</p>
+<p>The following configuration file defines a single rule:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat blkdebug.conf
+[inject-error]
+event = &quot;read_aio&quot;
+errno = &quot;28&quot;
+</pre></div>
+</div>
+<p>This rule fails all aio read requests with <code class="docutils literal notranslate"><span class="pre">ENOSPC</span></code> (28).  Note that the errno
+value depends on the host.  On Linux, see
+<code class="docutils literal notranslate"><span class="pre">/usr/include/asm-generic/errno-base.h</span></code> for errno values.</p>
+<p>Invoke QEMU as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ qemu-system-x86_64
+      -drive if=none,cache=none,file=blkdebug:blkdebug.conf:test.img,id=drive0 \
+      -device virtio-blk-pci,drive=drive0,id=virtio-blk-pci0
+</pre></div>
+</div>
+<p>Rules support the following attributes:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">event</span></code></dt><dd><p>which type of operation to match (e.g. <code class="docutils literal notranslate"><span class="pre">read_aio</span></code>, <code class="docutils literal notranslate"><span class="pre">write_aio</span></code>,
+<code class="docutils literal notranslate"><span class="pre">flush_to_os</span></code>, <code class="docutils literal notranslate"><span class="pre">flush_to_disk</span></code>).  See <a class="reference internal" href="#events">Events</a> for
+information on events.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">state</span></code></dt><dd><p>(optional) the engine must be in this state number in order for this
+rule to match.  See <a class="reference internal" href="#state-transitions">State transitions</a> for information
+on states.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">errno</span></code></dt><dd><p>the numeric errno value to return when a request matches this rule.
+The errno values depend on the host since the numeric values are not
+standardized in the POSIX specification.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">sector</span></code></dt><dd><p>(optional) a sector number that the request must overlap in order to
+match this rule</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">once</span></code></dt><dd><p>(optional, default <code class="docutils literal notranslate"><span class="pre">off</span></code>) only execute this action on the first
+matching request</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">immediately</span></code></dt><dd><p>(optional, default <code class="docutils literal notranslate"><span class="pre">off</span></code>) return a NULL <code class="docutils literal notranslate"><span class="pre">BlockAIOCB</span></code>
+pointer and fail without an errno instead.  This
+exercises the code path where <code class="docutils literal notranslate"><span class="pre">BlockAIOCB</span></code> fails and the
+caller’s <code class="docutils literal notranslate"><span class="pre">BlockCompletionFunc</span></code> is not invoked.</p>
+</dd>
+</dl>
+</section>
+<section id="events">
+<h2>Events<a class="headerlink" href="#events" title="Permalink to this headline"></a></h2>
+<p>Block drivers provide information about the type of I/O request they are about
+to make so rules can match specific types of requests.  For example, the <code class="docutils literal notranslate"><span class="pre">qcow2</span></code>
+block driver tells <code class="docutils literal notranslate"><span class="pre">blkdebug</span></code> when it accesses the L1 table so rules can match
+only L1 table accesses and not other metadata or guest data requests.</p>
+<p>The core events are:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">read_aio</span></code></dt><dd><p>guest data read</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">write_aio</span></code></dt><dd><p>guest data write</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">flush_to_os</span></code></dt><dd><p>write out unwritten block driver state (e.g. cached metadata)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">flush_to_disk</span></code></dt><dd><p>flush the host block device’s disk cache</p>
+</dd>
+</dl>
+<p>See <code class="docutils literal notranslate"><span class="pre">qapi/block-core.json:BlkdebugEvent</span></code> for the full list of events.
+You may need to grep block driver source code to understand the
+meaning of specific events.</p>
+</section>
+<section id="state-transitions">
+<h2>State transitions<a class="headerlink" href="#state-transitions" title="Permalink to this headline"></a></h2>
+<p>There are cases where more power is needed to match a particular I/O request in
+a longer sequence of requests.  For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">write_aio</span>
+<span class="n">flush_to_disk</span>
+<span class="n">write_aio</span>
+</pre></div>
+</div>
+<p>How do we match the 2nd <code class="docutils literal notranslate"><span class="pre">write_aio</span></code> but not the first?  This is where state
+transitions come in.</p>
+<p>The error injection engine has an integer called the “state” that always starts
+initialized to 1.  The state integer is internal to <code class="docutils literal notranslate"><span class="pre">blkdebug</span></code> and cannot be
+observed from outside but rules can interact with it for powerful matching
+behavior.</p>
+<p>Rules can be conditional on the current state and they can transition to a new
+state.</p>
+<p>When a rule’s “state” attribute is non-zero then the current state must equal
+the attribute in order for the rule to match.</p>
+<p>For example, to match the 2nd write_aio:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="nb">set</span><span class="o">-</span><span class="n">state</span><span class="p">]</span>
+<span class="n">event</span> <span class="o">=</span> <span class="s2">&quot;write_aio&quot;</span>
+<span class="n">state</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+<span class="n">new_state</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
+
+<span class="p">[</span><span class="n">inject</span><span class="o">-</span><span class="n">error</span><span class="p">]</span>
+<span class="n">event</span> <span class="o">=</span> <span class="s2">&quot;write_aio&quot;</span>
+<span class="n">state</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
+<span class="n">errno</span> <span class="o">=</span> <span class="s2">&quot;5&quot;</span>
+</pre></div>
+</div>
+<p>The first <code class="docutils literal notranslate"><span class="pre">write_aio</span></code> request matches the <code class="docutils literal notranslate"><span class="pre">set-state</span></code> rule and transitions from
+state 1 to state 2.  Once state 2 has been entered, the <code class="docutils literal notranslate"><span class="pre">set-state</span></code> rule no
+longer matches since it requires state 1.  But the <code class="docutils literal notranslate"><span class="pre">inject-error</span></code> rule now
+matches the next <code class="docutils literal notranslate"><span class="pre">write_aio</span></code> request and injects <code class="docutils literal notranslate"><span class="pre">EIO</span></code> (5).</p>
+<p>State transition rules support the following attributes:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">event</span></code></dt><dd><p>which type of operation to match (e.g. <code class="docutils literal notranslate"><span class="pre">read_aio</span></code>, <code class="docutils literal notranslate"><span class="pre">write_aio</span></code>,
+<code class="docutils literal notranslate"><span class="pre">flush_to_os`,</span> <span class="pre">``flush_to_disk</span></code>).  See <a class="reference internal" href="#events">Events</a> for
+information on events.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">state</span></code></dt><dd><p>(optional) the engine must be in this state number in order for this
+rule to match</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">new_state</span></code></dt><dd><p>transition to this state number</p>
+</dd>
+</dl>
+</section>
+<section id="suspend-and-resume">
+<h2>Suspend and resume<a class="headerlink" href="#suspend-and-resume" title="Permalink to this headline"></a></h2>
+<p>Exercising code paths in block drivers may require specific ordering amongst
+concurrent requests.  The “breakpoint” feature allows requests to be halted on
+a <code class="docutils literal notranslate"><span class="pre">blkdebug</span></code> event and resumed later.  This makes it possible to achieve
+deterministic ordering when multiple requests are in flight.</p>
+<p>Breakpoints on <code class="docutils literal notranslate"><span class="pre">blkdebug</span></code> events are associated with a user-defined <code class="docutils literal notranslate"><span class="pre">tag</span></code> string.
+This tag serves as an identifier by which the request can be resumed at a later
+point.</p>
+<p>See the <code class="docutils literal notranslate"><span class="pre">qemu-io(1)</span></code> <code class="docutils literal notranslate"><span class="pre">break</span></code>, <code class="docutils literal notranslate"><span class="pre">resume</span></code>, <code class="docutils literal notranslate"><span class="pre">remove_break</span></code>, and <code class="docutils literal notranslate"><span class="pre">wait_break</span></code>
+commands for details.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fuzzing.html" class="btn btn-neutral float-left" title="Fuzzing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="blkverify.html" class="btn btn-neutral float-right" title="Block driver correctness testing with blkverify" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

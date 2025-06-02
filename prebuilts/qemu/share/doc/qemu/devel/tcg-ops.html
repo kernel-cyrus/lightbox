@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TCG Intermediate Representation &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Decodetree Specification" href="decodetree.html" />
+    <link rel="prev" title="Translator Internals" href="tcg.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing/index.html">Testing QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-tcg.html">TCG Emulation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tcg.html">Translator Internals</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">TCG Intermediate Representation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#definitions">Definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#basic-blocks">Basic Blocks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#operations">Operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#variables">Variables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#types">Types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#helpers">Helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#code-optimizations">Code Optimizations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#instruction-reference">Instruction Reference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#backend">Backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#recommended-coding-rules-for-best-performance">Recommended coding rules for best performance</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="decodetree.html">Decodetree Specification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multi-thread-tcg.html">Multi-threaded TCG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tcg-icount.html">TCG Instruction Counting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tcg-plugins.html">QEMU TCG Plugins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tcg-plugins.html#plugin-api">Plugin API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="replay.html">Execution Record/Replay</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Developer Information</a> &raquo;</li>
+          <li><a href="index-tcg.html">TCG Emulation</a> &raquo;</li>
+      <li>TCG Intermediate Representation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/tcg-ops.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tcg-intermediate-representation">
+<span id="tcg-ops-ref"></span><h1>TCG Intermediate Representation<a class="headerlink" href="#tcg-intermediate-representation" title="Permalink to this headline"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<p>TCG (Tiny Code Generator) began as a generic backend for a C compiler.
+It was simplified to be used in QEMU.  It also has its roots in the
+QOP code generator written by Paul Brook.</p>
+</section>
+<section id="definitions">
+<h2>Definitions<a class="headerlink" href="#definitions" title="Permalink to this headline"></a></h2>
+<p>The TCG <em>target</em> is the architecture for which we generate the code.
+It is of course not the same as the “target” of QEMU which is the
+emulated architecture.  As TCG started as a generic C backend used
+for cross compiling, the assumption was that TCG target might be
+different from the host, although this is never the case for QEMU.</p>
+<p>In this document, we use <em>guest</em> to specify what architecture we are
+emulating; <em>target</em> always means the TCG target, the machine on which
+we are running QEMU.</p>
+<p>An operation with <em>undefined behavior</em> may result in a crash.</p>
+<p>An operation with <em>unspecified behavior</em> shall not crash.  However,
+the result may be one of several possibilities so may be considered
+an <em>undefined result</em>.</p>
+</section>
+<section id="basic-blocks">
+<h2>Basic Blocks<a class="headerlink" href="#basic-blocks" title="Permalink to this headline"></a></h2>
+<p>A TCG <em>basic block</em> is a single entry, multiple exit region which
+corresponds to a list of instructions terminated by a label, or
+any branch instruction.</p>
+<p>A TCG <em>extended basic block</em> is a single entry, multiple exit region
+which corresponds to a list of instructions terminated by a label or
+an unconditional branch.  Specifically, an extended basic block is
+a sequence of basic blocks connected by the fall-through paths of
+zero or more conditional branch instructions.</p>
+</section>
+<section id="operations">
+<h2>Operations<a class="headerlink" href="#operations" title="Permalink to this headline"></a></h2>
+<p>TCG instructions or <em>ops</em> operate on TCG <em>variables</em>, both of which
+are strongly typed.  Each instruction has a fixed number of output
+variable operands, input variable operands and constant operands.
+Vector instructions have a field specifying the element size within
+the vector.  The notable exception is the call instruction which has
+a variable number of outputs and inputs.</p>
+<p>In the textual form, output operands usually come first, followed by
+input operands, followed by constant operands. The output type is
+included in the instruction name. Constants are prefixed with a ‘$’.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>add_i32 t0, t1, t2    /* (t0 &lt;- t1 + t2) */
+</pre></div>
+</div>
+</section>
+<section id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">TEMP_FIXED</span></code></p>
+<p>There is one TCG <em>fixed global</em> variable, <code class="docutils literal notranslate"><span class="pre">cpu_env</span></code>, which is
+live in all translation blocks, and holds a pointer to <code class="docutils literal notranslate"><span class="pre">CPUArchState</span></code>.
+This variable is held in a host cpu register at all times in all
+translation blocks.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TEMP_GLOBAL</span></code></p>
+<p>A TCG <em>global</em> is a variable which is live in all translation blocks,
+and corresponds to memory location that is within <code class="docutils literal notranslate"><span class="pre">CPUArchState</span></code>.
+These may be specified as an offset from <code class="docutils literal notranslate"><span class="pre">cpu_env</span></code>, in which case
+they are called <em>direct globals</em>, or may be specified as an offset
+from a direct global, in which case they are called <em>indirect globals</em>.
+Even indirect globals should still reference memory within
+<code class="docutils literal notranslate"><span class="pre">CPUArchState</span></code>.  All TCG globals are defined during
+<code class="docutils literal notranslate"><span class="pre">TCGCPUOps.initialize</span></code>, before any translation blocks are generated.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TEMP_CONST</span></code></p>
+<p>A TCG <em>constant</em> is a variable which is live throughout the entire
+translation block, and contains a constant value.  These variables
+are allocated on demand during translation and are hashed so that
+there is exactly one variable holding a given value.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TEMP_TB</span></code></p>
+<p>A TCG <em>translation block temporary</em> is a variable which is live
+throughout the entire translation block, but dies on any exit.
+These temporaries are allocated explicitly during translation.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TEMP_EBB</span></code></p>
+<p>A TCG <em>extended basic block temporary</em> is a variable which is live
+throughout an extended basic block, but dies on any exit.
+These temporaries are allocated explicitly during translation.</p>
+</li>
+</ul>
+</section>
+<section id="types">
+<h2>Types<a class="headerlink" href="#types" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">TCG_TYPE_I32</span></code></p>
+<p>A 32-bit integer.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TCG_TYPE_I64</span></code></p>
+<p>A 64-bit integer.  For 32-bit hosts, such variables are split into a pair
+of variables with <code class="docutils literal notranslate"><span class="pre">type=TCG_TYPE_I32</span></code> and <code class="docutils literal notranslate"><span class="pre">base_type=TCG_TYPE_I64</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">temp_subindex</span></code> for each indicates where it falls within the
+host-endian representation.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TCG_TYPE_PTR</span></code></p>
+<p>An alias for <code class="docutils literal notranslate"><span class="pre">TCG_TYPE_I32</span></code> or <code class="docutils literal notranslate"><span class="pre">TCG_TYPE_I64</span></code>, depending on the size
+of a pointer for the host.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TCG_TYPE_REG</span></code></p>
+<p>An alias for <code class="docutils literal notranslate"><span class="pre">TCG_TYPE_I32</span></code> or <code class="docutils literal notranslate"><span class="pre">TCG_TYPE_I64</span></code>, depending on the size
+of the integer registers for the host.  This may be larger
+than <code class="docutils literal notranslate"><span class="pre">TCG_TYPE_PTR</span></code> depending on the host ABI.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TCG_TYPE_I128</span></code></p>
+<p>A 128-bit integer.  For all hosts, such variables are split into a number
+of variables with <code class="docutils literal notranslate"><span class="pre">type=TCG_TYPE_REG</span></code> and <code class="docutils literal notranslate"><span class="pre">base_type=TCG_TYPE_I128</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">temp_subindex</span></code> for each indicates where it falls within the
+host-endian representation.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TCG_TYPE_V64</span></code></p>
+<p>A 64-bit vector.  This type is valid only if the TCG target
+sets <code class="docutils literal notranslate"><span class="pre">TCG_TARGET_HAS_v64</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TCG_TYPE_V128</span></code></p>
+<p>A 128-bit vector.  This type is valid only if the TCG target
+sets <code class="docutils literal notranslate"><span class="pre">TCG_TARGET_HAS_v128</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TCG_TYPE_V256</span></code></p>
+<p>A 256-bit vector.  This type is valid only if the TCG target
+sets <code class="docutils literal notranslate"><span class="pre">TCG_TARGET_HAS_v256</span></code>.</p>
+</li>
+</ul>
+</section>
+<section id="helpers">
+<h2>Helpers<a class="headerlink" href="#helpers" title="Permalink to this headline"></a></h2>
+<p>Helpers are registered in a guest-specific <code class="docutils literal notranslate"><span class="pre">helper.h</span></code>,
+which is processed to generate <code class="docutils literal notranslate"><span class="pre">tcg_gen_helper_*</span></code> functions.
+With these functions it is possible to call a function taking
+i32, i64, i128 or pointer types.</p>
+<p>By default, before calling a helper, all globals are stored at their
+canonical location.  By default, the helper is allowed to modify the
+CPU state (including the state represented by tcg globals)
+or may raise an exception.  This default can be overridden using the
+following function modifiers:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">TCG_CALL_NO_WRITE_GLOBALS</span></code></p>
+<p>The helper does not modify any globals, but may read them.
+Globals will be saved to their canonical location before calling helpers,
+but need not be reloaded afterwards.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TCG_CALL_NO_READ_GLOBALS</span></code></p>
+<p>The helper does not read globals, either directly or via an exception.
+They will not be saved to their canonical locations before calling
+the helper.  This implies <code class="docutils literal notranslate"><span class="pre">TCG_CALL_NO_WRITE_GLOBALS</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TCG_CALL_NO_SIDE_EFFECTS</span></code></p>
+<p>The call to the helper function may be removed if the return value is
+not used.  This means that it may not modify any CPU state nor may it
+raise an exception.</p>
+</li>
+</ul>
+</section>
+<section id="code-optimizations">
+<h2>Code Optimizations<a class="headerlink" href="#code-optimizations" title="Permalink to this headline"></a></h2>
+<p>When generating instructions, you can count on at least the following
+optimizations:</p>
+<ul>
+<li><p>Single instructions are simplified, e.g.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>and_i32 t0, t0, $0xffffffff
+</pre></div>
+</div>
+<p>is suppressed.</p>
+</li>
+<li><p>A liveness analysis is done at the basic block level. The
+information is used to suppress moves from a dead variable to
+another one. It is also used to remove instructions which compute
+dead results. The later is especially useful for condition code
+optimization in QEMU.</p>
+<p>In the following example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>add_i32 t0, t1, t2
+add_i32 t0, t0, $1
+mov_i32 t0, $1
+</pre></div>
+</div>
+<p>only the last instruction is kept.</p>
+</li>
+</ul>
+</section>
+<section id="instruction-reference">
+<h2>Instruction Reference<a class="headerlink" href="#instruction-reference" title="Permalink to this headline"></a></h2>
+<section id="function-call">
+<h3>Function call<a class="headerlink" href="#function-call" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>call <em>&lt;ret&gt;</em> <em>&lt;params&gt;</em> ptr</p></td>
+<td><div class="line-block">
+<div class="line">call function ‘ptr’ (pointer type)</div>
+<div class="line"><br /></div>
+<div class="line"><em>&lt;ret&gt;</em> optional 32 bit or 64 bit return value</div>
+<div class="line"><em>&lt;params&gt;</em> optional 32 bit or 64 bit parameters</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="jumps-labels">
+<h3>Jumps/Labels<a class="headerlink" href="#jumps-labels" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>set_label $label</p></td>
+<td><div class="line-block">
+<div class="line">Define label ‘label’ at the current program point.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>br $label</p></td>
+<td><div class="line-block">
+<div class="line">Jump to label.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>brcond <em>t0</em>, <em>t1</em>, <em>cond</em>, <em>label</em></p></td>
+<td><div class="line-block">
+<div class="line">Conditional jump if <em>t0</em> <em>cond</em> <em>t1</em> is true. <em>cond</em> can be:</div>
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">TCG_COND_EQ</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">TCG_COND_NE</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">TCG_COND_LT</span> <span class="pre">/*</span> <span class="pre">signed</span> <span class="pre">*/</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">TCG_COND_GE</span> <span class="pre">/*</span> <span class="pre">signed</span> <span class="pre">*/</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">TCG_COND_LE</span> <span class="pre">/*</span> <span class="pre">signed</span> <span class="pre">*/</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">TCG_COND_GT</span> <span class="pre">/*</span> <span class="pre">signed</span> <span class="pre">*/</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">TCG_COND_LTU</span> <span class="pre">/*</span> <span class="pre">unsigned</span> <span class="pre">*/</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">TCG_COND_GEU</span> <span class="pre">/*</span> <span class="pre">unsigned</span> <span class="pre">*/</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">TCG_COND_LEU</span> <span class="pre">/*</span> <span class="pre">unsigned</span> <span class="pre">*/</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">TCG_COND_GTU</span> <span class="pre">/*</span> <span class="pre">unsigned</span> <span class="pre">*/</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">TCG_COND_TSTEQ</span> <span class="pre">/*</span> <span class="pre">t1</span> <span class="pre">&amp;</span> <span class="pre">t2</span> <span class="pre">==</span> <span class="pre">0</span> <span class="pre">*/</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">TCG_COND_TSTNE</span> <span class="pre">/*</span> <span class="pre">t1</span> <span class="pre">&amp;</span> <span class="pre">t2</span> <span class="pre">!=</span> <span class="pre">0</span> <span class="pre">*/</span></code></div>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="arithmetic">
+<h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>add <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> + <em>t2</em></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>sub <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> - <em>t2</em></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>neg <em>t0</em>, <em>t1</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = -<em>t1</em> (two’s complement)</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>mul <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> * <em>t2</em></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>divs <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> / <em>t2</em> (signed)</div>
+<div class="line">Undefined behavior if division by zero or overflow.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>divu <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> / <em>t2</em> (unsigned)</div>
+<div class="line">Undefined behavior if division by zero.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>rems <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> % <em>t2</em> (signed)</div>
+<div class="line">Undefined behavior if division by zero or overflow.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>remu <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> % <em>t2</em> (unsigned)</div>
+<div class="line">Undefined behavior if division by zero.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>divs2 <em>q</em>, <em>r</em>, <em>nl</em>, <em>nh</em>, <em>d</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>q</em> = <em>nh:nl</em> / <em>d</em> (signed)</div>
+<div class="line"><em>r</em> = <em>nh:nl</em> % <em>d</em></div>
+<div class="line">Undefined behaviour if division by zero, or the double-word
+numerator divided by the single-word divisor does not fit
+within the single-word quotient.  The code generator will
+pass <em>nh</em> as a simple sign-extension of <em>nl</em>, so the only
+overflow should be <em>INT_MIN</em> / -1.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>divu2 <em>q</em>, <em>r</em>, <em>nl</em>, <em>nh</em>, <em>d</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>q</em> = <em>nh:nl</em> / <em>d</em> (unsigned)</div>
+<div class="line"><em>r</em> = <em>nh:nl</em> % <em>d</em></div>
+<div class="line">Undefined behaviour if division by zero, or the double-word
+numerator divided by the single-word divisor does not fit
+within the single-word quotient.  The code generator will
+pass 0 to <em>nh</em> to make a simple zero-extension of <em>nl</em>,
+so overflow should never occur.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="logical">
+<h3>Logical<a class="headerlink" href="#logical" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>and <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> &amp; <em>t2</em></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>or <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> | <em>t2</em></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>xor <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> ^ <em>t2</em></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>not <em>t0</em>, <em>t1</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = ~<em>t1</em></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>andc <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> &amp; ~<em>t2</em></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>eqv <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = ~(<em>t1</em> ^ <em>t2</em>), or equivalently, <em>t0</em> = <em>t1</em> ^ ~<em>t2</em></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>nand <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = ~(<em>t1</em> &amp; <em>t2</em>)</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>nor <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = ~(<em>t1</em> | <em>t2</em>)</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>orc <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> | ~<em>t2</em></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>clz <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> ? clz(<em>t1</em>) : <em>t2</em></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>ctz <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> ? ctz(<em>t1</em>) : <em>t2</em></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>ctpop <em>t0</em>, <em>t1</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = number of bits set in <em>t1</em></div>
+<div class="line"><br /></div>
+<div class="line">The name <em>ctpop</em> is short for “count population”, and matches
+the function name used in <code class="docutils literal notranslate"><span class="pre">include/qemu/host-utils.h</span></code>.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="shifts-rotates">
+<h3>Shifts/Rotates<a class="headerlink" href="#shifts-rotates" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>shl <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> &lt;&lt; <em>t2</em></div>
+<div class="line">Unspecified behavior for negative or out-of-range shifts.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>shr <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> &gt;&gt; <em>t2</em> (unsigned)</div>
+<div class="line">Unspecified behavior for negative or out-of-range shifts.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>sar <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em> &gt;&gt; <em>t2</em> (signed)</div>
+<div class="line">Unspecified behavior for negative or out-of-range shifts.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>rotl <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Rotation of <em>t2</em> bits to the left</div>
+<div class="line">Unspecified behavior for negative or out-of-range shifts.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>rotr <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Rotation of <em>t2</em> bits to the right.</div>
+<div class="line">Unspecified behavior for negative or out-of-range shifts.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="misc">
+<h3>Misc<a class="headerlink" href="#misc" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>mov <em>t0</em>, <em>t1</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = <em>t1</em></div>
+<div class="line">Move <em>t1</em> to <em>t0</em>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>bswap16 <em>t0</em>, <em>t1</em>, <em>flags</em></p></td>
+<td><div class="line-block">
+<div class="line">16 bit byte swap on the low bits of a 32/64 bit input.</div>
+<div class="line"><br /></div>
+<div class="line">If <em>flags</em> &amp; <code class="docutils literal notranslate"><span class="pre">TCG_BSWAP_IZ</span></code>, then <em>t1</em> is known to be zero-extended from bit 15.</div>
+<div class="line">If <em>flags</em> &amp; <code class="docutils literal notranslate"><span class="pre">TCG_BSWAP_OZ</span></code>, then <em>t0</em> will be zero-extended from bit 15.</div>
+<div class="line">If <em>flags</em> &amp; <code class="docutils literal notranslate"><span class="pre">TCG_BSWAP_OS</span></code>, then <em>t0</em> will be sign-extended from bit 15.</div>
+<div class="line"><br /></div>
+<div class="line">If neither <code class="docutils literal notranslate"><span class="pre">TCG_BSWAP_OZ</span></code> nor <code class="docutils literal notranslate"><span class="pre">TCG_BSWAP_OS</span></code> are set, then the bits of <em>t0</em> above bit 15 may contain any value.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>bswap32 <em>t0</em>, <em>t1</em>, <em>flags</em></p></td>
+<td><div class="line-block">
+<div class="line">32 bit byte swap.  The flags are the same as for bswap16, except
+they apply from bit 31 instead of bit 15.  On TCG_TYPE_I32, the
+flags should be zero.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>bswap64 <em>t0</em>, <em>t1</em>, <em>flags</em></p></td>
+<td><div class="line-block">
+<div class="line">64 bit byte swap. The flags are ignored, but still present
+for consistency with the other bswap opcodes. For future
+compatibility, the flags should be zero.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>discard_i32/i64 <em>t0</em></p></td>
+<td><div class="line-block">
+<div class="line">Indicate that the value of <em>t0</em> won’t be used later. It is useful to
+force dead code elimination.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>deposit <em>dest</em>, <em>t1</em>, <em>t2</em>, <em>pos</em>, <em>len</em></p></td>
+<td><div class="line-block">
+<div class="line">Deposit <em>t2</em> as a bitfield into <em>t1</em>, placing the result in <em>dest</em>.</div>
+<div class="line"><br /></div>
+<div class="line">The bitfield is described by <em>pos</em>/<em>len</em>, which are immediate values:</div>
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><em>len</em> - the length of the bitfield</div>
+<div class="line"><em>pos</em> - the position of the first bit, counting from the LSB</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">For example, “deposit dest, t1, t2, 8, 4” indicates a 4-bit field
+at bit 8. This operation would be equivalent to</div>
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><em>dest</em> = (<em>t1</em> &amp; ~0x0f00) | ((<em>t2</em> &lt;&lt; 8) &amp; 0x0f00)</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">on TCG_TYPE_I32.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>extract <em>dest</em>, <em>t1</em>, <em>pos</em>, <em>len</em></p>
+<p>sextract <em>dest</em>, <em>t1</em>, <em>pos</em>, <em>len</em></p>
+</td>
+<td><div class="line-block">
+<div class="line">Extract a bitfield from <em>t1</em>, placing the result in <em>dest</em>.</div>
+<div class="line"><br /></div>
+<div class="line">The bitfield is described by <em>pos</em>/<em>len</em>, which are immediate values,
+as above for deposit.  For extract_*, the result will be extended
+to the left with zeros; for sextract_*, the result will be extended
+to the left with copies of the bitfield sign bit at <em>pos</em> + <em>len</em> - 1.</div>
+<div class="line"><br /></div>
+<div class="line">For example, “sextract dest, t1, 8, 4” indicates a 4-bit field
+at bit 8. This operation would be equivalent to</div>
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><em>dest</em> = (<em>t1</em> &lt;&lt; 20) &gt;&gt; 28</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">(using an arithmetic right shift) on TCG_TYPE_I32.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>extract2 <em>dest</em>, <em>t1</em>, <em>t2</em>, <em>pos</em></p></td>
+<td><div class="line-block">
+<div class="line">For TCG_TYPE_I{N}, extract an N-bit quantity from the concatenation
+of <em>t2</em>:<em>t1</em>, beginning at <em>pos</em>. The tcg_gen_extract2_{i32,i64} expander
+accepts 0 &lt;= <em>pos</em> &lt;= N as inputs. The backend code generator will
+not see either 0 or N as inputs for these opcodes.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>extrl_i64_i32 <em>t0</em>, <em>t1</em></p></td>
+<td><div class="line-block">
+<div class="line">For 64-bit hosts only, extract the low 32-bits of input <em>t1</em> and place it
+into 32-bit output <em>t0</em>.  Depending on the host, this may be a simple move,
+or may require additional canonicalization.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>extrh_i64_i32 <em>t0</em>, <em>t1</em></p></td>
+<td><div class="line-block">
+<div class="line">For 64-bit hosts only, extract the high 32-bits of input <em>t1</em> and place it
+into 32-bit output <em>t0</em>.  Depending on the host, this may be a simple shift,
+or may require additional canonicalization.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="conditional-moves">
+<h3>Conditional moves<a class="headerlink" href="#conditional-moves" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>setcond <em>dest</em>, <em>t1</em>, <em>t2</em>, <em>cond</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>dest</em> = (<em>t1</em> <em>cond</em> <em>t2</em>)</div>
+<div class="line"><br /></div>
+<div class="line">Set <em>dest</em> to 1 if (<em>t1</em> <em>cond</em> <em>t2</em>) is true, otherwise set to 0.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>negsetcond <em>dest</em>, <em>t1</em>, <em>t2</em>, <em>cond</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>dest</em> = -(<em>t1</em> <em>cond</em> <em>t2</em>)</div>
+<div class="line"><br /></div>
+<div class="line">Set <em>dest</em> to -1 if (<em>t1</em> <em>cond</em> <em>t2</em>) is true, otherwise set to 0.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>movcond <em>dest</em>, <em>c1</em>, <em>c2</em>, <em>v1</em>, <em>v2</em>, <em>cond</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>dest</em> = (<em>c1</em> <em>cond</em> <em>c2</em> ? <em>v1</em> : <em>v2</em>)</div>
+<div class="line"><br /></div>
+<div class="line">Set <em>dest</em> to <em>v1</em> if (<em>c1</em> <em>cond</em> <em>c2</em>) is true, otherwise set to <em>v2</em>.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="type-conversions">
+<h3>Type conversions<a class="headerlink" href="#type-conversions" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>ext_i32_i64 <em>t0</em>, <em>t1</em></p></td>
+<td><div class="line-block">
+<div class="line">Convert <em>t1</em> (32 bit) to <em>t0</em> (64 bit) and does sign extension</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>extu_i32_i64 <em>t0</em>, <em>t1</em></p></td>
+<td><div class="line-block">
+<div class="line">Convert <em>t1</em> (32 bit) to <em>t0</em> (64 bit) and does zero extension</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>trunc_i64_i32 <em>t0</em>, <em>t1</em></p></td>
+<td><div class="line-block">
+<div class="line">Truncate <em>t1</em> (64 bit) to <em>t0</em> (32 bit)</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>concat_i32_i64 <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Construct <em>t0</em> (64-bit) taking the low half from <em>t1</em> (32 bit) and the high half
+from <em>t2</em> (32 bit).</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>concat32_i64 <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Construct <em>t0</em> (64-bit) taking the low half from <em>t1</em> (64 bit) and the high half
+from <em>t2</em> (64 bit).</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="load-store">
+<h3>Load/Store<a class="headerlink" href="#load-store" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>ld_i32/i64 <em>t0</em>, <em>t1</em>, <em>offset</em></p>
+<p>ld8s_i32/i64 <em>t0</em>, <em>t1</em>, <em>offset</em></p>
+<p>ld8u_i32/i64 <em>t0</em>, <em>t1</em>, <em>offset</em></p>
+<p>ld16s_i32/i64 <em>t0</em>, <em>t1</em>, <em>offset</em></p>
+<p>ld16u_i32/i64 <em>t0</em>, <em>t1</em>, <em>offset</em></p>
+<p>ld32s_i64 t0, <em>t1</em>, <em>offset</em></p>
+<p>ld32u_i64 t0, <em>t1</em>, <em>offset</em></p>
+</td>
+<td><div class="line-block">
+<div class="line"><em>t0</em> = read(<em>t1</em> + <em>offset</em>)</div>
+<div class="line"><br /></div>
+<div class="line">Load 8, 16, 32 or 64 bits with or without sign extension from host memory.
+<em>offset</em> must be a constant.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>st_i32/i64 <em>t0</em>, <em>t1</em>, <em>offset</em></p>
+<p>st8_i32/i64 <em>t0</em>, <em>t1</em>, <em>offset</em></p>
+<p>st16_i32/i64 <em>t0</em>, <em>t1</em>, <em>offset</em></p>
+<p>st32_i64 <em>t0</em>, <em>t1</em>, <em>offset</em></p>
+</td>
+<td><div class="line-block">
+<div class="line">write(<em>t0</em>, <em>t1</em> + <em>offset</em>)</div>
+<div class="line"><br /></div>
+<div class="line">Write 8, 16, 32 or 64 bits to host memory.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>All this opcodes assume that the pointed host memory doesn’t correspond
+to a global. In the latter case the behaviour is unpredictable.</p>
+</section>
+<section id="multiword-arithmetic-support">
+<h3>Multiword arithmetic support<a class="headerlink" href="#multiword-arithmetic-support" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>addco <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Compute <em>t0</em> = <em>t1</em> + <em>t2</em> and in addition output to the
+carry bit provided by the host architecture.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>addci <em>t0, *t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Compute <em>t0</em> = <em>t1</em> + <em>t2</em> + <em>C</em>, where <em>C</em> is the
+input carry bit provided by the host architecture.
+The output carry bit need not be computed.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>addcio <em>t0, *t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Compute <em>t0</em> = <em>t1</em> + <em>t2</em> + <em>C</em>, where <em>C</em> is the
+input carry bit provided by the host architecture,
+and also compute the output carry bit.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>addc1o <em>t0, *t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Compute <em>t0</em> = <em>t1</em> + <em>t2</em> + 1, and in addition output to the
+carry bit provided by the host architecture.  This is akin to
+<em>addcio</em> with a fixed carry-in value of 1.</div>
+<div class="line">This is intended to be used by the optimization pass,
+intermediate to complete folding of the addition chain.
+In some cases complete folding is not possible and this
+opcode will remain until output.  If this happens, the
+code generator will use <code class="docutils literal notranslate"><span class="pre">tcg_out_set_carry</span></code> and then
+the output routine for <em>addcio</em>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>subbo <em>t0</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Compute <em>t0</em> = <em>t1</em> - <em>t2</em> and in addition output to the
+borrow bit provided by the host architecture.</div>
+<div class="line">Depending on the host architecture, the carry bit may or may not be
+identical to the borrow bit.  Thus the addc* and subb*
+opcodes must not be mixed.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>subbi <em>t0, *t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Compute <em>t0</em> = <em>t1</em> - <em>t2</em> - <em>B</em>, where <em>B</em> is the
+input borrow bit provided by the host architecture.
+The output borrow bit need not be computed.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>subbio <em>t0, *t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Compute <em>t0</em> = <em>t1</em> - <em>t2</em> - <em>B</em>, where <em>B</em> is the
+input borrow bit provided by the host architecture,
+and also compute the output borrow bit.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>subb1o <em>t0, *t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Compute <em>t0</em> = <em>t1</em> - <em>t2</em> - 1, and in addition output to the
+borrow bit provided by the host architecture.  This is akin to
+<em>subbio</em> with a fixed borrow-in value of 1.</div>
+<div class="line">This is intended to be used by the optimization pass,
+intermediate to complete folding of the subtraction chain.
+In some cases complete folding is not possible and this
+opcode will remain until output.  If this happens, the
+code generator will use <code class="docutils literal notranslate"><span class="pre">tcg_out_set_borrow</span></code> and then
+the output routine for <em>subbio</em>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>mulu2 <em>t0_low</em>, <em>t0_high</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Similar to mul, except two unsigned inputs <em>t1</em> and <em>t2</em> yielding the full
+double-word product <em>t0</em>. The latter is returned in two single-word outputs.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>muls2 <em>t0_low</em>, <em>t0_high</em>, <em>t1</em>, <em>t2</em></p></td>
+<td><div class="line-block">
+<div class="line">Similar to mulu2, except the two inputs <em>t1</em> and <em>t2</em> are signed.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>mulsh <em>t0</em>, <em>t1</em>, <em>t2</em></p>
+<p>muluh <em>t0</em>, <em>t1</em>, <em>t2</em></p>
+</td>
+<td><div class="line-block">
+<div class="line">Provide the high part of a signed or unsigned multiply, respectively.</div>
+<div class="line"><br /></div>
+<div class="line">If mulu2/muls2 are not provided by the backend, the tcg-op generator
+can obtain the same results by emitting a pair of opcodes, mul + muluh/mulsh.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="memory-barrier-support">
+<h3>Memory Barrier support<a class="headerlink" href="#memory-barrier-support" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>mb <em>&lt;$arg&gt;</em></p></td>
+<td><div class="line-block">
+<div class="line">Generate a target memory barrier instruction to ensure memory ordering
+as being  enforced by a corresponding guest memory barrier instruction.</div>
+<div class="line"><br /></div>
+<div class="line">The ordering enforced by the backend may be stricter than the ordering
+required by the guest. It cannot be weaker. This opcode takes a constant
+argument which is required to generate the appropriate barrier
+instruction. The backend should take care to emit the target barrier
+instruction only when necessary i.e., for SMP guests and when MTTCG is
+enabled.</div>
+<div class="line"><br /></div>
+<div class="line">The guest translators should generate this opcode for all guest instructions
+which have ordering side effects.</div>
+<div class="line"><br /></div>
+<div class="line">Please see <a class="reference internal" href="atomics.html#atomics-ref"><span class="std std-ref">Atomic operations in QEMU</span></a> for more information on memory barriers.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="bit-guest-on-32-bit-host-support">
+<h3>64-bit guest on 32-bit host support<a class="headerlink" href="#bit-guest-on-32-bit-host-support" title="Permalink to this headline"></a></h3>
+<p>The following opcodes are internal to TCG.  Thus they are to be implemented by
+32-bit host code generators, but are not to be emitted by guest translators.
+They are emitted as needed by inline functions within <code class="docutils literal notranslate"><span class="pre">tcg-op.h</span></code>.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>brcond2_i32 <em>t0_low</em>, <em>t0_high</em>, <em>t1_low</em>, <em>t1_high</em>, <em>cond</em>, <em>label</em></p></td>
+<td><div class="line-block">
+<div class="line">Similar to brcond, except that the 64-bit values <em>t0</em> and <em>t1</em>
+are formed from two 32-bit arguments.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>setcond2_i32 <em>dest</em>, <em>t1_low</em>, <em>t1_high</em>, <em>t2_low</em>, <em>t2_high</em>, <em>cond</em></p></td>
+<td><div class="line-block">
+<div class="line">Similar to setcond, except that the 64-bit values <em>t1</em> and <em>t2</em> are
+formed from two 32-bit arguments. The result is a 32-bit value.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="qemu-specific-operations">
+<h3>QEMU specific operations<a class="headerlink" href="#qemu-specific-operations" title="Permalink to this headline"></a></h3>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>exit_tb <em>t0</em></p></td>
+<td><div class="line-block">
+<div class="line">Exit the current TB and return the value <em>t0</em> (word type).</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>goto_tb <em>index</em></p></td>
+<td><div class="line-block">
+<div class="line">Exit the current TB and jump to the TB index <em>index</em> (constant) if the
+current TB was linked to this TB. Otherwise execute the next
+instructions. Only indices 0 and 1 are valid and tcg_gen_goto_tb may be issued
+at most once with each slot index per TB.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>lookup_and_goto_ptr <em>tb_addr</em></p></td>
+<td><div class="line-block">
+<div class="line">Look up a TB address <em>tb_addr</em> and jump to it if valid. If not valid,
+jump to the TCG epilogue to go back to the exec loop.</div>
+<div class="line"><br /></div>
+<div class="line">This operation is optional. If the TCG backend does not implement the
+goto_ptr opcode, emitting this op is equivalent to emitting exit_tb(0).</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>qemu_ld_i32/i64/i128 <em>t0</em>, <em>t1</em>, <em>flags</em>, <em>memidx</em></p>
+<p>qemu_st_i32/i64/i128 <em>t0</em>, <em>t1</em>, <em>flags</em>, <em>memidx</em></p>
+</td>
+<td><div class="line-block">
+<div class="line">Load data at the guest address <em>t1</em> into <em>t0</em>, or store data in <em>t0</em> at guest
+address <em>t1</em>.  The _i32/_i64/_i128 size applies to the size of the input/output
+register <em>t0</em> only.  The address <em>t1</em> is always sized according to the guest,
+and the width of the memory operation is controlled by <em>flags</em>.</div>
+<div class="line"><br /></div>
+<div class="line">Both <em>t0</em> and <em>t1</em> may be split into little-endian ordered pairs of registers
+if dealing with 64-bit quantities on a 32-bit host, or 128-bit quantities on
+a 64-bit host.</div>
+<div class="line"><br /></div>
+<div class="line">The <em>memidx</em> selects the qemu tlb index to use (e.g. user or kernel access).
+The flags are the MemOp bits, selecting the sign, width, and endianness
+of the memory access.</div>
+<div class="line"><br /></div>
+<div class="line">For a 32-bit host, qemu_ld/st_i64 is guaranteed to only be used with a
+64-bit memory access specified in <em>flags</em>.</div>
+<div class="line"><br /></div>
+<div class="line">For qemu_ld/st_i128, these are only supported for a 64-bit host.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="host-vector-operations">
+<h3>Host vector operations<a class="headerlink" href="#host-vector-operations" title="Permalink to this headline"></a></h3>
+<p>All of the vector ops have two parameters, <code class="docutils literal notranslate"><span class="pre">TCGOP_TYPE</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">TCGOP_VECE</span></code>.
+The former specifies the length of the vector as a TCGType; the latter
+specifies the length of the element (if applicable) in log2 8-bit units.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>mov_vec <em>v0</em>, <em>v1</em></p>
+<p>ld_vec <em>v0</em>, <em>t1</em></p>
+<p>st_vec <em>v0</em>, <em>t1</em></p>
+</td>
+<td><div class="line-block">
+<div class="line">Move, load and store.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>dup_vec <em>v0</em>, <em>r1</em></p></td>
+<td><div class="line-block">
+<div class="line">Duplicate the low N bits of <em>r1</em> into TYPE/VECE copies across <em>v0</em>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>dupi_vec <em>v0</em>, <em>c</em></p></td>
+<td><div class="line-block">
+<div class="line">Similarly, for a constant.</div>
+<div class="line">Smaller values will be replicated to host register size by the expanders.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>dup2_vec <em>v0</em>, <em>r1</em>, <em>r2</em></p></td>
+<td><div class="line-block">
+<div class="line">Duplicate <em>r2</em>:<em>r1</em> into TYPE/64 copies across <em>v0</em>. This opcode is
+only present for 32-bit hosts.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>add_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p></td>
+<td><div class="line-block">
+<div class="line"><em>v0</em> = <em>v1</em> + <em>v2</em>, in elements across the vector.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>sub_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p></td>
+<td><div class="line-block">
+<div class="line">Similarly, <em>v0</em> = <em>v1</em> - <em>v2</em>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>mul_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p></td>
+<td><div class="line-block">
+<div class="line">Similarly, <em>v0</em> = <em>v1</em> * <em>v2</em>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>neg_vec <em>v0</em>, <em>v1</em></p></td>
+<td><div class="line-block">
+<div class="line">Similarly, <em>v0</em> = -<em>v1</em>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>abs_vec <em>v0</em>, <em>v1</em></p></td>
+<td><div class="line-block">
+<div class="line">Similarly, <em>v0</em> = <em>v1</em> &lt; 0 ? -<em>v1</em> : <em>v1</em>, in elements across the vector.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>smin_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+<p>umin_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+</td>
+<td><div class="line-block">
+<div class="line">Similarly, <em>v0</em> = MIN(<em>v1</em>, <em>v2</em>), for signed and unsigned element types.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>smax_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+<p>umax_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+</td>
+<td><div class="line-block">
+<div class="line">Similarly, <em>v0</em> = MAX(<em>v1</em>, <em>v2</em>), for signed and unsigned element types.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>ssadd_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+<p>sssub_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+<p>usadd_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+<p>ussub_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+</td>
+<td><div class="line-block">
+<div class="line">Signed and unsigned saturating addition and subtraction.</div>
+<div class="line"><br /></div>
+<div class="line">If the true result is not representable within the element type, the
+element is set to the minimum or maximum value for the type.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>and_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+<p>or_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+<p>xor_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+<p>andc_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+<p>orc_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+<p>not_vec <em>v0</em>, <em>v1</em></p>
+</td>
+<td><div class="line-block">
+<div class="line">Similarly, logical operations with and without complement.</div>
+<div class="line"><br /></div>
+<div class="line">Note that VECE is unused.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>shli_vec <em>v0</em>, <em>v1</em>, <em>i2</em></p>
+<p>shls_vec <em>v0</em>, <em>v1</em>, <em>s2</em></p>
+</td>
+<td><div class="line-block">
+<div class="line">Shift all elements from v1 by a scalar <em>i2</em>/<em>s2</em>. I.e.</div>
+</div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">TYPE</span><span class="o">/</span><span class="n">VECE</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">v0</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">s2</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>shri_vec <em>v0</em>, <em>v1</em>, <em>i2</em></p>
+<p>sari_vec <em>v0</em>, <em>v1</em>, <em>i2</em></p>
+<p>rotli_vec <em>v0</em>, <em>v1</em>, <em>i2</em></p>
+<p>shrs_vec <em>v0</em>, <em>v1</em>, <em>s2</em></p>
+<p>sars_vec <em>v0</em>, <em>v1</em>, <em>s2</em></p>
+</td>
+<td><div class="line-block">
+<div class="line">Similarly for logical and arithmetic right shift, and left rotate.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>shlv_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p></td>
+<td><div class="line-block">
+<div class="line">Shift elements from <em>v1</em> by elements from <em>v2</em>. I.e.</div>
+</div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">TYPE</span><span class="o">/</span><span class="n">VECE</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">v0</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">v2</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>shrv_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+<p>sarv_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+<p>rotlv_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+<p>rotrv_vec <em>v0</em>, <em>v1</em>, <em>v2</em></p>
+</td>
+<td><div class="line-block">
+<div class="line">Similarly for logical and arithmetic right shift, and rotates.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>cmp_vec <em>v0</em>, <em>v1</em>, <em>v2</em>, <em>cond</em></p></td>
+<td><div class="line-block">
+<div class="line">Compare vectors by element, storing -1 for true and 0 for false.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>bitsel_vec <em>v0</em>, <em>v1</em>, <em>v2</em>, <em>v3</em></p></td>
+<td><div class="line-block">
+<div class="line">Bitwise select, <em>v0</em> = (<em>v2</em> &amp; <em>v1</em>) | (<em>v3</em> &amp; ~<em>v1</em>), across the entire vector.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>cmpsel_vec <em>v0</em>, <em>c1</em>, <em>c2</em>, <em>v3</em>, <em>v4</em>, <em>cond</em></p></td>
+<td><div class="line-block">
+<div class="line">Select elements based on comparison results:</div>
+</div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">v0</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">c1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="n">cond</span><span class="w"> </span><span class="n">c2</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">v3</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">v4</span><span class="p">[</span><span class="n">i</span><span class="p">].</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note 1</strong>: Some shortcuts are defined when the last operand is known to be
+a constant (e.g. addi for add, movi for mov).</p>
+<p><strong>Note 2</strong>: When using TCG, the opcodes must never be generated directly
+as some of them may not be available as “real” opcodes. Always use the
+function tcg_gen_xxx(args).</p>
+</section>
+</section>
+<section id="backend">
+<h2>Backend<a class="headerlink" href="#backend" title="Permalink to this headline"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">tcg-target.h</span></code> contains the target specific definitions. <code class="docutils literal notranslate"><span class="pre">tcg-target.c.inc</span></code>
+contains the target specific code; it is #included by <code class="docutils literal notranslate"><span class="pre">tcg/tcg.c</span></code>, rather
+than being a standalone C file.</p>
+<section id="assumptions">
+<h3>Assumptions<a class="headerlink" href="#assumptions" title="Permalink to this headline"></a></h3>
+<p>The target word size (<code class="docutils literal notranslate"><span class="pre">TCG_TARGET_REG_BITS</span></code>) is expected to be 32 bit or
+64 bit. It is expected that the pointer has the same size as the word.</p>
+<p>On a 32 bit target, all 64 bit operations are converted to 32 bits.
+A few specific operations must be implemented to allow it
+(see brcond2_i32, setcond2_i32).</p>
+<p>On a 64 bit target, the values are transferred between 32 and 64-bit
+registers using the following ops:</p>
+<ul class="simple">
+<li><p>extrl_i64_i32</p></li>
+<li><p>extrh_i64_i32</p></li>
+<li><p>ext_i32_i64</p></li>
+<li><p>extu_i32_i64</p></li>
+</ul>
+<p>They ensure that the values are correctly truncated or extended when
+moved from a 32-bit to a 64-bit register or vice-versa. Note that the
+extrl_i64_i32 and extrh_i64_i32 are optional ops. It is not necessary
+to implement them if all the following conditions are met:</p>
+<ul class="simple">
+<li><p>64-bit registers can hold 32-bit values</p></li>
+<li><p>32-bit values in a 64-bit register do not need to stay zero or
+sign extended</p></li>
+<li><p>all 32-bit TCG ops ignore the high part of 64-bit registers</p></li>
+</ul>
+<p>Floating point operations are not supported in this version. A
+previous incarnation of the code generator had full support of them,
+but it is better to concentrate on integer operations first.</p>
+</section>
+<section id="constraints">
+<h3>Constraints<a class="headerlink" href="#constraints" title="Permalink to this headline"></a></h3>
+<p>GCC like constraints are used to define the constraints of every
+instruction. Memory constraints are not supported in this
+version. Aliases are specified in the input operands as for GCC.</p>
+<p>The same register may be used for both an input and an output, even when
+they are not explicitly aliased.  If an op expands to multiple target
+instructions then care must be taken to avoid clobbering input values.
+GCC style “early clobber” outputs are supported, with ‘<code class="docutils literal notranslate"><span class="pre">&amp;</span></code>’.</p>
+<p>A target can define specific register or constant constraints. If an
+operation uses a constant input constraint which does not allow all
+constants, it must also accept registers in order to have a fallback.
+The constraint ‘<code class="docutils literal notranslate"><span class="pre">i</span></code>’ is defined generically to accept any constant.
+The constraint ‘<code class="docutils literal notranslate"><span class="pre">r</span></code>’ is not defined generically, but is consistently
+used by each backend to indicate all registers.  If <code class="docutils literal notranslate"><span class="pre">TCG_REG_ZERO</span></code>
+is defined by the backend, the constraint ‘<code class="docutils literal notranslate"><span class="pre">z</span></code>’ is defined generically
+to map constant 0 to the hardware zero register.</p>
+<p>The movi_i32 and movi_i64 operations must accept any constants.</p>
+<p>The mov_i32 and mov_i64 operations must accept any registers of the
+same type.</p>
+<p>The ld/st/sti instructions must accept signed 32 bit constant offsets.
+This can be implemented by reserving a specific register in which to
+compute the address if the offset is too big.</p>
+<p>The ld/st instructions must accept any destination (ld) or source (st)
+register.</p>
+<p>The sti instruction may fail if it cannot store the given constant.</p>
+</section>
+<section id="function-call-assumptions">
+<h3>Function call assumptions<a class="headerlink" href="#function-call-assumptions" title="Permalink to this headline"></a></h3>
+<ul class="simple">
+<li><p>The only supported types for parameters and return value are: 32 and
+64 bit integers and pointer.</p></li>
+<li><p>The stack grows downwards.</p></li>
+<li><p>The first N parameters are passed in registers.</p></li>
+<li><p>The next parameters are passed on the stack by storing them as words.</p></li>
+<li><p>Some registers are clobbered during the call.</p></li>
+<li><p>The function can return 0 or 1 value in registers. On a 32 bit
+target, functions must be able to return 2 values in registers for
+64 bit return type.</p></li>
+</ul>
+</section>
+</section>
+<section id="recommended-coding-rules-for-best-performance">
+<h2>Recommended coding rules for best performance<a class="headerlink" href="#recommended-coding-rules-for-best-performance" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Use globals to represent the parts of the QEMU CPU state which are
+often modified, e.g. the integer registers and the condition
+codes. TCG will be able to use host registers to store them.</p></li>
+<li><p>Don’t hesitate to use helpers for complicated or seldom used guest
+instructions. There is little performance advantage in using TCG to
+implement guest instructions taking more than about twenty TCG
+instructions. Note that this rule of thumb is more applicable to
+helpers doing complex logic or arithmetic, where the C compiler has
+scope to do a good job of optimisation; it is less relevant where
+the instruction is mostly doing loads and stores, and in those cases
+inline TCG may still be faster for longer sequences.</p></li>
+<li><p>Use the ‘discard’ instruction if you know that TCG won’t be able to
+prove that a given global is “dead” at a given program point. The
+x86 guest uses it to improve the condition codes optimisation.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tcg.html" class="btn btn-neutral float-left" title="Translator Internals" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="decodetree.html" class="btn btn-neutral float-right" title="Decodetree Specification" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

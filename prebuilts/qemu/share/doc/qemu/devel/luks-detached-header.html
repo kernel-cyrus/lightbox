@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LUKS volume with detached header &mdash; QEMU  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/qemu_32x32.png"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Using Multiple IOThreads" href="multiple-iothreads.html" />
+    <link rel="prev" title="Cryptography in QEMU" href="crypto.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #802400" >
+            <a href="../index.html" class="icon icon-home"> QEMU
+            <img src="../_static/qemu_128x128.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                10.0.50
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About QEMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Mode Emulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interop/index.html">System Emulation Management and Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Information</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index-process.html">QEMU Community Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-build.html">QEMU Build System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing/index.html">Testing QEMU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index-api.html">Internal QEMU APIs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index-internals.html">Internal Subsystem Information</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qom.html">The QEMU Object Model (QOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="atomics.html">Atomic operations in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rcu.html">Using RCU (Read-Copy-Update) for synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="block-coroutine-wrapper.html">block-coroutine-wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clocks.html">Modelling a clock tree in QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ebpf_rss.html">eBPF RSS virtio-net support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="migration/index.html">Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multi-process.html">Multi-process QEMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reset.html">Reset in QEMU: the Resettable interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="s390-cpu-topology.html">QAPI interface for S390 CPU topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="s390-dasd-ipl.html">Booting from real channel-attached devices on s390x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracing.html">Tracing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="uefi-vars.html">UEFI variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vfio-iommufd.html">IOMMUFD BACKEND usage with VFIO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="writing-monitor-commands.html">How to write monitor commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="virtio-backends.html">Writing VirtIO backends for QEMU</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="crypto.html">Cryptography in QEMU</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">LUKS volume with detached header</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="multiple-iothreads.html">Using Multiple <code class="docutils literal notranslate"><span class="pre">IOThread</span></code>s</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index-tcg.html">TCG Emulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="codebase.html">Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #802400" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QEMU</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Developer Information</a> &raquo;</li>
+          <li><a href="index-internals.html">Internal Subsystem Information</a> &raquo;</li>
+          <li><a href="crypto.html">Cryptography in QEMU</a> &raquo;</li>
+      <li>LUKS volume with detached header</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/luks-detached-header.rst">View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="luks-volume-with-detached-header">
+<h1>LUKS volume with detached header<a class="headerlink" href="#luks-volume-with-detached-header" title="Permalink to this headline"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<p>This document gives an overview of the design of LUKS volume with detached
+header and how to use it.</p>
+</section>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Permalink to this headline"></a></h2>
+<p>The LUKS format has ability to store the header in a separate volume from
+the payload. We could extend the LUKS driver in QEMU to support this use
+case.</p>
+<p>Normally a LUKS volume has a layout:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>        <span class="o">+-----------------------------------------------+</span>
+        <span class="o">|</span>         <span class="o">|</span>                <span class="o">|</span>                    <span class="o">|</span>
+<span class="n">disk</span>    <span class="o">|</span> <span class="n">header</span>  <span class="o">|</span>  <span class="n">key</span> <span class="n">material</span>  <span class="o">|</span>  <span class="n">disk</span> <span class="n">payload</span> <span class="n">data</span> <span class="o">|</span>
+        <span class="o">|</span>         <span class="o">|</span>                <span class="o">|</span>                    <span class="o">|</span>
+        <span class="o">+-----------------------------------------------+</span>
+</pre></div>
+</div>
+<p>With a detached LUKS header, you need 2 disks so getting:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>        <span class="o">+--------------------------+</span>
+<span class="n">disk1</span>   <span class="o">|</span>   <span class="n">header</span>  <span class="o">|</span> <span class="n">key</span> <span class="n">material</span> <span class="o">|</span>
+        <span class="o">+--------------------------+</span>
+        <span class="o">+---------------------+</span>
+<span class="n">disk2</span>   <span class="o">|</span>  <span class="n">disk</span> <span class="n">payload</span> <span class="n">data</span>  <span class="o">|</span>
+        <span class="o">+---------------------+</span>
+</pre></div>
+</div>
+<p>There are a variety of benefits to doing this:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Secrecy - the disk2 cannot be identified as containing LUKS</dt><dd><p>volume since there’s no header</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Control - if access to the disk1 is restricted, then even</dt><dd><p>if someone has access to disk2 they can’t unlock
+it. Might be useful if you have disks on NFS but
+want to restrict which host can launch a VM
+instance from it, by dynamically providing access
+to the header to a designated host</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Flexibility - your application data volume may be a given</dt><dd><p>size and it is inconvenient to resize it to
+add encryption.You can store the LUKS header
+separately and use the existing storage
+volume for payload</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Recovery - corruption of a bit in the header may make the</dt><dd><p>entire payload inaccessible. It might be
+convenient to take backups of the header. If
+your primary disk header becomes corrupt, you
+can unlock the data still by pointing to the
+backup detached header</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline"></a></h2>
+<p>Take the qcow2 encryption, for example. The architecture of the
+LUKS volume with detached header is shown in the diagram below.</p>
+<p>There are two children of the root node: a file and a header.
+Data from the disk payload is stored in the file node. The
+LUKS header and key material are located in the header node,
+as previously mentioned.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                     <span class="o">+-----------------------------+</span>
+<span class="n">Root</span> <span class="n">node</span>            <span class="o">|</span>          <span class="n">foo</span><span class="p">[</span><span class="n">luks</span><span class="p">]</span>          <span class="o">|</span>
+                     <span class="o">+-----------------------------+</span>
+                        <span class="o">|</span>                       <span class="o">|</span>
+                   <span class="n">file</span> <span class="o">|</span>                <span class="n">header</span> <span class="o">|</span>
+                        <span class="o">|</span>                       <span class="o">|</span>
+             <span class="o">+---------------------+</span>    <span class="o">+------------------+</span>
+<span class="n">Child</span> <span class="n">node</span>   <span class="o">|</span><span class="n">payload</span><span class="o">-</span><span class="nb">format</span><span class="p">[</span><span class="n">qcow2</span><span class="p">]</span><span class="o">|</span>    <span class="o">|</span><span class="n">header</span><span class="o">-</span><span class="nb">format</span><span class="p">[</span><span class="n">raw</span><span class="p">]</span><span class="o">|</span>
+             <span class="o">+---------------------+</span>    <span class="o">+------------------+</span>
+                        <span class="o">|</span>                       <span class="o">|</span>
+                   <span class="n">file</span> <span class="o">|</span>                 <span class="n">file</span>  <span class="o">|</span>
+                        <span class="o">|</span>                       <span class="o">|</span>
+             <span class="o">+----------------------+</span>  <span class="o">+---------------------+</span>
+<span class="n">Child</span> <span class="n">node</span>   <span class="o">|</span><span class="n">payload</span><span class="o">-</span><span class="n">protocol</span><span class="p">[</span><span class="n">file</span><span class="p">]</span><span class="o">|</span>  <span class="o">|</span><span class="n">header</span><span class="o">-</span><span class="n">protocol</span><span class="p">[</span><span class="n">file</span><span class="p">]</span><span class="o">|</span>
+             <span class="o">+----------------------+</span>  <span class="o">+---------------------+</span>
+                        <span class="o">|</span>                       <span class="o">|</span>
+                        <span class="o">|</span>                       <span class="o">|</span>
+                        <span class="o">|</span>                       <span class="o">|</span>
+                   <span class="n">Host</span> <span class="n">storage</span>            <span class="n">Host</span> <span class="n">storage</span>
+</pre></div>
+</div>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
+<section id="create-a-luks-disk-with-a-detached-header-using-qemu-img">
+<h3>Create a LUKS disk with a detached header using qemu-img<a class="headerlink" href="#create-a-luks-disk-with-a-detached-header-using-qemu-img" title="Permalink to this headline"></a></h3>
+<p>Shell commandline:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># qemu-img create --object secret,id=sec0,data=abc123 -f luks \</span>
+  <span class="o">-</span><span class="n">o</span> <span class="n">cipher</span><span class="o">-</span><span class="n">alg</span><span class="o">=</span><span class="n">aes</span><span class="o">-</span><span class="mi">256</span><span class="p">,</span><span class="n">cipher</span><span class="o">-</span><span class="n">mode</span><span class="o">=</span><span class="n">xts</span> <span class="o">-</span><span class="n">o</span> <span class="n">key</span><span class="o">-</span><span class="n">secret</span><span class="o">=</span><span class="n">sec0</span> \
+  <span class="o">-</span><span class="n">o</span> <span class="n">detached</span><span class="o">-</span><span class="n">header</span><span class="o">=</span><span class="n">true</span> <span class="n">test</span><span class="o">-</span><span class="n">header</span><span class="o">.</span><span class="n">img</span>
+<span class="c1"># qemu-img create -f qcow2 test-payload.qcow2 200G</span>
+<span class="c1"># qemu-img info &#39;json:{&quot;driver&quot;:&quot;luks&quot;,&quot;file&quot;:{&quot;filename&quot;: \</span>
+  <span class="s2">&quot;test-payload.img&quot;</span><span class="p">},</span><span class="s2">&quot;header&quot;</span><span class="p">:{</span><span class="s2">&quot;filename&quot;</span><span class="p">:</span><span class="s2">&quot;test-header.img&quot;</span><span class="p">}}</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="set-up-a-vm-s-luks-volume-with-a-detached-header">
+<h3>Set up a VM’s LUKS volume with a detached header<a class="headerlink" href="#set-up-a-vm-s-luks-volume-with-a-detached-header" title="Permalink to this headline"></a></h3>
+<p>Qemu commandline:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># qemu-system-x86_64 ... \</span>
+  <span class="o">-</span><span class="nb">object</span> <span class="s1">&#39;{&quot;qom-type&quot;:&quot;secret&quot;,&quot;id&quot;:&quot;libvirt-3-format-secret&quot;, </span><span class="se">\</span>
+<span class="s1">  &quot;data&quot;:&quot;abc123&quot;}&#39;</span> \
+  <span class="o">-</span><span class="n">blockdev</span> <span class="s1">&#39;{&quot;driver&quot;:&quot;file&quot;,&quot;filename&quot;:&quot;/path/to/test-header.img&quot;, </span><span class="se">\</span>
+<span class="s1">  &quot;node-name&quot;:&quot;libvirt-1-storage&quot;}&#39;</span> \
+  <span class="o">-</span><span class="n">blockdev</span> <span class="s1">&#39;{&quot;node-name&quot;:&quot;libvirt-1-format&quot;,&quot;read-only&quot;:false, </span><span class="se">\</span>
+<span class="s1">  &quot;driver&quot;:&quot;raw&quot;,&quot;file&quot;:&quot;libvirt-1-storage&quot;}&#39;</span> \
+  <span class="o">-</span><span class="n">blockdev</span> <span class="s1">&#39;{&quot;driver&quot;:&quot;file&quot;,&quot;filename&quot;:&quot;/path/to/test-payload.qcow2&quot;, </span><span class="se">\</span>
+<span class="s1">  &quot;node-name&quot;:&quot;libvirt-2-storage&quot;}&#39;</span> \
+  <span class="o">-</span><span class="n">blockdev</span> <span class="s1">&#39;{&quot;node-name&quot;:&quot;libvirt-2-format&quot;,&quot;read-only&quot;:false, </span><span class="se">\</span>
+<span class="s1">  &quot;driver&quot;:&quot;qcow2&quot;,&quot;file&quot;:&quot;libvirt-2-storage&quot;}&#39;</span> \
+  <span class="o">-</span><span class="n">blockdev</span> <span class="s1">&#39;{&quot;node-name&quot;:&quot;libvirt-3-format&quot;,&quot;driver&quot;:&quot;luks&quot;, </span><span class="se">\</span>
+<span class="s1">  &quot;file&quot;:&quot;libvirt-2-format&quot;,&quot;header&quot;:&quot;libvirt-1-format&quot;,&quot;key-secret&quot;: </span><span class="se">\</span>
+<span class="s1">  &quot;libvirt-3-format-secret&quot;}&#39;</span> \
+  <span class="o">-</span><span class="n">device</span> <span class="s1">&#39;{&quot;driver&quot;:&quot;virtio-blk-pci&quot;,&quot;bus&quot;:XXX,&quot;addr&quot;:YYY,&quot;drive&quot;: </span><span class="se">\</span>
+<span class="s1">  &quot;libvirt-3-format&quot;,&quot;id&quot;:&quot;virtio-disk1&quot;}&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="add-luks-volume-to-a-vm-with-a-detached-header">
+<h3>Add LUKS volume to a VM with a detached header<a class="headerlink" href="#add-luks-volume-to-a-vm-with-a-detached-header" title="Permalink to this headline"></a></h3>
+<ol class="arabic">
+<li><p>object-add the secret for decrypting the cipher stored in
+LUKS header above:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># virsh qemu-monitor-command vm &#39;{&quot;execute&quot;:&quot;object-add&quot;, \</span>
+  <span class="s2">&quot;arguments&quot;</span><span class="p">:{</span><span class="s2">&quot;qom-type&quot;</span><span class="p">:</span><span class="s2">&quot;secret&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> \
+  <span class="s2">&quot;libvirt-4-format-secret&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span><span class="s2">&quot;abc123&quot;</span><span class="p">}}</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>block-add the protocol node for LUKS header:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># virsh qemu-monitor-command vm &#39;{&quot;execute&quot;:&quot;blockdev-add&quot;, \</span>
+  <span class="s2">&quot;arguments&quot;</span><span class="p">:{</span><span class="s2">&quot;node-name&quot;</span><span class="p">:</span><span class="s2">&quot;libvirt-1-storage&quot;</span><span class="p">,</span> <span class="s2">&quot;driver&quot;</span><span class="p">:</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> \
+  <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/test-header.img&quot;</span> <span class="p">}}</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>block-add the raw-drived node for LUKS header:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># virsh qemu-monitor-command vm &#39;{&quot;execute&quot;:&quot;blockdev-add&quot;, \</span>
+  <span class="s2">&quot;arguments&quot;</span><span class="p">:{</span><span class="s2">&quot;node-name&quot;</span><span class="p">:</span><span class="s2">&quot;libvirt-1-format&quot;</span><span class="p">,</span> <span class="s2">&quot;driver&quot;</span><span class="p">:</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span> \
+  <span class="s2">&quot;file&quot;</span><span class="p">:</span><span class="s2">&quot;libvirt-1-storage&quot;</span><span class="p">}}</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>block-add the protocol node for disk payload image:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># virsh qemu-monitor-command vm &#39;{&quot;execute&quot;:&quot;blockdev-add&quot;, \</span>
+  <span class="s2">&quot;arguments&quot;</span><span class="p">:{</span><span class="s2">&quot;node-name&quot;</span><span class="p">:</span><span class="s2">&quot;libvirt-2-storage&quot;</span><span class="p">,</span> <span class="s2">&quot;driver&quot;</span><span class="p">:</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> \
+  <span class="s2">&quot;filename&quot;</span><span class="p">:</span><span class="s2">&quot;/path/to/test-payload.qcow2&quot;</span><span class="p">}}</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>block-add the qcow2-drived format node for disk payload data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># virsh qemu-monitor-command vm &#39;{&quot;execute&quot;:&quot;blockdev-add&quot;, \</span>
+  <span class="s2">&quot;arguments&quot;</span><span class="p">:{</span><span class="s2">&quot;node-name&quot;</span><span class="p">:</span><span class="s2">&quot;libvirt-2-format&quot;</span><span class="p">,</span> <span class="s2">&quot;driver&quot;</span><span class="p">:</span><span class="s2">&quot;qcow2&quot;</span><span class="p">,</span> \
+  <span class="s2">&quot;file&quot;</span><span class="p">:</span><span class="s2">&quot;libvirt-2-storage&quot;</span><span class="p">}}</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>block-add the luks-drived format node to link the qcow2 disk
+with the LUKS header by specifying the field “header”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># virsh qemu-monitor-command vm &#39;{&quot;execute&quot;:&quot;blockdev-add&quot;, \</span>
+  <span class="s2">&quot;arguments&quot;</span><span class="p">:{</span><span class="s2">&quot;node-name&quot;</span><span class="p">:</span><span class="s2">&quot;libvirt-3-format&quot;</span><span class="p">,</span> <span class="s2">&quot;driver&quot;</span><span class="p">:</span><span class="s2">&quot;luks&quot;</span><span class="p">,</span> \
+  <span class="s2">&quot;file&quot;</span><span class="p">:</span><span class="s2">&quot;libvirt-2-format&quot;</span><span class="p">,</span> <span class="s2">&quot;header&quot;</span><span class="p">:</span><span class="s2">&quot;libvirt-1-format&quot;</span><span class="p">,</span> \
+  <span class="s2">&quot;key-secret&quot;</span><span class="p">:</span><span class="s2">&quot;libvirt-2-format-secret&quot;</span><span class="p">}}</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>hot-plug the virtio-blk device finally:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># virsh qemu-monitor-command vm &#39;{&quot;execute&quot;:&quot;device_add&quot;, \</span>
+  <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;driver&quot;</span><span class="p">:</span><span class="s2">&quot;virtio-blk-pci&quot;</span><span class="p">,</span> \
+  <span class="s2">&quot;drive&quot;</span><span class="p">:</span> <span class="s2">&quot;libvirt-3-format&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;virtio-disk2&quot;</span><span class="p">}}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="todo">
+<h2>TODO<a class="headerlink" href="#todo" title="Permalink to this headline"></a></h2>
+<ol class="arabic simple">
+<li><p>Support the shared detached LUKS header within the VM.</p></li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="crypto.html" class="btn btn-neutral float-left" title="Cryptography in QEMU" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="multiple-iothreads.html" class="btn btn-neutral float-right" title="Using Multiple IOThreads" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, The QEMU Project Developers.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<!-- Empty para to force a blank line after "Built with Sphinx ..." -->
+<p></p>
+
+<p>This documentation is for QEMU version 10.0.50.</p>
+
+
+<p><a href="../about/license.html">QEMU and this manual are released under the
+GNU General Public License, version 2.</a></p>
+
+ 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
