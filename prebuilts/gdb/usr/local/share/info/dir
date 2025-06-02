@@ -49,9 +49,13 @@ Software development
 * As: (as).                     The GNU assembler.
 * Bfd: (bfd).                   The Binary File Descriptor library.
 * Binutils: (binutils).         The GNU binary utilities.
+* CTF: (ctf-spec).              The CTF file format.
 * Gas: (as).                    The GNU assembler.
 * Gdb: (gdb).                   The GNU debugger.
 * Ld: (ld).                     The GNU linker.
+* Ld-Internals: (ldint).        The GNU linker internals.
+* SFrame: (sframe-spec).        The Simple Frame format.
 * Stabs: (stabs).               The "stabs" debugging information format.
 * gdbserver: (gdb) Server.      The GNU debugging server.
 * gprof: (gprof).               Profiling your program's execution
+* gprofng: (gprofng).           The next generation profiling tool for Linux

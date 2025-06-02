@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2021 Free Software Foundation, Inc.
+# Copyright (C) 2011-2025 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,13 +15,14 @@
 
 """Configure GDB using the ELinOS environment."""
 
-import os
 import glob
+import os
+
 import gdb
 
 
 def warn(msg):
-    print "warning: %s" % msg
+    print("warning: %s" % msg)
 
 
 def get_elinos_environment():

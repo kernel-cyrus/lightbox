@@ -1,5 +1,5 @@
 # Xmethod commands.
-# Copyright 2013-2021 Free Software Foundation, Inc.
+# Copyright 2013-2025 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gdb
 import re
+
+import gdb
 
 """GDB commands for working with xmethods."""
 
@@ -36,7 +37,7 @@ def parse_xm_command_args(arg):
     Returns:
         A 3-tuple: (<locus matching regular expression>,
                     <matcher matching regular expression>,
-                    <name matching regular experession>)
+                    <name matching regular expression>)
     """
     argv = gdb.string_to_argv(arg)
     argc = len(argv)
