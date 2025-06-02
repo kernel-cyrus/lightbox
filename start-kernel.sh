@@ -125,17 +125,19 @@ fi
 
 QEMU_TITTLE="QEMU@localhost:$DEBUG_PORT"
 
-QEMU_CMD="${QEMU_EXEC}          \
- -machine virt,gic_version=3    \
- -cpu cortex-a72                \
- -m 1024                        \
- -smp 8                         \
- -kernel ${KERNEL_IMAGE}        \
- ${ROOTFS_PARAM}                \
- ${SHARE_PARAM}                 \
- -serial mon:stdio              \
- -display none                  \
- -gdb tcp::${DEBUG_PORT}        \
+QEMU_CMD="${QEMU_EXEC}                 \
+ -machine virt,gic_version=3           \
+ -cpu cortex-a72                       \
+ -m 1024                               \
+ -smp 8                                \
+ -kernel ${KERNEL_IMAGE}               \
+ ${ROOTFS_PARAM}                       \
+ ${SHARE_PARAM}                        \
+ -netdev user,id=net0                  \
+ -device virtio-net-device,netdev=net0 \
+ -serial mon:stdio                     \
+ -display none                         \
+ -gdb tcp::${DEBUG_PORT}               \
  -S -append '${ROOTFS_BOOTARGS} ${CMDLINE} earlycon=pl011,0x9000000 nokaslr'"
 
 if [ $TERMINAL == "gnome" ]; then
