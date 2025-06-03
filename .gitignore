@@ -2,3 +2,6 @@ __pycache__
 *.pyc
 ddd.script
 host-share
+scripts/debian-rootfs/debian-arm64.cpio.gz
+scripts/debian-rootfs/debian-arm64.qcow2
+scripts/debian-rootfs/rootfs

@@ -189,6 +189,12 @@ And then start gdb in another cli session:
 ./start-kernel --kernel=<kernel_dir> --terminal="cli-gdb"
 ```
 
+**Create debian rootfs**
+
+By default, lightbox use a prebuilt busybox initrd image, you can download or create a debian rootfs
+
+see: scripts/debian-rootfs/README.md
+
 Contact
 -----------------------------
 
