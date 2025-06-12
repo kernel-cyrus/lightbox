@@ -193,7 +193,7 @@ And then start gdb in another cli session:
 
 By default, lightbox use a prebuilt busybox initrd image, you can download or create a debian rootfs
 
-see: scripts/debian-rootfs/README.md
+see: [scripts/debian-rootfs/README.md](https://github.com/kernel-cyrus/lightbox/tree/master/scripts/debian-rootfs)
 
 Contact
 -----------------------------
