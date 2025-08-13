@@ -2,6 +2,7 @@
 
 / {
 	interrupt-parent = <0x8009>;
+	dma-coherent;
 	model = "linux,dummy-virt";
 	#size-cells = <0x02>;
 	#address-cells = <0x02>;
@@ -331,6 +332,7 @@
 		its@8080000 {
 			phandle = <0x800a>;
 			reg = <0x00 0x8080000 0x00 0x20000>;
+			#msi-cells = <0x01>;
 			msi-controller;
 			compatible = "arm,gic-v3-its";
 		};
@@ -346,7 +348,48 @@
 		#size-cells = <0x00>;
 		#address-cells = <0x01>;
 
-		CPU0: cpu@0 {
+		cpu-map {
+
+			socket0 {
+
+				cluster0 {
+
+					core0 {
+						cpu = <0x8008>;
+					};
+
+					core1 {
+						cpu = <0x8007>;
+					};
+
+					core2 {
+						cpu = <0x8006>;
+					};
+
+					core3 {
+						cpu = <0x8005>;
+					};
+
+					core4 {
+						cpu = <0x8004>;
+					};
+
+					core5 {
+						cpu = <0x8003>;
+					};
+
+					core6 {
+						cpu = <0x8002>;
+					};
+
+					core7 {
+						cpu = <0x8001>;
+					};
+				};
+			};
+		};
+
+		cpu@0 {
 			phandle = <0x8008>;
 			reg = <0x00>;
 			enable-method = "psci";
@@ -354,7 +397,7 @@
 			device_type = "cpu";
 		};
 
-		CPU1: cpu@1 {
+		cpu@1 {
 			phandle = <0x8007>;
 			reg = <0x01>;
 			enable-method = "psci";
@@ -362,7 +405,7 @@
 			device_type = "cpu";
 		};
 
-		CPU2: cpu@2 {
+		cpu@2 {
 			phandle = <0x8006>;
 			reg = <0x02>;
 			enable-method = "psci";
@@ -370,7 +413,7 @@
 			device_type = "cpu";
 		};
 
-		CPU3: cpu@3 {
+		cpu@3 {
 			phandle = <0x8005>;
 			reg = <0x03>;
 			enable-method = "psci";
@@ -378,7 +421,7 @@
 			device_type = "cpu";
 		};
 
-		CPU4: cpu@4 {
+		cpu@4 {
 			phandle = <0x8004>;
 			reg = <0x04>;
 			enable-method = "psci";
@@ -386,7 +429,7 @@
 			device_type = "cpu";
 		};
 
-		CPU5: cpu@5 {
+		cpu@5 {
 			phandle = <0x8003>;
 			reg = <0x05>;
 			enable-method = "psci";
@@ -394,7 +437,7 @@
 			device_type = "cpu";
 		};
 
-		CPU6: cpu@6 {
+		cpu@6 {
 			phandle = <0x8002>;
 			reg = <0x06>;
 			enable-method = "psci";
@@ -402,56 +445,17 @@
 			device_type = "cpu";
 		};
 
-		CPU7: cpu@7 {
+		cpu@7 {
 			phandle = <0x8001>;
 			reg = <0x07>;
 			enable-method = "psci";
 			compatible = "arm,cortex-a72";
 			device_type = "cpu";
 		};
-
-		cpu-map {
-			cluster0 {
-				core0 {
-					cpu = <&CPU0>;
-				};
-
-				core1 {
-					cpu = <&CPU1>;
-				};
-
-				core2 {
-					cpu = <&CPU2>;
-				};
-
-				core3 {
-					cpu = <&CPU3>;
-				};
-			};
-			cluster1 {
-				core0 {
-					cpu = <&CPU4>;
-				};
-
-				core1 {
-					cpu = <&CPU5>;
-				};
-
-			};
-			cluster2 {
-				core0 {
-					cpu = <&CPU6>;
-				};
-
-				core1 {
-					cpu = <&CPU7>;
-				};
-			};
-		};
 	};
 
 	timer {
-		interrupts = <0x01 0x0d 0xff04 0x01 0x0e 0xff04 0x01 0x0b 0xff04 0x01 0x0a 0xff04>;
+		interrupts = <0x01 0x0d 0x04 0x01 0x0e 0x04 0x01 0x0b 0x04 0x01 0x0a 0x04>;
 		always-on;
 		compatible = "arm,armv8-timer\0arm,armv7-timer";
 	};
@@ -464,12 +468,16 @@
 		compatible = "fixed-clock";
 	};
 
+	aliases {
+		serial0 = "/pl011@9000000";
+	};
+
 	chosen {
-		linux,initrd-end = <0x00 0x49e898cc>;
+		linux,initrd-end = <0x00 0x48a5979d>;
 		linux,initrd-start = <0x00 0x48000000>;
-		bootargs = " earlycon=pl011,0x9000000 nokaslr";
+		bootargs = "  earlycon=pl011,0x9000000 nokaslr";
 		stdout-path = "/pl011@9000000";
-		rng-seed = <0xbd1ac6fb 0x79714d61 0x6574207a 0xde906408 0xdefe9a7a 0x65ae25e7 0xe39f1834 0xe123a371>;
-		kaslr-seed = <0x7382f515 0xfcfe4034>;
+		rng-seed = <0x865a6565 0xc99df542 0x9af98235 0x1e8dc8d1 0x304ca4a1 0x8549595 0x44474aa9 0x22fd7cc6>;
+		kaslr-seed = <0x57d10a3e 0x1452eea3>;
 	};
 };

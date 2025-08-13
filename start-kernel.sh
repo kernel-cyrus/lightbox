@@ -1,9 +1,9 @@
 KERNEL=""
 INITRD=$(realpath ./prebuilts/rootfs/initrd_aarch64.cpio.gz)
-DTB=$(realpath ./prebuilts/dts/lightbox.dtb)
 CMDLINE=""
 DEBUGGER="gdb"
 SHARE_FOLDER=$(realpath ./host-share)
+QEMU_EXTRA_PARAM=""
 
 if type tmux >/dev/null 2>&1; then
     TERMINAL="tmux"
@@ -27,6 +27,10 @@ for i in "$@"; do
             ROOTFS="${i#*=}"
             shift # past argument=value
             ;;
+        -dtb=*|--dtb=*)
+            DTB="${i#*=}"
+            shift # past argument=value
+            ;;
         -with=*|--with=*)
             DEBUGGER="${i#*=}"
             shift # past argument=value
@@ -41,6 +45,14 @@ for i in "$@"; do
             ;;
         -terminal=*|--terminal=*)
             TERMINAL="${i#*=}"
+            shift # past argument=value
+            ;;
+        -qemu-dir=*|--qemu-dir=*)
+            QEMU_DIR="${i#*=}"
+            shift # past argument=value
+            ;;
+        -qemu-extra=*|--qemu-extra=*)
+            QEMU_EXTRA_PARAM="${i#*=}"
             shift # past argument=value
             ;;
         *)
@@ -84,15 +96,26 @@ elif [ $KERNEL_TYPE == "linux" ]; then
     RELOC_SECTIONS="-s .head.text 0x40200000 -s .text 0x40210000 -s .init.text 0x418b0000"
 fi
 
+if [ -z "$QEMU_DIR" ]; then
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+        QEMU_DIR=/usr/bin
+    else
+        QEMU_DIR=$(realpath ./prebuilts/qemu/bin)
+    fi
+fi
+
+QEMU_EXEC=${QEMU_DIR}/qemu-system-aarch64
+echo "Using QEMU: ${QEMU_EXEC}"
+
 if [[ "$(uname -m)" == "aarch64" ]]; then
     GDB_EXEC=gdb
     GDB_DATA=/usr/share/gdb
-    QEMU_EXEC=qemu-system-aarch64
+    echo "Using system default gdb."
 else
     GDB_DIR=$(cd ./prebuilts/gdb; pwd)
     GDB_EXEC=${GDB_DIR}/usr/local/bin/aarch64-linux-gnu-gdb
     GDB_DATA=${GDB_DIR}/usr/local/share/gdb
-    QEMU_EXEC=$(realpath ./prebuilts/qemu/bin/qemu-system-aarch64)
+    echo "Using prebuilt gdb."
 fi
 
 if [ -n "$ROOTFS" ]; then
@@ -114,7 +137,15 @@ else
     echo "Using initrd image: ${INITRD_PATH}"
 fi
 
-DTB_PATH=$(realpath ${DTB})
+if [ -n "$DTB" ]; then
+    DTB_PATH="$(realpath ${DTB})"
+    DTB_PARAM="-dtb ${DTB_PATH}"
+    echo "Using dtb: ${DTB_PATH}"
+else
+    DTB_PARAM=""
+    echo "Using qemu default dtb."
+fi
+
 SHARE_PARAM="-fsdev local,security_model=mapped,id=fsdev0,path=$(realpath ${SHARE_FOLDER}) -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare"
 
 if [[ $TERMINAL == cli* ]]; then
@@ -131,10 +162,12 @@ QEMU_CMD="${QEMU_EXEC}                 \
  -m 1024                               \
  -smp 8                                \
  -kernel ${KERNEL_IMAGE}               \
+ ${DTB_PRAM}                           \
  ${ROOTFS_PARAM}                       \
  ${SHARE_PARAM}                        \
  -netdev user,id=net0                  \
  -device virtio-net-device,netdev=net0 \
+ ${QEMU_EXTRA_PARAM}                   \
  -serial mon:stdio                     \
  -display none                         \
  -gdb tcp::${DEBUG_PORT}               \
