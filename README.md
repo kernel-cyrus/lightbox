@@ -122,6 +122,7 @@ Start Kernel
 ```
 ./start-kernel.sh
     --kernel=<kernel dir>           # kernel repo dir            (REQUIRED)
+    --dtb=<kernel dtb>              # kernel dtb path            (OPTIONAL)
     --initrd=<initrd image path>    # initrd file (.cpio.gz)     (OPTIONAL)
     --rootfs=<rootfs image path>    # rootfs file (.ext4)        (OPTIONAL)
     --with=<"gdb" or "ddd">         # use gdb or ddd as debugger (OPTIONAL)
@@ -138,6 +139,12 @@ Start Kernel
 ```
 sudo apt install ddd
 ./start-kernel --kernel=<kernel_dir> --with=ddd
+```
+**Customize DTS**
+```
+vim ./prebuilts/dts/lightbox.dts
+dtc -I dts -O dtb lightbox.dts > lightbox.dtb
+./start-kernel --kernel=<kernel_dir> --dtb=./prebuilts/dts/lightbox.dtb
 ```
 **Run with your own initramfs image or ext4 rootfs**
 ```
