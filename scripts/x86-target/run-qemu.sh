@@ -4,6 +4,7 @@ qemu-system-x86_64 \
   -machine accel=tcg \
   -kernel arch/x86_64/boot/bzImage \
   -drive file=debian-12-nocloud-amd64.qcow2,if=virtio,format=qcow2 \
+  -virtfs local,path=host-share,mount_tag=hostshare,security_model=passthrough,id=hostshare \
   -append "root=/dev/vda1 rw console=ttyS0 earlycon=uart,io,0x3f8,115200 nokaslr" \
   -serial mon:stdio \
   -nographic \
