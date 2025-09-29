@@ -146,6 +146,7 @@ else
     echo "Using qemu default dtb."
 fi
 
+# sudo mount -t 9p -o trans=virtio hostshare /mnt
 SHARE_PARAM="-fsdev local,security_model=mapped,id=fsdev0,path=$(realpath ${SHARE_FOLDER}) -device virtio-9p-pci,id=fs0,fsdev=fsdev0,mount_tag=hostshare"
 
 if [[ $TERMINAL == cli* ]]; then
