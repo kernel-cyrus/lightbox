@@ -1,6 +1,7 @@
 __pycache__
 *.pyc
 ddd.script
+qemu.log
 host-share
 scripts/debian-rootfs/debian-arm64.cpio.gz
 scripts/debian-rootfs/debian-arm64.qcow2
