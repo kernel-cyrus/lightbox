@@ -187,7 +187,7 @@ elif [ $TERMINAL == "cli-gdb" ]; then
 elif [ $TERMINAL == "tmux" ]; then
     DIR=$(pwd)
     tmux kill-session -t lightbox
-    tmux new-session -d -s lightbox "bash"\; pipe-pane -o "cat >>./qemu.log"
+    tmux new-session -d -s lightbox "bash"\; pipe-pane -o 'cat > ./qemu.log'
     tmux send-keys -t lightbox "cd $DIR" C-m
     tmux send-keys -t lightbox "source ./start-kernel.sh ${PARAMS/tmux/cli-qemu} --terminal=cli-qemu" C-m
     tmux split-window -h "bash"
