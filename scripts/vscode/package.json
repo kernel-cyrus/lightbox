@@ -1,0 +1,79 @@
+{
+  "name": "lightbox",
+  "displayName": "Lightbox",
+  "description": "Adds Run and Debug buttons to the editor title bar that launch shell scripts in a floating terminal window.",
+  "version": "0.0.1",
+  "publisher": "cyrus",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Lightbox",
+      "properties": {
+        "lightbox.run": {
+          "default": "",
+          "description": "Run button: a command string, or an object {script, cwd, args, floatingWindow}.",
+          "oneOf": [
+            { "type": "string" },
+            {
+              "type": "object",
+              "properties": {
+                "script": { "type": "string", "description": "Shell command or path to a .sh script." },
+                "cwd": { "type": "string", "description": "Working directory. Supports ${workspaceFolder}, ${fileDirname}, ${env:VAR}." },
+                "args": { "type": "array", "items": { "type": "string" }, "description": "Optional arguments appended to the script." },
+                "floatingWindow": { "type": "boolean", "default": true, "description": "If true, move the terminal into a separate window after launching." },
+                "autoClose": { "type": "boolean", "default": true, "description": "If true, dispose the terminal (and close its floating window) when the command finishes." }
+              }
+            }
+          ]
+        },
+        "lightbox.debug": {
+          "default": "",
+          "description": "Debug button: a command string, or an object {script, cwd, args, floatingWindow}.",
+          "oneOf": [
+            { "type": "string" },
+            {
+              "type": "object",
+              "properties": {
+                "script": { "type": "string", "description": "Shell command or path to a .sh script." },
+                "cwd": { "type": "string", "description": "Working directory. Supports ${workspaceFolder}, ${fileDirname}, ${env:VAR}." },
+                "args": { "type": "array", "items": { "type": "string" }, "description": "Optional arguments appended to the script." },
+                "floatingWindow": { "type": "boolean", "default": true, "description": "If true, move the terminal into a separate window after launching." },
+                "autoClose": { "type": "boolean", "default": true, "description": "If true, dispose the terminal (and close its floating window) when the command finishes." }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "commands": [
+      { "command": "lightbox.run", "title": "Lightbox: Run", "icon": "$(play)" },
+      { "command": "lightbox.debug", "title": "Lightbox: Debug", "icon": "$(debug-alt)" }
+    ],
+    "menus": {
+      "editor/title": [
+        { "command": "lightbox.run", "group": "navigation@10", "when": "lightbox.runEnabled" },
+        { "command": "lightbox.debug", "group": "navigation@11", "when": "lightbox.debugEnabled" }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.4.0"
+  }
+}
