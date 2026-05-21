@@ -76,16 +76,43 @@ async function runButton(id: ButtonId): Promise<void> {
     cwd,
   });
   terminal.show();
-  terminal.sendText(commandLine, true);
 
   const floating = cfg.floatingWindow !== false;
-  if (floating) {
-    setTimeout(() => {
-      vscode.commands.executeCommand('workbench.action.terminal.moveIntoNewWindow').then(
-        undefined,
-        () => vscode.commands.executeCommand('workbench.action.terminal.moveToNewWindow'),
-      );
-    }, 150);
+  const moveToNewWindow = () => {
+    vscode.commands.executeCommand('workbench.action.terminal.moveIntoNewWindow').then(
+      undefined,
+      () => vscode.commands.executeCommand('workbench.action.terminal.moveToNewWindow'),
+    );
+  };
+
+  const sendCommand = () => {
+    if (terminal.shellIntegration) {
+      terminal.shellIntegration.executeCommand(commandLine);
+    } else {
+      terminal.sendText(commandLine, true);
+    }
+    if (floating) {
+      setTimeout(moveToNewWindow, 50);
+    }
+  };
+
+  if (terminal.shellIntegration) {
+    sendCommand();
+  } else {
+    let fired = false;
+    const sub = vscode.window.onDidChangeTerminalShellIntegration((e) => {
+      if (e.terminal !== terminal || fired) return;
+      fired = true;
+      sub.dispose();
+      clearTimeout(fallback);
+      sendCommand();
+    });
+    const fallback = setTimeout(() => {
+      if (fired) return;
+      fired = true;
+      sub.dispose();
+      sendCommand();
+    }, 3000);
   }
 
   const autoClose = cfg.autoClose !== false;
